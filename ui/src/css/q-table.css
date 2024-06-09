@@ -1,0 +1,94 @@
+/*スクロール可能にする*/
+.scroll-table .q-table__top,
+.scroll-table .q-table__bottom,
+.scroll-table thead tr:first-child th {
+  /* bg color is important for th; just specify one */
+  background-color: white;
+}
+
+.scroll-table thead tr th {
+  position: sticky;
+  z-index: 1;
+}
+
+.scroll-table thead tr:first-child th {
+  top: 0;
+}
+
+/* this is when the loading indicator appears */
+.scroll-table.q-table--loading thead tr:last-child th {
+  /* height of all previous header rows */
+  top: 48px;
+}
+
+/* prevent scrolling behind sticky top row on focus */
+.scroll-table tbody {
+  /* height of all previous header rows */
+  scroll-margin-top: 48px;
+}
+
+/*テーブルのベース*/
+.table-base {
+  max-width: 800px;
+}
+.table-base-header {
+  width: 800px;
+}
+
+.table-base-main-column {
+  width: 200px;
+}
+
+.table-base-sub-column {
+  width: 100px;
+}
+
+.table-base-filter {
+  width: 70%;
+}
+
+.table-base-filter-input {
+  width: 200px;
+}
+
+.table-base-form-model {
+  width: 200px;
+  height: 40px;
+}
+
+/*テーブルのベース(スマホ用) */
+@media only screen and (max-width: 500px) {
+  .table-base {
+    max-width: 350px;
+  }
+  .table-base-header {
+    max-width: 350px;
+  }
+  .table-base-main-column {
+    width: 50px;
+  }
+
+  .table-base-sub-column {
+    width: 30px;
+  }
+  .table-base-filter {
+    width: 50%;
+  }
+
+  .table-base-filter-input {
+    width: 170px;
+  }
+}
+
+/*テーブルのメインコンテンツ(スマホ) */
+@media screen and (max-width: 600px) {
+  .pc-content {
+    display: none;
+  }
+}
+/*テーブルのメイン集約コンテンツ(PC) */
+@media screen and (min-width: 600px) {
+  .android-content {
+    display: none;
+  }
+}
