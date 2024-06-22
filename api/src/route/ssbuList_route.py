@@ -5,7 +5,7 @@ import json
 import os
 from flask import Blueprint, request, jsonify, send_file
 from file.src.modules import file_const
-from file.src.modules import ssbuList
+from api.src.route.service import ssbulist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = file_const.get_new_line_text()
@@ -18,7 +18,7 @@ app = Blueprint('ssbuList',__name__)
 
 @app.route("/ssbu/search",methods=['GET'])
 def ssbulist_search():
-    records = ssbuList.search()
+    records = ssbulist_service.search()
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -37,6 +37,6 @@ def ssbulist_search():
 @app.route('/ssbu/download',methods=['GET'])
 def ssbulist_download():
     id = int(request.args.get('id',-1))
-    rec = ssbuList.select(id)
+    rec = ssbulist_service.select(id)
     path = os.path.join(DATA_PATH,'スマブラ','切り抜き',rec.year,rec.date,rec.file_name+'.mp4')
     return send_file(path , mimetype='video/mp4')

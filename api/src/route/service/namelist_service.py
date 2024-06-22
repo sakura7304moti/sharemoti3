@@ -28,6 +28,6 @@ def delete(key: str = "", val: str = ""):
 
 def search(key: str = "", val: str = ""):
     """
-    レコードの削除
+    レコードの検索
     """
     return namelist.search(key, val)

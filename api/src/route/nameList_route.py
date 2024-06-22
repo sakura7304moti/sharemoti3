@@ -4,7 +4,7 @@
 import json
 from flask import Blueprint, request, jsonify
 from main.src.modules import main_const
-from main.src.modules import nameList
+from api.src.route.service import namelist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = main_const.get_new_line_text()
@@ -21,7 +21,7 @@ def namelist_search():
     key = json_data.get("key", "")
     val = json_data.get("val", "")
 
-    records = nameList.search(key, val)
+    records = namelist_service.search(key, val)
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -50,7 +50,7 @@ def namelist_insert():
     key = json_data.get("key", "")
     val = json_data.get("val", "")
 
-    result = nameList.insert(key, val)
+    result = namelist_service.insert(key, val)
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換
     json_data = json.dumps(result, ensure_ascii=False)
@@ -66,7 +66,7 @@ def namelist_update():
     key = json_data.get("key", "")
     val = json_data.get("val", "")
 
-    result = nameList.update(bkey, bval, key, val)
+    result = namelist_service.update(bkey, bval, key, val)
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換
     json_data = json.dumps(result, ensure_ascii=False)
@@ -80,7 +80,7 @@ def namelist_delete():
     key = json_data.get("key", "")
     val = json_data.get("val", "")
 
-    res = nameList.delete(key, val)
+    res = namelist_service.delete(key, val)
     result = {"status": res}
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換

@@ -5,7 +5,7 @@ import json
 import os
 from flask import Blueprint, request, jsonify, send_file
 from file.src.modules import file_const
-from file.src.modules import voiceList
+from api.src.route.service import voicelist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = file_const.get_new_line_text()
@@ -18,7 +18,7 @@ app = Blueprint('voiceList',__name__)
 
 @app.route("/voice/search",methods=['GET'])
 def voicelist_search():
-    records = voiceList.search()
+    records = voicelist_service.search()
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -43,6 +43,6 @@ def voicelist_search():
 @app.route('/voice/download',methods=['GET'])
 def voicelist_download():
     id = int(request.args.get('id',-1))
-    rec = voiceList.select(id)
+    rec = voicelist_service.select(id)
     path = os.path.join(DATA_PATH,'ボイス',rec.file_name+'.mp3')
     return send_file(path , mimetype='audio/mpeg')

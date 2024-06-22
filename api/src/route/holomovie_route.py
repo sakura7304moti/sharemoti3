@@ -3,7 +3,7 @@
 """
 import json
 from flask import Blueprint, jsonify
-from scraper.src.modules import holosong
+from api.src.route.service import holosong_service
 from scraper.src.modules import scraper_const
 
 #改行文字を取得
@@ -13,7 +13,7 @@ NEW_LINE_TEXT = scraper_const.get_new_line_text()
 app = Blueprint('holomovie',__name__)
 @app.route("/holoMovie/memory",methods=["GET"])
 def holomovie_memory():
-    records = holosong.get_memory_movies()
+    records = holosong_service.memory_movies()
     # 辞書にまとめる
     result = {
         "records": json.dumps(

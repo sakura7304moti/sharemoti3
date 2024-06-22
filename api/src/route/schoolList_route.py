@@ -4,7 +4,7 @@
 import json
 from flask import Blueprint, request, jsonify
 from main.src.modules import main_const
-from main.src.modules import schoolList
+from api.src.route.service import schoollist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = main_const.get_new_line_text()
@@ -13,14 +13,14 @@ NEW_LINE_TEXT = main_const.get_new_line_text()
 app = Blueprint('schoolList',__name__)
 
 # schoolListの初期設定
-schoolList.init()
+schoollist_service.make_db()
 
 @app.route("/schoolList/search", methods=["POST"])
 def schoolList_search():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     word = json_data.get("word", "")
 
-    records = schoolList.search(word)
+    records = schoollist_service.search(word)
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -48,7 +48,7 @@ def schoolList_save():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     word = json_data.get("word", "")
 
-    result = schoolList.save(word)
+    result = schoollist_service.save(word)
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換
     json_data = json.dumps(result, ensure_ascii=False)
@@ -61,7 +61,7 @@ def schoolList_delete():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     word = json_data.get("word", "")
 
-    res = schoolList.delete(word)
+    res = schoollist_service.delete(word)
     result = {"status": res}
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換

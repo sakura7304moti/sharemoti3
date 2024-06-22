@@ -5,8 +5,8 @@ import json
 import math
 
 from flask import Blueprint, jsonify, request
-from scraper.src.modules import hololewd_sqlite
-from scraper.src.modules import scraper_const
+from api.src.route.service import hololewd_service
+from api.src.route.service.module.utils import const
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('hololewd',__name__)
@@ -20,7 +20,7 @@ def hololewd_search():
     flair_text = json_data.get("flairText", "")
     min_score = json_data.get("minScore", 50)
 
-    records , count = hololewd_sqlite.search(
+    records , count = hololewd_service.search(
         page_no,
         page_size,
         flair_text,
@@ -49,7 +49,7 @@ def hololewd_search():
 
 @app.route("/hololewd/hololist",methods=["GET"])
 def hololewd_hololist():
-    json_data = json.dumps(scraper_const.hololewd_flair_texts(), ensure_ascii=False)
+    json_data = json.dumps(const.Option.hololewd_flair_texts(), ensure_ascii=False)
     response = jsonify(json_data)
     return response
     

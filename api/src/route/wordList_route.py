@@ -1,10 +1,10 @@
 """
-名言集2のルーティング
+名言集のルーティング
 """
 import json
 from flask import Blueprint, request, jsonify
 from main.src.modules import main_const
-from main.src.modules import wordList2
+from api.src.route.service import wordlist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = main_const.get_new_line_text()
@@ -13,14 +13,14 @@ NEW_LINE_TEXT = main_const.get_new_line_text()
 app = Blueprint('wordList2',__name__)
 
 # wordList2の初期設定
-wordList2.init()
+wordlist_service.create_db()
 
 @app.route("/wordList2/search", methods=["POST"])
 def wordlist2_search():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     text = json_data.get("text", "")
 
-    records = wordList2.search(text)
+    records = wordlist_service.search(text)
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -49,7 +49,7 @@ def wordlist2_save():
     word = json_data.get("word", "")
     desc = json_data.get("desc", "")
 
-    result = wordList2.save(word, desc)
+    result = wordlist_service.save(word, desc)
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換
     json_data = json.dumps(result, ensure_ascii=False)
@@ -63,7 +63,7 @@ def wordlist2_delete():
     word = json_data.get("word", "")
     desc = json_data.get("desc", "")
 
-    res = wordList2.delete(word, desc)
+    res = wordlist_service.delete(word, desc)
     result = {"status": res}
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換

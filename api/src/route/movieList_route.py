@@ -5,7 +5,7 @@ import json
 import os
 from flask import Blueprint, request, jsonify, send_file
 from file.src.modules import file_const
-from file.src.modules import movieList
+from api.src.route.service import movielist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = file_const.get_new_line_text()
@@ -18,7 +18,7 @@ app = Blueprint('movieList',__name__)
 
 @app.route("/movieList/search",methods=['GET'])
 def movielist_search():
-    records = movieList.search()
+    records = movielist_service.search()
     # 辞書にまとめる
     result = {
         "records": json.dumps(

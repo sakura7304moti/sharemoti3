@@ -6,7 +6,7 @@ import json
 import os
 from flask import Blueprint, flash, request, jsonify, send_file
 from werkzeug.utils import secure_filename
-from main.src.modules import main_const
+from api.src.route.service import imagelist_service
 from main.src.modules import imageList
 
 
@@ -41,7 +41,7 @@ def imagelist_insert():
     title = json_data.get("title","")
     detail = json_data.get("detail","")
     
-    result = imageList.insert(file_name,ext,title,detail)
+    result = imagelist_service.insert(file_name,ext,title,detail)
     
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)
@@ -94,7 +94,7 @@ def imagelist_download():
 
 @app.route("/imageList/search",methods=['GET'])
 def imagelist_search():
-    records = imageList.search()
+    records = imagelist_service.search()
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -123,7 +123,7 @@ def imagelist_update():
     title = json_data.get("title","")
     detail = json_data.get("detail","")
     
-    result = imageList.update(id,title,detail)
+    result = imagelist_service.update(id,title,detail)
     
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)
@@ -135,7 +135,7 @@ def imagelist_delete():
     json_data = request.json
     id = json_data.get("id",-1)
     
-    result = imageList.delete(id)
+    result = imagelist_service.delete(id)
     
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)

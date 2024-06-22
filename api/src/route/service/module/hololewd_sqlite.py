@@ -69,7 +69,7 @@ def search(
         page_size:int=30,
         flair_text:str='',
         min_score:int=100
-) -> list[interface.HololewdQueryRecord]:
+):
     conn = sqlite3.connect(dbname)
     cursor = conn.cursor()
 

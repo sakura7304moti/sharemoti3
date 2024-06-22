@@ -5,7 +5,7 @@ import json
 import os
 from flask import Blueprint, request, jsonify, send_file
 from file.src.modules import file_const
-from file.src.modules import radioList
+from api.src.route.service import radiolist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = file_const.get_new_line_text()
@@ -18,7 +18,7 @@ app = Blueprint('radioList',__name__)
 
 @app.route("/radio/search",methods=['GET'])
 def radiolist_search():
-    records = radioList.search()
+    records = radiolist_service.search()
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -43,6 +43,6 @@ def radiolist_search():
 @app.route('/radio/download',methods=['GET'])
 def radiolist_download():
     id = int(request.args.get('id',-1))
-    rec = radioList.select(id)
+    rec = radiolist_service.select(id)
     path = os.path.join(DATA_PATH,'オムコレイディオ','mp3',rec.file_name+'.mp3')
     return send_file(path , mimetype='audio/mpeg')

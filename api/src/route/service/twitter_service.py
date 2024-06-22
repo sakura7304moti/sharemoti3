@@ -28,7 +28,7 @@ def search(
     """
     レコード検索
     """
-    return twitter_sqlite.search(
+    records = twitter_sqlite.search(
         page_no,
         page_size,
         hashtag,
@@ -39,3 +39,24 @@ def search(
         min_like,
         max_like
     )
+    return records
+
+def search_count(
+    hashtag:str='',
+    start_date:str='',
+    end_date:str='',
+    user_name:str='',
+    mode:str='',
+    min_like:int=0,
+    max_like:int=0
+) -> int:
+    total_count = twitter_sqlite.search_count(
+        hashtag,
+        start_date,
+        end_date,
+        user_name,
+        mode,
+        min_like,
+        max_like
+    )
+    return total_count

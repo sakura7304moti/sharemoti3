@@ -4,7 +4,7 @@
 import json
 from flask import Blueprint, request, jsonify
 from main.src.modules import main_const
-from main.src.modules import nameList2
+from api.src.route.service import namelist2_service
 
 #改行文字を取得
 NEW_LINE_TEXT = main_const.get_new_line_text()
@@ -13,11 +13,11 @@ NEW_LINE_TEXT = main_const.get_new_line_text()
 app = Blueprint('nameList2',__name__)
 
 # nameListの初期設定
-nameList2.init()
+namelist2_service.create_db()
 
 @app.route("/nameList2/search", methods=["GET"])
 def namelist2_search():
-    records = nameList2.search()
+    records = namelist2_service.search()
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -45,7 +45,7 @@ def namelist2_insert():
     name = json_data.get("name", "")
     ssbu_name = json_data.get("ssbuName", "")
 
-    result = nameList2.insert(name, ssbu_name)
+    result = namelist2_service.insert(name, ssbu_name)
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)
@@ -59,7 +59,7 @@ def namelist2_update():
     name = json_data.get("name", "")
     ssbu_name = json_data.get("ssbuName", "")
 
-    result = nameList2.update(id, name, ssbu_name)
+    result = namelist2_service.update(id, name, ssbu_name)
     # レスポンスとしてJSONデータを返す
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)
@@ -70,7 +70,7 @@ def namelist2_update():
 def namelist2_delete():
     json_data = request.json
     id = int(json_data.get("id",-1))
-    result = nameList2.delete(id)
+    result = namelist2_service.delete(id)
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)
     response = jsonify(json_data)

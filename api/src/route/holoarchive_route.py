@@ -3,8 +3,8 @@
 """
 import json
 from flask import Blueprint, jsonify, request
-from scraper.src.modules import holo_archive
-from scraper.src.modules import scraper_const
+from api.src.route.service import holoarchive_service
+from api.src.route.service.module.utils import const
 
 #改行文字を取得
 NEW_LINE_TEXT = scraper_const.get_new_line_text()
@@ -17,7 +17,7 @@ app = Blueprint('holoarchive',__name__)
 """
 @app.route("/holoArchive/search/channel",methods=["GET"])
 def holomovie_channel():
-    records = holo_archive.search_channel()
+    records = const.Option.youtube_holo_channels()
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -55,15 +55,8 @@ def holomovie_movie():
     movie_type = json_data.get("movieType","")
 
     
-    records = holo_archive.search_movie(
+    records,total_pages = holoarchive_service.search_records(
         page_no,page_size,
-        title,
-        from_date,to_date,
-        channel_id,
-        movie_type
-    )
-    total_pages = holo_archive.search_movie_count(
-        page_size,
         title,
         from_date,to_date,
         channel_id,
@@ -96,7 +89,7 @@ def holomovie_movie():
 """
 @app.route("/holoArchive/channelUrl",methods=["GET"])
 def holochannel():
-    records = scraper_const.channel_list()
+    records = const.Option.youtube_holo_channels()
     # 辞書にまとめる
     result = {
         "records": json.dumps(

@@ -4,7 +4,7 @@
 import json
 from flask import Blueprint, request, jsonify
 from main.src.modules import main_const
-from main.src.modules import haikuList
+from api.src.route.service import haikulist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = main_const.get_new_line_text()
@@ -13,7 +13,7 @@ NEW_LINE_TEXT = main_const.get_new_line_text()
 app = Blueprint('haikuList',__name__)
 
 # haikuListの初期設定
-haikuList.init()
+haikulist_service.create_db()
 
 
 @app.route("/haikuList/search",methods=["POST"])
@@ -24,7 +24,7 @@ def haikuList_search():
     poster = json_data.get("poster","")
     detail = json_data.get("detail","")
 
-    records = haikuList.select(id,haikuText,poster,detail)
+    records = haikulist_service.search(id,haikuText,poster,detail)
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -55,7 +55,7 @@ def haikuList_insert():
     poster = json_data.get("poster","")
     detail = json_data.get("detail","")
 
-    result = haikuList.insert(first,second,third,poster,detail)
+    result = haikulist_service.insert(first,second,third,poster,detail)
     print(result.__dict__)
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)
@@ -72,7 +72,7 @@ def haikuList_update():
     poster = json_data.get("poster","")
     detail = json_data.get("detail","")
 
-    result = haikuList.update(id,first,second,third,poster,detail)
+    result = haikulist_service.update(id,first,second,third,poster,detail)
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)
     response = jsonify(json_data)
@@ -82,7 +82,7 @@ def haikuList_update():
 def haikuList_delete():
     json_data = request.json
     id = int(json_data.get("id",-1))
-    result = haikuList.delete(id)
+    result = haikulist_service.delete(id)
     # JSON文字列に変換
     json_data = json.dumps(result.__dict__(), ensure_ascii=False)
     response = jsonify(json_data)

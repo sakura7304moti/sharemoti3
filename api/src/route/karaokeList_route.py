@@ -5,7 +5,7 @@ import json
 import os
 from flask import Blueprint, request, jsonify, send_file
 from file.src.modules import file_const
-from file.src.modules import karaokeList
+from api.src.route.service import karaokelist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = file_const.get_new_line_text()
@@ -18,7 +18,7 @@ app = Blueprint('karaokeList',__name__)
 
 @app.route("/karaoke/search",methods=['GET'])
 def karaokelist_search():
-    records = karaokeList.search()
+    records = karaokelist_service.search()
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -43,6 +43,6 @@ def karaokelist_search():
 @app.route('/karaoke/download',methods=['GET'])
 def karaokelist_download():
     id = int(request.args.get('id',-1))
-    rec = karaokeList.select(id)
+    rec = karaokelist_service.select(id)
     path = os.path.join(DATA_PATH,'カラオケ','音声のみ',rec.date,rec.file_name+'.mp3')
     return send_file(path , mimetype='audio/mpeg')
