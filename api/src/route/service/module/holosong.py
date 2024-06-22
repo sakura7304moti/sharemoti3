@@ -1,19 +1,18 @@
 """
 ホロライブの歌ってみたやオリ曲のスクレイピング
 """
-from . import scraper_const
 import requests
 from bs4 import BeautifulSoup
 import re
 
-urlModel = scraper_const.UrlOption()
-cover_url = urlModel.cover
+from api.src.route.service.module.utils import const
+
 
 def get_cover_songs() -> list[scraper_const.SongQueryRecord]:
     records = []
 
     # 指定したURLからHTMLを取得
-    url = cover_url
+    url = const.Option.holo_wiki_cover
     response = requests.get(url)
 
     # BeautifulSoupでHTMLを解析
@@ -41,7 +40,7 @@ def get_cover_songs() -> list[scraper_const.SongQueryRecord]:
 
 def get_original_songs() -> list[scraper_const.SongQueryRecord]:
     records = []
-    response = requests.get('https://seesaawiki.jp/hololivetv/d/%a5%aa%a5%ea%a5%b8%a5%ca%a5%eb%a5%bd%a5%f3%a5%b0')
+    response = holo_wiki_original
     soup = BeautifulSoup(response.text, 'html.parser')
     elements = soup.find_all('div',class_="wiki-section-3")
     for element in elements:
@@ -63,7 +62,7 @@ def get_original_songs() -> list[scraper_const.SongQueryRecord]:
     return records
 
 def get_memory_movies() -> list[scraper_const.HoloMemoryRecord]:
-    url = 'https://seesaawiki.jp/hololivetv/d/%b5%ad%c7%b0%c7%db%bf%ae%b0%ec%cd%f7'
+    url = const.Option.holo_wiki_memory
     
     # 指定したURLからHTMLを取得
     response = requests.get(url)

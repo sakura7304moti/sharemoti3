@@ -1,16 +1,12 @@
 """
 あだ名一覧2 API
 """
-from . import main_const
 import sqlite3
 import datetime
 
-output = main_const.Output()
-
-
-# sns.dbを作成する
-# すでに存在していれば、それにアスセスする。
-dbname = output.sqlite_db()
+from api.src.route.service.module.utils import const
+const_path = const.Path
+dbname = const_path.db_main_share
 
 def init():
     conn = sqlite3.connect(dbname)

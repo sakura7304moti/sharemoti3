@@ -1,9 +1,7 @@
 import sqlite3
-import re
-from . import scraper_const
+from api.src.route.service.module.utils import const
 
-database = scraper_const.Database()
-dbname = database.hololewd_path()
+dbname = const.Path.db_hololewd
 
 def make_table():
     conn = sqlite3.connect(dbname)

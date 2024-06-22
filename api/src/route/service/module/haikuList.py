@@ -1,14 +1,12 @@
 """
 俳句一覧
 """
-from . import main_const
 import sqlite3
 import datetime
 
-# sns.dbを作成する
-# すでに存在していれば、それにアスセスする。
-output = main_const.Output()
-dbname = output.sqlite_db()
+from api.src.route.service.module.utils import const
+const_path = const.Path
+dbname = const_path.db_main_share
 
 
 """

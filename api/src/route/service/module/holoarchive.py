@@ -8,10 +8,10 @@ from typing import List
 from tqdm import tqdm
 
 
-from . import scraper_const
+from api.src.route.service.module.utils import const
 
 
-channel_url_list = scraper_const.channel_list()
+channel_url_list = const.Option.youtube_holo_channels()
 
 
 """

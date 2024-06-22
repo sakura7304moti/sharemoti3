@@ -45,6 +45,10 @@ class Path:
         return os.path.join(self.root_path, 'src', 'database')
     
     @property
+    def file_data_dir(self):
+        return os.getenv('SHAREMOTI_SHARE_DIR')
+    
+    @property
     def image_uploads(self):
         """
         画像一覧のページの画像置き場
@@ -154,7 +158,7 @@ class Option:
         df = pd.read_csv(path)
         return df['flair_text'].tolist()
     
-    def holo_wiki_cover(self):
+    def holo_wiki_original(self):
         """
         ホロライブ非公式Wikiの歌ってみたのURL
         """
@@ -163,11 +167,11 @@ class Option:
             yml = yaml.safe_load(file)
             return yml['cover']
         
-    def holo_wiki_original(self):
+    def holo_wiki_memory(self):
         """
-        ホロライブ非公式Wikiのオリジナル曲のURL
+        ホロライブ非公式Wikiの記念配信のURL
         """
         yaml_path = os.path.join(Path.option, 'holo_wiki_urls.yaml')
         with open(yaml_path) as file:
             yml = yaml.safe_load(file)
-            return yml['ori']
+            return yml['memory']

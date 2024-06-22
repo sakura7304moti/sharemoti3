@@ -4,8 +4,9 @@
 import os
 import glob
 
-from . import file_const
-DATA_PATH = file_const.get_data_path()
+
+from api.src.route.service.module.utils import const
+DATA_PATH = const.Path.file_data_dir
 
 
 """

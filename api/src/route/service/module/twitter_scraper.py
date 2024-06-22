@@ -4,8 +4,6 @@ import datetime
 import time
 import pandas as pd
 
-from . import scraper_const
-
 def parse_date(epoch_seconds:int):
     """
     エポック時間をyyyy-mm-ddに変換

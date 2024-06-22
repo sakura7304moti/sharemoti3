@@ -1,16 +1,12 @@
 """
-日本国失礼憲法 API
+名言集 API
 """
-from . import main_const
 import sqlite3
+import datetime
 
-output = main_const.Output()
-
-
-# sns.dbを作成する
-# すでに存在していれば、それにアスセスする。
-dbname = output.sqlite_db()
-
+from api.src.route.service.module.utils import const
+const_path = const.Path
+dbname = const_path.db_main_share
 
 """
 CREATE DB
@@ -29,11 +25,14 @@ def init():
     # sqliteを操作するカーソルオブジェクトを作成
     cur = conn.cursor()
 
-    # mannerListというtableを作成してみる
+    # wordlistというtableを作成してみる
     # 大文字部はSQL文。小文字でも問題ない。
     cur.execute(
-        """CREATE TABLE IF NOT EXISTS mannerList(
-                word STRING
+        """CREATE TABLE IF NOT EXISTS wordList2(
+                word STRING,
+                desc STRING,
+                create_at STRING,
+                update_at STRING
                 )
                 """
     )
@@ -48,26 +47,28 @@ INSERT and UPDATE
 """
 
 
-def save(word: str = ""):
+def save(word: str = "", desc: str = ""):
+    # 現在の日時を取得
+    current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     # データベースに接続する
     conn = sqlite3.connect(dbname)
     cursor = conn.cursor()
 
     if word != "":
         # レコードの存在をチェックするためのクエリを作成する
-        check_query = "SELECT * FROM mannerList WHERE word = :word"
+        check_query = "SELECT * FROM wordList2 WHERE word = :word"
         cursor.execute(check_query, {"word": word})
         result = cursor.fetchall()
 
         if not result:
             # 存在しないレコードなら追加する
-            query = "INSERT INTO mannerList (word) VALUES (:word)"
-            args = {"word": word}
+            query = "INSERT INTO wordList2 (word, desc,create_at,update_at) VALUES (:word, :desc, :current_time, :current_time)"
+            args = {"word": word, "desc": desc,"current_time":current_time}
             cursor.execute(query, args)
         else:
             # 存在するレコードなら更新する
-            query = "UPDATE mannerList SET word = :word WHERE word = :word"
-            args = {"word": word}
+            query = "UPDATE wordList2 SET desc = :desc, update_at = :current_time WHERE word = :word"
+            args = {"word": word, "desc": desc,"current_time":current_time}
             cursor.execute(query, args)
 
         # 変更をコミットし、接続を閉じる
@@ -87,21 +88,21 @@ DELETE
 """
 
 
-def delete(word: str = ""):
+def delete(word: str = "", desc: str = ""):
     # データベースに接続する
     conn = sqlite3.connect(dbname)
     cursor = conn.cursor()
 
     # レコードの存在をチェックするためのクエリを作成する
-    check_query = f"SELECT * FROM mannerList WHERE word = '{word}'"
+    check_query = f"SELECT * FROM wordList2 WHERE word = '{word}'"
     # クエリを実行して結果を取得する
     cursor.execute(check_query)
     result = cursor.fetchall()
 
     # 存在するレコードなら削除する
     if result != []:
-        query = "DELETE FROM mannerList WHERE word = :word"
-        args = {"word": word}
+        query = "DELETE FROM wordlist2 WHERE word = :word and desc = :desc"
+        args = {"word": word, "desc": desc}
         # レコードを削除する
         cursor.execute(query, args)
 
@@ -118,15 +119,15 @@ SELECT
 """
 
 
-def search(word: str = ""):
+def search(text: str = ""):
     # データベースに接続する
     conn = sqlite3.connect(dbname)
     cursor = conn.cursor()
 
     # クエリー設定
-    query = "SELECT * FROM mannerList WHERE word like :word"
+    query = "SELECT * FROM wordList2 WHERE word like :text or desc like :text"
 
-    args = {"word": f"%{word}%"}
+    args = {"text": f"%{text}%"}
     print("query", query)
 
     # SELECTクエリを実行
@@ -136,7 +137,7 @@ def search(word: str = ""):
     # 結果を表示
     records = []
     for row in results:
-        rec = main_const.MannerListRecord(*row)
+        rec = main_const.WordList2Record(*row)
         records.append(rec)
 
     # 接続を閉じる

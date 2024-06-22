@@ -1,9 +1,7 @@
 import sqlite3
 import re
-from . import scraper_const
-
-database = scraper_const.Database()
-dbname = database.twitter_path()
+from api.src.route.service.module.utils import const
+dbname = const.Path.db_twitter
 
 
 def init():
