@@ -8,7 +8,7 @@ from typing import List
 from tqdm import tqdm
 
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const, interface
 
 
 channel_url_list = const.Option.youtube_holo_channels()
@@ -66,7 +66,7 @@ def get_channel_info(result):
                 
     #プロフィール画像URL
     avatar_url = result['thumbnails'][-2]['url']
-    return scraper_const.ChannelInfo(channel_id,channel_name,description,header_url,avatar_url)
+    return interface.ChannelInfo(channel_id,channel_name,description,header_url,avatar_url)
 
 def get_thumbnail_url(id):
     return f'http://img.youtube.com/vi/{id}/maxresdefault.jpg'
@@ -87,11 +87,11 @@ def get_movie_list(entries):
     for rec in entries:
         info = get_movie_info(rec)
         if info is not None:
-            movie_info = scraper_const.MovieInfo(info[0],info[1],info[2],'','',info[3],info[4],'')
+            movie_info = interface.MovieInfo(info[0],info[1],info[2],'','',info[3],info[4],'')
             movie_list.append(movie_info)
     return movie_list
 
-def inferece_channenl(url:str) -> scraper_const.Archive:
+def inferece_channenl(url:str) -> interface.Archive:
     """
     チャンネルの情報やアーカイブを取得する
     """
@@ -110,7 +110,7 @@ def inferece_channenl(url:str) -> scraper_const.Archive:
         live = get_movie_list(result['entries'][1]['entries'])
         short = []
 
-    archive = scraper_const.Archive(channel,movie,short,live)
+    archive = interface.Archive(channel,movie,short,live)
     return archive
 
 def get_upload_date(url:str):
@@ -141,7 +141,7 @@ def get_upload_date(url:str):
             return str(datetime.datetime.fromtimestamp(stamp))
         
 
-def holo_archives() -> List[scraper_const.Archive]:
+def holo_archives() -> List[interface.Archive]:
     archives = []
     for url in tqdm(channel_url_list,desc="get archives"):
         archive = inferece_channenl(url)
@@ -246,7 +246,7 @@ def update_archives():
 """
 データベース用の関数
 """
-database = scraper_const.Database()
+database = interface.Database()
 dbname = database.youtube_path()
 def make_database():
     #dbファイル作成
@@ -296,7 +296,7 @@ def search_movie(
     to_date = '',
     channel_id = '',
     movie_type = ''
-) -> List[scraper_const.MovieInfo]:
+) -> List[interface.MovieInfo]:
     # データベースに接続する
     conn = sqlite3.connect(dbname)
     cursor = conn.cursor()
@@ -320,7 +320,7 @@ def search_movie(
     # 結果を表示
     records = []
     for row in results:
-        rec = scraper_const.MovieInfo(*row)
+        rec = interface.MovieInfo(*row)
         records.append(rec)
 
     return records
@@ -404,7 +404,7 @@ def search_query_args(
     }
     return query , args
 
-def search_channel() -> List[scraper_const.ChannelInfo]:
+def search_channel() -> List[interface.ChannelInfo]:
     # データベースに接続する
     conn = sqlite3.connect(dbname)
     cursor = conn.cursor()
@@ -418,7 +418,7 @@ def search_channel() -> List[scraper_const.ChannelInfo]:
     # 結果をまとめる
     records = []
     for row in results:
-        rec = scraper_const.ChannelInfo(*row)
+        rec = interface.ChannelInfo(*row)
         records.append(rec)
     
     return records

@@ -9,7 +9,7 @@ import os
 from tqdm import tqdm
 
 from . import hololewd_sqlite
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const, interface
 
 def get_rows():
     # Reddit APIの認証情報を設定

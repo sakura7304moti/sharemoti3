@@ -3,7 +3,7 @@
 """
 import sqlite3
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const, interface
 const_path = const.Path
 dbname = const_path.db_main_share
 
@@ -130,7 +130,7 @@ def search(word: str = ""):
     # 結果を表示
     records = []
     for row in results:
-        rec = main_const.SchoolListRecord(*row)
+        rec = interface.SchoolListRecord(*row)
         records.append(rec)
 
     # 接続を閉じる

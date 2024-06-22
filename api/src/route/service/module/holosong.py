@@ -5,10 +5,10 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const, interface
 
 
-def get_cover_songs() -> list[scraper_const.SongQueryRecord]:
+def get_cover_songs() -> list[interface.SongQueryRecord]:
     records = []
 
     # 指定したURLからHTMLを取得
@@ -34,11 +34,11 @@ def get_cover_songs() -> list[scraper_const.SongQueryRecord]:
             td_song_name = a_tag.get_text()
 
         td_detail = td_elements[3].get_text()
-        rec = scraper_const.SongQueryRecord(td_date,td_member,td_link,td_song_name,td_detail)
+        rec = interface.SongQueryRecord(td_date,td_member,td_link,td_song_name,td_detail)
         records.append(rec)
     return records
 
-def get_original_songs() -> list[scraper_const.SongQueryRecord]:
+def get_original_songs() -> list[interface.SongQueryRecord]:
     records = []
     response = holo_wiki_original
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -56,12 +56,12 @@ def get_original_songs() -> list[scraper_const.SongQueryRecord]:
         youtube_link = [a for a in a_tags if 'youtube' in a.text.lower()]
         if len(youtube_link) > 0:
             youtube_url = youtube_link[0]['href']
-            rec = scraper_const.SongQueryRecord(release_date,members,youtube_url,title,'')
+            rec = interface.SongQueryRecord(release_date,members,youtube_url,title,'')
             if youtube_url != 'https://www.youtube.com/watch?v=VKyEVCPEV6c':
                 records.append(rec)
     return records
 
-def get_memory_movies() -> list[scraper_const.HoloMemoryRecord]:
+def get_memory_movies() -> list[interface.HoloMemoryRecord]:
     url = const.Option.holo_wiki_memory
     
     # 指定したURLからHTMLを取得
@@ -85,6 +85,6 @@ def get_memory_movies() -> list[scraper_const.HoloMemoryRecord]:
             td_link = a_tag.get("href")
             td_title = a_tag.get_text().replace('"','').replace("'",'')
             if '非公開' not  in td_title:
-                rec = scraper_const.HoloMemoryRecord(td_title,td_member,td_date,td_link,td_memory,td_detail)
+                rec = interface.HoloMemoryRecord(td_title,td_member,td_date,td_link,td_memory,td_detail)
                 records.append(rec)
     return records

@@ -4,7 +4,7 @@
 import sqlite3
 
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const, interface
 const_path = const.Path
 dbname = const_path.db_main_share
 """
@@ -69,7 +69,7 @@ def insert(key: str = "", val: str = ""):
 
 
 def check_name_existence(
-    name_list: list[main_const.NameListRecord], target_key: str
+    name_list: list[interface.NameListRecord], target_key: str
 ) -> bool:
     for record in name_list:
         if record.key == target_key:
@@ -157,7 +157,7 @@ def search(key: str = "", val: str = ""):
     # 結果を表示
     records = []
     for row in results:
-        rec = main_const.NameListRecord(*row)
+        rec = interface.NameListRecord(*row)
         records.append(rec)
 
     # 接続を閉じる
@@ -166,7 +166,7 @@ def search(key: str = "", val: str = ""):
 
 
 def init_update():
-    df = main_const.ssbu_dict()
+    df = interface.ssbu_dict()
     for index, row in df.iterrows():
         key = row["key"]
         val = row["val"]

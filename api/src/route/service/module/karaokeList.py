@@ -4,7 +4,7 @@
 import os
 import glob
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const,interface
 DATA_PATH = const.Path.file_data_dir
 
 
@@ -20,7 +20,7 @@ def search():
         dir_path = os.path.dirname(path)
         date = os.path.basename(dir_path)
 
-        rec = file_const.KaraokeListRecord(id,file_name,date)
+        rec = interface.KaraokeListRecord(id,file_name,date)
         records.append(rec)
     return records
 
@@ -35,7 +35,7 @@ def select(select_id:int):
             file_name = os.path.basename(path).split('.')[0]
             dir_path = os.path.dirname(path)
             date = os.path.basename(dir_path)
-            rec = file_const.KaraokeListRecord(id,file_name,date)
+            rec = interface.KaraokeListRecord(id,file_name,date)
             print(rec)
             break
     return rec

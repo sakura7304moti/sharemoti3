@@ -5,7 +5,7 @@ import os
 import glob
 
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const,interface
 DATA_PATH = const.Path.file_data_dir
 
 
@@ -18,7 +18,7 @@ def search():
     for path in path_list:
         id = path_list.index(path)
         file_name = os.path.basename(path).split('.')[0]
-        rec = file_const.VoiceListRecord(id,file_name)
+        rec = interface.VoiceListRecord(id,file_name)
         records.append(rec)
     return records
 
@@ -31,6 +31,6 @@ def select(select_id:int):
         id = path_list.index(path)
         if id == select_id:
             file_name = os.path.basename(path).split('.')[0]
-            rec = file_const.VoiceListRecord(id,file_name)
+            rec = interface.VoiceListRecord(id,file_name)
             break
     return rec

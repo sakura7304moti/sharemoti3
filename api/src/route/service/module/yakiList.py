@@ -4,7 +4,7 @@
 import sqlite3
 import datetime
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const,interface
 const_path = const.Path
 dbname = const_path.db_main_share
 
@@ -80,11 +80,11 @@ def insert(
             # 変更をコミットし、接続を閉じる
             conn.commit()
             conn.close()
-            return main_const.DbResult(True,"")
+            return interface.DbResult(True,"")
 
     except Exception as e:
         err_text = str(e)
-        return main_const.DbResult(False,err_text)
+        return interface.DbResult(False,err_text)
         
 def update(
     id:int,
@@ -117,11 +117,11 @@ def update(
         # 変更をコミットし、接続を閉じる
         conn.commit()
         conn.close()
-        return main_const.DbResult(True,"")
+        return interface.DbResult(True,"")
 
     except Exception as e:
         err_text = str(e)
-        return main_const.DbResult(False,err_text)
+        return interface.DbResult(False,err_text)
 
 def delete(id:int):
     try:
@@ -138,11 +138,11 @@ def delete(id:int):
         # 変更をコミットし、接続を閉じる
         conn.commit()
         conn.close()
-        return main_const.DbResult(True,"")
+        return interface.DbResult(True,"")
 
     except Exception as e:
         err_text = str(e)
-        return main_const.DbResult(False,err_text)
+        return interface.DbResult(False,err_text)
 
 def search():
     # データベースに接続する
@@ -158,7 +158,7 @@ def search():
     # 結果を表示
     records = []
     for row in results:
-        rec = main_const.YakiList2Record(*row)
+        rec = interface.YakiList2Record(*row)
         records.append(rec)
 
     # 接続を閉じる

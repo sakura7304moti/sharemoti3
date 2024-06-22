@@ -48,7 +48,7 @@ def get_list(url:str , hashtag:str):
         user_name = tweet['name']
         like_count = tweet['likesCount']
 
-        rec = scraper_const.TwitterQueryRecord(
+        rec = interface.TwitterQueryRecord(
             hashtag,
             '',
             url,

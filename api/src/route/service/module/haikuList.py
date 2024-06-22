@@ -4,7 +4,7 @@
 import sqlite3
 import datetime
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const,interface
 const_path = const.Path
 dbname = const_path.db_main_share
 
@@ -65,10 +65,10 @@ def insert(first:str,second:str,third:str,poster:str,detail:str):
         # データベースへコミット。これで変更が反映される。
         conn.commit()
         conn.close()
-        result = main_const.HaikuListStatusResult(True,"")
+        result = interface.HaikuListStatusResult(True,"")
     except Exception as e:
         #エラー出たらエラー内容と追加失敗を返す
-        result = main_const.HaikuListStatusResult(False,str(e))
+        result = interface.HaikuListStatusResult(False,str(e))
     return result
 
 def update(id:int,first:str,second:str,third:str,poster:str,detail:str):
@@ -104,10 +104,10 @@ def update(id:int,first:str,second:str,third:str,poster:str,detail:str):
         # データベースへコミット。これで変更が反映される。
         conn.commit()
         conn.close()
-        result = main_const.HaikuListStatusResult(True,"")
+        result = interface.HaikuListStatusResult(True,"")
     except Exception as e:
         #エラー出たらエラー内容と追加失敗を返す
-        result = main_const.HaikuListStatusResult(False,str(e))
+        result = interface.HaikuListStatusResult(False,str(e))
     return result
 
 """
@@ -129,16 +129,16 @@ def delete(id:int):
         conn.commit()
         conn.close()
 
-        result = main_const.HaikuListStatusResult(True,"")
+        result = interface.HaikuListStatusResult(True,"")
     except Exception as e:
         #エラー出たらエラー内容と追加失敗を返す
-        result = main_const.HaikuListStatusResult(False,str(e))
+        result = interface.HaikuListStatusResult(False,str(e))
     return result
 
 """
 SELECT
 """
-def select(id:int,haikuText:str,poster:str,detail:str) -> list[main_const.HaikuListRecord]:
+def select(id:int,haikuText:str,poster:str,detail:str) -> list[interface.HaikuListRecord]:
     # データベースに接続する
     conn = sqlite3.connect(dbname)
     cursor = conn.cursor()
@@ -164,7 +164,7 @@ def select(id:int,haikuText:str,poster:str,detail:str) -> list[main_const.HaikuL
     # 結果を表示
     records = []
     for row in results:
-        rec = main_const.HaikuListRecord(*row)
+        rec = interface.HaikuListRecord(*row)
         records.append(rec)
 
     # 接続を閉じる

@@ -4,7 +4,7 @@
 import os
 import glob
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const,interface
 DATA_PATH = const.Path.file_data_dir
 
 """
@@ -20,7 +20,7 @@ def search():
         date = os.path.basename(dir_path)
         dir_path_u = os.path.dirname(dir_path)
         year = os.path.basename(dir_path_u)
-        rec = file_const.ssbuListRecord(id,file_name,date,year)
+        rec = interface.ssbuListRecord(id,file_name,date,year)
         records.append(rec)
     return records
 
@@ -37,6 +37,6 @@ def select(select_id:int):
             date = os.path.basename(dir_path)
             dir_path_u = os.path.dirname(dir_path)
             year = os.path.basename(dir_path_u)
-            rec = file_const.ssbuListRecord(id,file_name,date,year)
+            rec = interface.ssbuListRecord(id,file_name,date,year)
             break
     return rec

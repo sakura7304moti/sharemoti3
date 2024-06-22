@@ -1,5 +1,5 @@
 import sqlite3
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const, interface
 
 dbname = const.Path.db_hololewd
 
@@ -60,7 +60,7 @@ def select_hololewd(query:str):
     cursor.execute(query)
 
     results = cursor.fetchall()
-    records = [scraper_const.HololewdQueryRecord(*r) for r in results]
+    records = [interface.HololewdQueryRecord(*r) for r in results]
     cursor.close()
     return records
 
@@ -69,7 +69,7 @@ def search(
         page_size:int=30,
         flair_text:str='',
         min_score:int=100
-) -> list[scraper_const.HololewdQueryRecord]:
+) -> list[interface.HololewdQueryRecord]:
     conn = sqlite3.connect(dbname)
     cursor = conn.cursor()
 
@@ -95,7 +95,7 @@ def search(
 
     records = []
     for row in results:
-        rec = scraper_const.HololewdQueryRecord(*row)
+        rec = interface.HololewdQueryRecord(*row)
         records.append(rec)
 
     # 件数取得

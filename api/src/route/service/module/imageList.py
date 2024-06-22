@@ -4,7 +4,7 @@
 import sqlite3
 import datetime
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const, interface
 const_path = const.Path
 dbname = const_path.db_main_share
 
@@ -63,10 +63,10 @@ def insert(file_name:str,ext:str,title:str,detail:str):
         # データベースへコミット。これで変更が反映される。
         conn.commit()
         conn.close()
-        result = main_const.ImageListStatusResult(True,"")
+        result = interface.ImageListStatusResult(True,"")
     except Exception as e:
         print(f'insert err -> {e}')
-        result = main_const.ImageListStatusResult(False,str(e))
+        result = interface.ImageListStatusResult(False,str(e))
     return result
     
 """
@@ -96,10 +96,10 @@ def update(id:int,title:str,detail:str):
         # データベースへコミット。これで変更が反映される。
         conn.commit()
         conn.close()
-        result = main_const.ImageListStatusResult(True,"")
+        result = interface.ImageListStatusResult(True,"")
     except Exception as e:
         print(f'update err -> {e}')
-        result = main_const.ImageListStatusResult(False,str(e))
+        result = interface.ImageListStatusResult(False,str(e))
     return result
     
 """
@@ -119,10 +119,10 @@ def delete(id:int):
         conn.commit()
         conn.close()
         
-        result = main_const.ImageListStatusResult(True,"")
+        result = interface.ImageListStatusResult(True,"")
     except Exception as e:
         print(f'delete err -> {e}')
-        result = main_const.ImageListStatusResult(False,str(e))
+        result = interface.ImageListStatusResult(False,str(e))
     return result
     
 """
@@ -140,7 +140,7 @@ def search():
     # 結果を表示
     records = []
     for row in results:
-        rec = main_const.ImageListRecord(*row)
+        rec = interface.ImageListRecord(*row)
         records.append(rec)
 
     # 接続を閉じる

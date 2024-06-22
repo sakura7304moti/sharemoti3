@@ -1,6 +1,6 @@
 import sqlite3
 import re
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const, interface
 dbname = const.Path.db_twitter
 
 
@@ -95,7 +95,7 @@ def search(
         mode:str='',
         min_like:int=0,
         max_like:int=0
-) -> list[scraper_const.TwitterQueryRecord]:
+) -> list[interface.TwitterQueryRecord]:
     """
     レコードを取得する
     """
@@ -121,7 +121,7 @@ def search(
     # 結果を表示
     records = []
     for row in results:
-        rec = scraper_const.TwitterQueryRecord(*row)
+        rec = interface.TwitterQueryRecord(*row)
         records.append(rec)
 
     # 接続を閉じる

@@ -5,7 +5,7 @@ import os
 import glob
 import datetime
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const,interface
 DATA_PATH = const.Path.file_data_dir
 
 
@@ -27,7 +27,7 @@ def search():
         except:
             pass
 
-        rec = file_const.RadioListRecord(id,file_name,date)
+        rec = interface.RadioListRecord(id,file_name,date)
         records.append(rec)
     # 日付文字列を日付オブジェクトに変換してソート
     #records = sorted(records, key=lambda x: datetime.datetime.strptime(x.date, '%Y-%m-%d %H:%M:%S'))
@@ -52,7 +52,7 @@ def select(select_id:int):
             except:
                 pass
 
-            rec = file_const.RadioListRecord(id,file_name,date)
+            rec = interface.RadioListRecord(id,file_name,date)
             print(rec)
             break
     return rec

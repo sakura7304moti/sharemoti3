@@ -4,7 +4,7 @@
 import os
 import glob
 
-from api.src.route.service.module.utils import const
+from api.src.route.service.module.utils import const,interface
 DATA_PATH = const.Path.file_data_dir
 
 
@@ -18,7 +18,7 @@ def search():
         id = path_list.index(path)
         file_name = file_name = ''.join(os.path.basename(path).split('.')[:-1])
         poster = os.path.basename(os.path.dirname(path))
-        rec = file_const.MovieListRecord(id,file_name,poster)
+        rec = interface.MovieListRecord(id,file_name,poster)
         records.append(rec)
     return records
 
@@ -32,6 +32,6 @@ def select(select_id:int):
         if id == select_id:
             file_name = ''.join(os.path.basename(path).split('.')[:-1])
             poster = os.path.basename(os.path.dirname(path))
-            rec = file_const.MovieListRecord(id,file_name,poster)
+            rec = interface.MovieListRecord(id,file_name,poster)
             break
     return rec
