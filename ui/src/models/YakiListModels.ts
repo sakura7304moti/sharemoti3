@@ -1,5 +1,5 @@
 import { QTableColumn, useQuasar } from 'quasar';
-import api from 'src/api/main/YakiList2Api';
+import api from 'src/api/main/YakiListApi';
 import { ref } from 'vue';
 
 export function useYakiListModel() {

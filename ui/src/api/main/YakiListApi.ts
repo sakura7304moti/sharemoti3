@@ -1,70 +1,63 @@
 import { MainAPIClient } from './MainBaseApi';
-
-export class YakiListApi extends MainAPIClient {
+export class YakiList2Api extends MainAPIClient {
   //検索
-  public search(
-    request: YakiListSearchRequest
-  ): Promise<YakiListResponse | null> {
+  public search(): Promise<SearchResponse | null> {
     const url = '/yakiList/search';
     const path = this.combineUrl(url);
-
-    return this.httpPost<YakiListSearchRequest, YakiListResponse>(
-      path,
-      request
-    );
+    return this.httpGet<SearchResponse>(path);
   }
 
-  //追加・更新
-  public save(request: YakiListRequest): Promise<YakiListSaveResponse | null> {
-    const url = '/yakiList/save';
+  //追加
+  public insert(request: InsertRequest): Promise<DbResult | null> {
+    const url = '/yakiList/insert';
     const path = this.combineUrl(url);
+    return this.httpPost<InsertRequest, DbResult>(path, request);
+  }
 
-    return this.httpPost<YakiListRequest, YakiListSaveResponse>(path, request);
+  //更新
+  public update(request: UpdateRequest): Promise<DbResult | null> {
+    const url = '/yakiList/update';
+    const path = this.combineUrl(url);
+    return this.httpPost<UpdateRequest, DbResult>(path, request);
   }
 
   //削除
-  public delete(
-    request: YakiListRequest
-  ): Promise<YakiListDeleteResponse | null> {
+  public dell(request: DeleteRequest): Promise<DbResult | null> {
     const url = '/yakiList/delete';
     const path = this.combineUrl(url);
-
-    return this.httpPost<YakiListRequest, YakiListDeleteResponse>(
-      path,
-      request
-    );
+    return this.httpPost<DeleteRequest, DbResult>(path, request);
   }
 }
 
-const api = new YakiListApi();
+const api = new YakiList2Api();
 export default api;
 
 /*
  *interfaces
  */
-export interface YakiListSearchRequest {
-  text: string | null;
+interface InsertRequest {
+  word: string;
+  yaki: string;
 }
-
-export interface YakiListRequest {
-  word: string | null;
-  yaki: string | null;
+interface UpdateRequest {
+  id: number;
+  word: string;
+  yaki: string;
 }
-
-export interface YakiListResponse {
-  records: Array<WordListRec>;
+interface DeleteRequest {
+  id: number;
 }
-
-interface WordListRec {
-  word: string | null;
-  yaki: string | null;
+interface SearchResponse {
+  records: DataState[];
 }
-
-export interface YakiListSaveResponse {
-  insert: boolean;
-  update: boolean;
+interface DataState {
+  id: number;
+  word: string;
+  yaki: string;
+  createAt: string;
+  updateAt: string;
 }
-
-export interface YakiListDeleteResponse {
-  status: boolean;
+interface DbResult {
+  success: boolean;
+  errorText: string;
 }

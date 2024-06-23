@@ -6,6 +6,8 @@ from flask import Blueprint, jsonify
 from src.route.service import holosong_service
 from src.route.service.module.utils import const
 
+opt = const.Option()
+
 #改行文字を取得
 NEW_LINE_TEXT = const.get_new_line_text()
 
@@ -37,7 +39,7 @@ def holosong_select():
 
 @app.route("/holoSong/hololist", methods=["GET"])
 def holosong_get_hololist():
-    json_data = json.dumps(scraper_const.holoMember(), ensure_ascii=False)
+    json_data = json.dumps(opt.holo_wiki_members(), ensure_ascii=False)
     response = jsonify(json_data)
     return response
 

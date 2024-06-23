@@ -233,11 +233,12 @@ class ssbuListRecord:#スマブラのクリップ
         return f"ID: {self.id}, File Name: {self.file_name}, Date: {self.date}, Year: {self.year}"
     
 class SsbuNameRecord:#スマブラのキャラ名と画像URL
-    def __init__(self,name:str,url:str):
+    def __init__(self,name:str,url:str,icon:str):
         self.name = name
         self.url = url
+        self.icon = icon
     def __dict__(self):
-        return {"name":self.name,"url":self.url}
+        return {"name":self.name,"url":self.url,"icon":self.icon}
 
 class MovieListRecord:#完成品
     def __init__(self,

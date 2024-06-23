@@ -38,7 +38,7 @@ class Path:
     
 
     def archive(self):
-        return os.path.join(self.root_path(), 'arhcive')
+        return os.path.join(self.root_path(), 'archive')
     
 
     def database(self):
@@ -56,7 +56,7 @@ class Path:
         """
         画像の背景除去の一時ファイル置き場
         """
-        return os.path.join(self.archive(), 'revmg_temp')
+        return os.path.join(self.archive(), 'rembg_temp')
     
 
     def share_folder(self):
@@ -88,7 +88,7 @@ class Path:
         """
         twitterのDB
         """
-        return os.path.join(self.database(), 'hololewd.db')
+        return os.path.join(self.database(), 'twitter.db')
     
 
     def db_youtube(self):
@@ -184,3 +184,10 @@ class Option:
         with open(yaml_path) as file:
             yml = yaml.safe_load(file)
             return yml['memory']
+        
+    #ホロメン一覧
+    def holo_wiki_members(self):
+        holo_path = os.path.join(self.p.option(), "holo_member_name.csv")
+        df = pd.read_csv(holo_path)
+        word_list = df["member"].tolist()
+        return word_list

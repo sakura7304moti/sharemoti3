@@ -8,6 +8,8 @@ from flask import Blueprint, jsonify, request
 from src.route.service import hololewd_service
 from src.route.service.module.utils import const
 
+opt = const.Option()
+
 # Blueprintのオブジェクトを生成する
 app = Blueprint('hololewd',__name__)
 
@@ -49,7 +51,7 @@ def hololewd_search():
 
 @app.route("/hololewd/hololist",methods=["GET"])
 def hololewd_hololist():
-    json_data = json.dumps(const.Option.hololewd_flair_texts(), ensure_ascii=False)
+    json_data = json.dumps(opt.hololewd_flair_texts(), ensure_ascii=False)
     response = jsonify(json_data)
     return response
     

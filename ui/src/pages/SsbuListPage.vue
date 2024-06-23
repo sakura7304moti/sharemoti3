@@ -4,13 +4,18 @@
     <div class="ssbu-mobile hukidasi" v-if="playNameMobile != ''">
       <p>{{ playNameMobile }}</p>
     </div>
-    <div style="display: flex">
+    <div class="ssbu-vt">
       <q-video
         :src="playUrlDesktop"
         volume="0.5"
         class="ssbu-desktop"
         v-if="playUrlDesktop != ''"
-        style="width: 50%; max-width: 900px"
+        style="
+          width: 569px;
+          height: 320px;
+          position: relative;
+          overflow: hidden; /* オーバーフローしたコンテンツを非表示にする */
+        "
       />
       <q-table
         :rows="records"
@@ -93,7 +98,7 @@
             id="ssbu-option-mobile"
             style="position: fixed; top: 10%; left: 5%"
           >
-            <div class="text-h6 q-pr-md">スマブラ切り抜き</div>
+            <div class="text-h6 q-pl-sm">スマブラ切り抜き</div>
             <q-btn
               icon="search"
               round
@@ -132,6 +137,9 @@
               :key="col.name"
               :props="props"
               class="ssbu-desktop"
+              :class="{
+                'mobile-only': col.label == 'アイコン',
+              }"
             >
               <div v-if="col.label == '再生'" style="width: 50px">
                 {{ col.label }}
@@ -171,6 +179,9 @@
               v-for="col in props.cols"
               :key="col.name"
               :props="props"
+              :class="{
+                'mobile-only': col.label == 'アイコン',
+              }"
               style="white-space: normal; text-align: left"
             >
               {{ col.value }}
@@ -192,16 +203,18 @@
               "
             >
               <div style="display: flex">
-                <div>
-                  <q-avatar v-if="props.cols[3].value != ''"
-                    ><img :src="props.cols[3].value" /></q-avatar
-                  ><br />
-                </div>
                 <div
                   style="padding-top: 16px; padding-left: 8px"
                   class="text-subtitle1"
                 >
                   {{ props.cols[1].value.split('_')[0] }}
+                </div>
+                <div
+                  style="padding-top: 18px; padding-left: 8px"
+                  class="text-subtitle2 text-grey"
+                  v-if="props.cols[0].value != ''"
+                >
+                  ({{ props.cols[0].value }})
                 </div>
               </div>
 
@@ -349,8 +362,8 @@ export default defineComponent({
     search();
 
     /*ちょうどいいくらいのページ数を取得 */
-    const initTablePage = ref(50);
-    const pageOption = ref([50] as number[]);
+    const initTablePage = ref(100);
+    const pageOption = ref([100, 500, 0] as number[]);
 
     const resetOption = function () {
       filter.value.title = '';
@@ -386,6 +399,11 @@ export default defineComponent({
 });
 </script>
 <style>
+@media screen and (min-width: 1370px) {
+  .ssbu-vt {
+    display: flex;
+  }
+}
 #ssbu-table {
   height: 80vh;
   overflow-y: auto;

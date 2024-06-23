@@ -7,6 +7,8 @@ import io
 import glob
 from src.route.service.module.utils import const
 
+p = const.Path()
+
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 # ファイルアップロードを許可するか判別する
@@ -16,7 +18,7 @@ def allowed_file(filename):
 
 # tmpに一時保存
 def tmp_name(file_name:str):
-    return os.path.join(const.Path.rembg_temp , f"cleaned_{file_name}")
+    return os.path.join(p.rembg_temp() , f"cleaned_{file_name}")
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('rembg',__name__)
@@ -108,5 +110,5 @@ def remove_bg_anime():
 @app.route('/rembg/download', methods=['GET'])
 def remove_file_download():
     fileName = request.args.get('fileName','')
-    path = os.path.join(const.Path.rembg_temp, fileName)
+    path = os.path.join(p.rembg_temp(), fileName)
     return send_file(path, mimetype='image/png')

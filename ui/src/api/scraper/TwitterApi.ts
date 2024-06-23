@@ -5,7 +5,7 @@ export class TwitterApi extends ScraperAPIClient {
   public search(
     request: TwitterRequest
   ): Promise<PageResult<TwitterResponse> | null> {
-    const url = '/nitter/search'; //twitter/search
+    const url = '/twitter/search'; //twitter/search
     const path = this.combineUrl(url);
 
     return this.httpPost<TwitterRequest, PageResult<TwitterResponse>>(
@@ -15,7 +15,7 @@ export class TwitterApi extends ScraperAPIClient {
   }
 
   public holoList(): Promise<HoloNameResponse | null> {
-    const url = '/nitter/hololist'; //twitter/hololist
+    const url = '/twitter/hololist'; //twitter/hololist
     const path = this.combineUrl(url);
 
     return this.httpGet<HoloNameResponse>(path);

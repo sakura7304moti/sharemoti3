@@ -44,7 +44,6 @@ def init():
     # データベースへコミット。これで変更が反映される。
     conn.commit()
     conn.close()
-    print('create table haikuList')
 
 """
 INSERT and UPDATE

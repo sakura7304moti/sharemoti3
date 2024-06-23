@@ -1,6 +1,6 @@
 <template>
   <q-page class="">
-    <div class="text-h5 q-pb-sm q-pt-md">GB画像自動生成ページ</div>
+    <div class="text-h5 q-pb-sm q-pt-md">画像の背景透過ページ</div>
     <div class="text-subtitle1">1.まず画像がアニメかどうかを選択して...</div>
     <div class="row q-gutter-md q-pl-md">
       <q-radio v-model="isAnime" val="anime" label="Anime" />

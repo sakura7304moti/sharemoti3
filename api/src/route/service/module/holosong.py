@@ -40,7 +40,9 @@ def get_cover_songs() -> list[interface.SongQueryRecord]:
 
 def get_original_songs() -> list[interface.SongQueryRecord]:
     records = []
-    response = opt.holo_wiki_original()
+    url = opt.holo_wiki_original()
+    response = requests.get(url)
+    
     soup = BeautifulSoup(response.text, 'html.parser')
     elements = soup.find_all('div',class_="wiki-section-3")
     for element in elements:

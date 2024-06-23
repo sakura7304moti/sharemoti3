@@ -7,6 +7,8 @@ from flask import Blueprint, request, jsonify
 from src.route.service import twitter_service
 from src.route.service.module.utils import const
 
+opt = const.Option()
+
 #改行文字を取得
 NEW_LINE_TEXT = const.get_new_line_text()
 
@@ -87,7 +89,7 @@ def nitter_search_count_handler():
 
 @app.route("/twitter/hololist", methods=["GET"])
 def nitter_get_hololist():
-    records = const.Option.twitter_holo_hashtags()
+    records = opt.twitter_holo_hashtags()
     # 辞書にまとめる
     result = {
         "records": json.dumps(

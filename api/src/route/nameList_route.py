@@ -6,6 +6,7 @@ from flask import Blueprint, request, jsonify
 from src.route.service.module.utils import const
 from src.route.service import namelist_service
 
+opt = const.Option()
 #改行文字を取得
 NEW_LINE_TEXT = const.get_new_line_text()
 
@@ -91,7 +92,7 @@ def namelist_delete():
 
 @app.route("/nameList/names", methods=["GET"])
 def nameList_names():
-    records = main_const.ssbu_names()
+    records = opt.ssbu_names()
     # 辞書にまとめる
     result = {
         "records": json.dumps(

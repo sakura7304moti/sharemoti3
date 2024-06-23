@@ -6,6 +6,8 @@ from flask import Blueprint, jsonify, request
 from src.route.service import holoarchive_service
 from src.route.service.module.utils import const
 
+opt = const.Option()
+
 #改行文字を取得
 NEW_LINE_TEXT = const.get_new_line_text()
 
@@ -17,7 +19,7 @@ app = Blueprint('holoarchive',__name__)
 """
 @app.route("/holoArchive/search/channel",methods=["GET"])
 def holomovie_channel():
-    records = const.Option.youtube_holo_channels()
+    records = holoarchive_service.search_chennel()
     # 辞書にまとめる
     result = {
         "records": json.dumps(
@@ -89,7 +91,7 @@ def holomovie_movie():
 """
 @app.route("/holoArchive/channelUrl",methods=["GET"])
 def holochannel():
-    records = const.Option.youtube_holo_channels()
+    records = opt.youtube_holo_channels()
     # 辞書にまとめる
     result = {
         "records": json.dumps(

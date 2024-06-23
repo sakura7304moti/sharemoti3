@@ -5,7 +5,7 @@ export class WordList2Api extends MainAPIClient {
   public search(
     request: WordList2SearchRequest
   ): Promise<WordList2Response | null> {
-    const url = '/wordList2/search';
+    const url = '/wordList/search';
     const path = this.combineUrl(url);
 
     return this.httpPost<WordList2SearchRequest, WordList2Response>(
@@ -18,7 +18,7 @@ export class WordList2Api extends MainAPIClient {
   public save(
     request: WordList2Request
   ): Promise<WordList2SaveResponse | null> {
-    const url = '/wordList2/save';
+    const url = '/wordList/save';
     const path = this.combineUrl(url);
 
     return this.httpPost<WordList2Request, WordList2SaveResponse>(
@@ -31,7 +31,7 @@ export class WordList2Api extends MainAPIClient {
   public delete(
     request: WordList2Request
   ): Promise<WordList2DeleteResponse | null> {
-    const url = '/wordList2/delete';
+    const url = '/wordList/delete';
     const path = this.combineUrl(url);
 
     return this.httpPost<WordList2Request, WordList2DeleteResponse>(

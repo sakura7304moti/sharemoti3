@@ -38,9 +38,6 @@ def init():
     # データベースへコミット。これで変更が反映される。
     conn.commit()
     conn.close()
-    print('create table imageList2')
-    
-    #todo DBとフォルダーの画像で一致しないのがあれば更新する
     
 """
 INSERT
