@@ -7,21 +7,20 @@ import os
 from flask import Blueprint, flash, request, jsonify, send_file
 from werkzeug.utils import secure_filename
 from api.src.route.service import imagelist_service
-from main.src.modules import imageList
+from api.src.route.service.module.utils import const
 
 
 #改行文字を取得
-NEW_LINE_TEXT = main_const.get_new_line_text()
+NEW_LINE_TEXT = const.get_new_line_text()
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('imageList',__name__)
 
 # imageListの初期設定
-imageList.init()
+imagelist_service.create_db()
 
 # 保存先のフォルダーを取得・作成
-output = main_const.Output()
-UPLOAD_FOLDER = output.image_upload_folder()
+UPLOAD_FOLDER = const.Path.image_uploads
 print(f'uploads -> {UPLOAD_FOLDER}')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)

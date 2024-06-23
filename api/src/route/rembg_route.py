@@ -5,7 +5,7 @@ from PIL import Image
 from rembg import remove, new_session
 import io
 import glob
-from sub.src.modules import sub_const
+from api.src.route.service.module.utils import const
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
@@ -16,7 +16,7 @@ def allowed_file(filename):
 
 # tmpに一時保存
 def tmp_name(file_name:str):
-    return os.path.join(sub_const.get_tmp_dir() , f"cleaned_{file_name}")
+    return os.path.join(const.Path.rembg_temp , f"cleaned_{file_name}")
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('rembg',__name__)
@@ -108,5 +108,5 @@ def remove_bg_anime():
 @app.route('/rembg/download', methods=['GET'])
 def remove_file_download():
     fileName = request.args.get('fileName','')
-    path = os.path.join(sub_const.get_tmp_dir(), fileName)
+    path = os.path.join(const.Path.rembg_temp, fileName)
     return send_file(path, mimetype='image/png')

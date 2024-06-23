@@ -3,11 +3,11 @@
 """
 import json
 from flask import Blueprint, request, jsonify
-from main.src.modules import main_const
+from api.src.route.service.module.utils import const
 from api.src.route.service import haikulist_service
 
 #改行文字を取得
-NEW_LINE_TEXT = main_const.get_new_line_text()
+NEW_LINE_TEXT = const.get_new_line_text()
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('haikuList',__name__)

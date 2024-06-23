@@ -5,10 +5,10 @@ import json
 import math
 from flask import Blueprint, request, jsonify
 from api.src.route.service import twitter_service
-from scraper.src.modules import scraper_const
+from api.src.route.service.module.utils import const
 
 #改行文字を取得
-NEW_LINE_TEXT = scraper_const.get_new_line_text()
+NEW_LINE_TEXT = const.get_new_line_text()
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('twitter',__name__)
@@ -16,7 +16,7 @@ app = Blueprint('twitter',__name__)
 """
 Monitter Nitter
 """
-@app.route("/nitter/search", methods=["POST"])
+@app.route("/twitter/search", methods=["POST"])
 def nitter_search():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     # JSONデータから必要なパラメータを抽出
@@ -63,7 +63,7 @@ def nitter_search():
     return response
 
 
-@app.route("/nitter/search/count", methods=["POST"])
+@app.route("/twitter/search/count", methods=["POST"])
 def nitter_search_count_handler():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
 
@@ -85,9 +85,9 @@ def nitter_search_count_handler():
     return response
 
 
-@app.route("/nitter/hololist", methods=["GET"])
+@app.route("/twitter/hololist", methods=["GET"])
 def nitter_get_hololist():
-    records = scraper_const.holoList()
+    records = const.Option.twitter_holo_hashtags()
     # 辞書にまとめる
     result = {
         "records": json.dumps(

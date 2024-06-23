@@ -3,19 +3,19 @@
 """
 import json
 from flask import Blueprint, request, jsonify
-from main.src.modules import main_const
+from api.src.route.service.module.utils import const
 from api.src.route.service import wordlist_service
 
 #改行文字を取得
-NEW_LINE_TEXT = main_const.get_new_line_text()
+NEW_LINE_TEXT = const.get_new_line_text()
 
 # Blueprintのオブジェクトを生成する
-app = Blueprint('wordList2',__name__)
+app = Blueprint('wordList',__name__)
 
 # wordList2の初期設定
 wordlist_service.create_db()
 
-@app.route("/wordList2/search", methods=["POST"])
+@app.route("/wordList/search", methods=["POST"])
 def wordlist2_search():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     text = json_data.get("text", "")
@@ -43,7 +43,7 @@ def wordlist2_search():
     return response
 
 
-@app.route("/wordList2/save", methods=["POST"])
+@app.route("/wordList/save", methods=["POST"])
 def wordlist2_save():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     word = json_data.get("word", "")
@@ -57,7 +57,7 @@ def wordlist2_save():
     return response
 
 
-@app.route("/wordList2/delete", methods=["POST"])
+@app.route("/wordList/delete", methods=["POST"])
 def wordlist2_delete():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     word = json_data.get("word", "")

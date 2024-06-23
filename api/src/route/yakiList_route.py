@@ -3,11 +3,11 @@
 """
 import json
 from flask import Blueprint, request, jsonify
-from main.src.modules import main_const
+from api.src.route.service.module.utils import const
 from api.src.route.service import yakilist_service
 
 #改行文字を取得
-NEW_LINE_TEXT = main_const.get_new_line_text()
+NEW_LINE_TEXT = const.get_new_line_text()
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('yakiList2',__name__)
@@ -15,7 +15,7 @@ app = Blueprint('yakiList2',__name__)
 # nameListの初期設定
 yakilist_service.create_db()
 
-@app.route("/yakiList2/search", methods=["GET"])
+@app.route("/yakiList/search", methods=["GET"])
 def yakiList2_search():
     records = yakilist_service.search()
     # 辞書にまとめる
@@ -39,7 +39,7 @@ def yakiList2_search():
     response = jsonify(json_data)
     return response
 
-@app.route("/yakiList2/insert", methods=["POST"])
+@app.route("/yakiList/insert", methods=["POST"])
 def yakiList2_insert():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     word = json_data.get("word", "")
@@ -52,7 +52,7 @@ def yakiList2_insert():
     response = jsonify(json_data)
     return response
 
-@app.route("/yakiList2/update", methods=["POST"])
+@app.route("/yakiList/update", methods=["POST"])
 def yakiList2_update():
     json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
     id = int(json_data.get("id","-1"))
@@ -66,7 +66,7 @@ def yakiList2_update():
     response = jsonify(json_data)
     return response
 
-@app.route("/yakiList2/delete", methods=["POST"])
+@app.route("/yakiList/delete", methods=["POST"])
 def yakiList2_delete():
     json_data = request.json
     id = int(json_data.get("id",-1))

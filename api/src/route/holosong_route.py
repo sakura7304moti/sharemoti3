@@ -4,10 +4,10 @@
 import json
 from flask import Blueprint, jsonify
 from api.src.route.service import holosong_service
-from scraper.src.modules import scraper_const
+from api.src.route.service.module.utils import const
 
 #改行文字を取得
-NEW_LINE_TEXT = scraper_const.get_new_line_text()
+NEW_LINE_TEXT = const.get_new_line_text()
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('holosong',__name__)

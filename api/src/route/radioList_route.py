@@ -4,14 +4,14 @@
 import json
 import os
 from flask import Blueprint, request, jsonify, send_file
-from file.src.modules import file_const
+from api.src.route.service.module.utils import const
 from api.src.route.service import radiolist_service
 
 #改行文字を取得
-NEW_LINE_TEXT = file_const.get_new_line_text()
+NEW_LINE_TEXT = const.get_new_line_text()
 
 #保存先
-DATA_PATH = file_const.get_data_path()
+DATA_PATH = const.Path.file_data_dir
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('radioList',__name__)

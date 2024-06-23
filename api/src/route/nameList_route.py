@@ -3,17 +3,17 @@
 """
 import json
 from flask import Blueprint, request, jsonify
-from main.src.modules import main_const
+from api.src.route.service.module.utils import const
 from api.src.route.service import namelist_service
 
 #改行文字を取得
-NEW_LINE_TEXT = main_const.get_new_line_text()
+NEW_LINE_TEXT = const.get_new_line_text()
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('nameList',__name__)
 
 # nameListの初期設定
-nameList.init()
+namelist_service.create_db()
 
 @app.route("/nameList/search", methods=["POST"])
 def namelist_search():
