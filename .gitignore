@@ -4,3 +4,4 @@ holo_archives.json
 api/src/database/
 api/src/route/service/__pycache__
 api/src/route/service/module/__pycache__
+api/src/route/__pycache__

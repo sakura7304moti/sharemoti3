@@ -11,7 +11,8 @@ from src.route.service import karaokelist_service
 NEW_LINE_TEXT = const.get_new_line_text()
 
 #保存先
-DATA_PATH = const.Path.file_data_dir
+p = const.Path()
+DATA_PATH = p.share_folder()
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('karaokeList',__name__)

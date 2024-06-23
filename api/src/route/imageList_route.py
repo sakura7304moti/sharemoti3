@@ -20,7 +20,8 @@ app = Blueprint('imageList',__name__)
 imagelist_service.create_db()
 
 # 保存先のフォルダーを取得・作成
-UPLOAD_FOLDER = const.Path.image_uploads
+p = const.Path()
+UPLOAD_FOLDER = p.image_uploads()
 print(f'uploads -> {UPLOAD_FOLDER}')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)

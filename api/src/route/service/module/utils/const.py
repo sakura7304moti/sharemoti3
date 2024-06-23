@@ -98,6 +98,10 @@ class Path:
         return os.path.join(self.database(), 'youtube.db')
     
 class Option:
+
+    def __init__(self):
+        self.p = Path()
+
     """
     csvやyamlの読み取りに使用する
     """
@@ -105,7 +109,7 @@ class Option:
         """
         スマブラのキャラ名・画像URL・アイコンURL
         """
-        df_path = os.path.join(Path.option(), 'ssbu_names.csv')
+        df_path = os.path.join(self.p.option(), 'ssbu_names.csv')
         df = pd.read_csv(df_path)
         records = []
         for _, row in df.iterrows():
@@ -120,7 +124,7 @@ class Option:
         """
         ホロライブのハッシュタグの一覧 + アイコンの画像URL
         """
-        df_path = os.path.join(Path.option(), 'holo_twitter_hashtag.csv')
+        df_path = os.path.join(self.p.option(), 'holo_twitter_hashtag.csv')
         df = pd.read_csv(df_path)
         records = []
         for _, row in df.iterrows():
@@ -134,7 +138,7 @@ class Option:
         """
         ホロライブ以外で収集したいハッシュタグの一覧
         """
-        df_path = os.path.join(Path.option(), 'twitter_base_hashtags.csv')
+        df_path = os.path.join(self.p.option(), 'twitter_base_hashtags.csv')
         df = pd.read_csv(df_path)
         return df['hashtag']
     
@@ -142,7 +146,7 @@ class Option:
         """
         ホロライブのYouTubeチャンネル一覧
         """
-        df_path = os.path.join(Path.option(), 'holo_youtube_channel_url.csv')
+        df_path = os.path.join(self.p.option(), 'holo_youtube_channel_url.csv')
         df = pd.read_csv(df_path)
         return df['0'].tolist()
     
@@ -150,7 +154,7 @@ class Option:
         """
         ホロライブのエロ画像のメンバー名一覧
         """
-        path = os.path.join(Path.option(), 'holo_lewd_flair_texts.csv')
+        path = os.path.join(self.p.option(), 'holo_lewd_flair_texts.csv')
         df = pd.read_csv(path)
         return df['flair_text'].tolist()
     
@@ -158,7 +162,7 @@ class Option:
         """
         ホロライブ非公式Wikiの歌ってみたのURL
         """
-        yaml_path = os.path.join(Path.option(), 'holo_wiki_urls.yaml')
+        yaml_path = os.path.join(self.p.option(), 'holo_wiki_urls.yaml')
         with open(yaml_path) as file:
             yml = yaml.safe_load(file)
             return yml['cover']
@@ -167,7 +171,7 @@ class Option:
         """
         ホロライブ非公式Wikiのオリ曲のURL
         """
-        yaml_path = os.path.join(Path.option(), 'holo_wiki_urls.yaml')
+        yaml_path = os.path.join(self.p.option(), 'holo_wiki_urls.yaml')
         with open(yaml_path) as file:
             yml = yaml.safe_load(file)
             return yml['ori']
@@ -176,7 +180,7 @@ class Option:
         """
         ホロライブ非公式Wikiの記念配信のURL
         """
-        yaml_path = os.path.join(Path.option(), 'holo_wiki_urls.yaml')
+        yaml_path = os.path.join(self.p.option(), 'holo_wiki_urls.yaml')
         with open(yaml_path) as file:
             yml = yaml.safe_load(file)
             return yml['memory']

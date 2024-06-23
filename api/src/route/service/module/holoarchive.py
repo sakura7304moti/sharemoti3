@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from src.route.service.module.utils import const, interface
 
+p = const.Path()
 opt = const.Option()
 channel_url_list = opt.youtube_holo_channels()
 
@@ -246,8 +247,7 @@ def update_archives():
 """
 データベース用の関数
 """
-database = interface.Database()
-dbname = database.youtube_path()
+dbname = p.db_youtube()
 def make_database():
     #dbファイル作成
     conn = sqlite3.connect(dbname)
