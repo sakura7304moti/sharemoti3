@@ -1,4 +1,4 @@
-from api.src.route.service.module import holoarchive
+from src.route.service.module import holoarchive
 
 """
 ホロライブのYouTube動画一覧

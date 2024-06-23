@@ -1,7 +1,8 @@
 import sqlite3
 import re
-from api.src.route.service.module.utils import const, interface
-dbname = const.Path.db_twitter
+from src.route.service.module.utils import const, interface
+p = const.Path()
+dbname = p.db_twitter()
 
 
 def init():

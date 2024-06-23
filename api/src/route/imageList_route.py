@@ -6,8 +6,8 @@ import json
 import os
 from flask import Blueprint, flash, request, jsonify, send_file
 from werkzeug.utils import secure_filename
-from api.src.route.service import imagelist_service
-from api.src.route.service.module.utils import const
+from src.route.service import imagelist_service
+from src.route.service.module.utils import const
 
 
 #改行文字を取得

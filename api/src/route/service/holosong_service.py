@@ -1,4 +1,4 @@
-from api.src.route.service.module import holosong
+from src.route.service.module import holosong
 
 """
 ホロライブ非公式wikiのスクレイピング

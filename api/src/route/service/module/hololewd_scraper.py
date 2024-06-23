@@ -9,7 +9,9 @@ import os
 from tqdm import tqdm
 
 from . import hololewd_sqlite
-from api.src.route.service.module.utils import const, interface
+from src.route.service.module.utils import const
+
+p = const.Path()
 
 def get_rows():
     # Reddit APIの認証情報を設定
@@ -51,7 +53,7 @@ def flair_texts_update():
     records,cn = hololewd_sqlite.search(page_size=999999)
     flair_texts = sorted(list(set([r.flair_text for r in records])))
 
-    csv_path = os.path.join(const.Path.option, "holo_lewd_flair_texts.csv")
+    csv_path = os.path.join(p.option(), "holo_lewd_flair_texts.csv")
     with open(csv_path, 'w', newline='') as file:
         writer = csv.writer(file)
         writer.writerow(["flair_text"])

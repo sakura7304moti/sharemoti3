@@ -5,7 +5,7 @@ from PIL import Image
 from rembg import remove, new_session
 import io
 import glob
-from api.src.route.service.module.utils import const
+from src.route.service.module.utils import const
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 

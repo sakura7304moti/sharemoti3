@@ -5,14 +5,14 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-from api.src.route.service.module.utils import const, interface
-
+from src.route.service.module.utils import const, interface
+opt = const.Option()
 
 def get_cover_songs() -> list[interface.SongQueryRecord]:
     records = []
 
     # 指定したURLからHTMLを取得
-    url = const.Option.holo_wiki_cover
+    url = opt.holo_wiki_cover()
     response = requests.get(url)
 
     # BeautifulSoupでHTMLを解析
@@ -40,7 +40,7 @@ def get_cover_songs() -> list[interface.SongQueryRecord]:
 
 def get_original_songs() -> list[interface.SongQueryRecord]:
     records = []
-    response = holo_wiki_original
+    response = opt.holo_wiki_original()
     soup = BeautifulSoup(response.text, 'html.parser')
     elements = soup.find_all('div',class_="wiki-section-3")
     for element in elements:
@@ -62,7 +62,7 @@ def get_original_songs() -> list[interface.SongQueryRecord]:
     return records
 
 def get_memory_movies() -> list[interface.HoloMemoryRecord]:
-    url = const.Option.holo_wiki_memory
+    url = opt.holo_wiki_memory()
     
     # 指定したURLからHTMLを取得
     response = requests.get(url)

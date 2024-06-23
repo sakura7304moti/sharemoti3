@@ -1,4 +1,4 @@
-from api.src.route.service.module import karaokelist
+from src.route.service.module import karaokelist
 """
 カラオケ
 """

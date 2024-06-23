@@ -1,4 +1,4 @@
-from api.src.route.service.module import radiolist
+from src.route.service.module import radiolist
 """
 オムコレイディオ
 """

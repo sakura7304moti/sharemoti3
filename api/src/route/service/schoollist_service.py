@@ -1,4 +1,4 @@
-from api.src.route.service.module import schoollist
+from src.route.service.module import schoollist
 
 """
 学校一覧

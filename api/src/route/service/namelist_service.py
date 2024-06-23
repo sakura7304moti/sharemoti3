@@ -1,4 +1,4 @@
-from api.src.route.service.module import namelist
+from src.route.service.module import namelist
 """
 スマブラのページ用のあだ名一覧
 """

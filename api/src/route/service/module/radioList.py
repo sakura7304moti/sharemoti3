@@ -5,8 +5,9 @@ import os
 import glob
 import datetime
 
-from api.src.route.service.module.utils import const,interface
-DATA_PATH = const.Path.file_data_dir
+from src.route.service.module.utils import const,interface
+p = const.Path()
+DATA_PATH = p.share_folder()
 
 
 """

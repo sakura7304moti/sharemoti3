@@ -1,4 +1,4 @@
-from api.src.route.service.module import wordlist
+from src.route.service.module import wordlist
 """
 名言集
 """

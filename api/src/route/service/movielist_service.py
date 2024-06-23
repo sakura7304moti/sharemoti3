@@ -1,4 +1,4 @@
-from api.src.route.service.module import movielist
+from src.route.service.module import movielist
 
 """
 完成品一覧

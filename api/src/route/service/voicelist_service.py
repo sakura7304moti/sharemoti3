@@ -1,4 +1,4 @@
-from api.src.route.service.module import voicelist
+from src.route.service.module import voicelist
 
 """
 ボイス

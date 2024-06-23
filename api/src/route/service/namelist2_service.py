@@ -1,4 +1,4 @@
-from api.src.route.service.module import namelist2
+from src.route.service.module import namelist2
 """
 あだ名一覧
 """

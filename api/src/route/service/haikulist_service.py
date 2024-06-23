@@ -1,4 +1,4 @@
-from api.src.route.service.module import haikulist
+from src.route.service.module import haikulist
 
 """
 俳句一覧

@@ -4,8 +4,8 @@
 import json
 import os
 from flask import Blueprint, request, jsonify, send_file
-from api.src.route.service.module.utils import const
-from api.src.route.service import movielist_service
+from src.route.service.module.utils import const
+from src.route.service import movielist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = const.get_new_line_text()

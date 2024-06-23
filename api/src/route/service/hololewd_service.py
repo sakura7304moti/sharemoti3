@@ -1,4 +1,4 @@
-from api.src.route.service.module import hololewd_scraper,hololewd_sqlite
+from src.route.service.module import hololewd_scraper,hololewd_sqlite
 
 """
 Hololewd

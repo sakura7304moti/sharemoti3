@@ -1,4 +1,4 @@
-from api.src.route.service.module import yakilist
+from src.route.service.module import yakilist
 
 def create_db():
     """

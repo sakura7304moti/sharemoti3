@@ -4,9 +4,9 @@
 import sqlite3
 import datetime
 
-from api.src.route.service.module.utils import const,interface
-const_path = const.Path
-dbname = const_path.db_main_share
+from src.route.service.module.utils import const,interface
+p = const.Path()
+dbname = p.db_main_share()
 
 
 """

@@ -1,7 +1,7 @@
 import sqlite3
-from api.src.route.service.module.utils import const, interface
-
-dbname = const.Path.db_hololewd
+from src.route.service.module.utils import const, interface
+p = const.Path()
+dbname = p.db_hololewd()
 
 def make_table():
     conn = sqlite3.connect(dbname)

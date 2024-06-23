@@ -5,8 +5,8 @@ import json
 import math
 
 from flask import Blueprint, jsonify, request
-from api.src.route.service import hololewd_service
-from api.src.route.service.module.utils import const
+from src.route.service import hololewd_service
+from src.route.service.module.utils import const
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('hololewd',__name__)

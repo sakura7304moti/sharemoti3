@@ -3,8 +3,8 @@
 """
 import json
 from flask import Blueprint, request, jsonify
-from api.src.route.service.module.utils import const
-from api.src.route.service import haikulist_service
+from src.route.service.module.utils import const
+from src.route.service import haikulist_service
 
 #改行文字を取得
 NEW_LINE_TEXT = const.get_new_line_text()

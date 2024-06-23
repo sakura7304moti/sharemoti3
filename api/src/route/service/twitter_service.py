@@ -1,4 +1,4 @@
-from api.src.route.service.module import twitter_scraper,twitter_sqlite
+from src.route.service.module import twitter_scraper,twitter_sqlite
 
 def get_tweet(hashtag:str, date:int):
     """

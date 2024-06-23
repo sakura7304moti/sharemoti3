@@ -1,4 +1,4 @@
-from api.src.route.service.module import ssbulist
+from src.route.service.module import ssbulist
 
 """
 スマブラの切り抜き

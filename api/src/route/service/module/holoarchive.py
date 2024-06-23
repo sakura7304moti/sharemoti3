@@ -8,10 +8,10 @@ from typing import List
 from tqdm import tqdm
 
 
-from api.src.route.service.module.utils import const, interface
+from src.route.service.module.utils import const, interface
 
-
-channel_url_list = const.Option.youtube_holo_channels()
+opt = const.Option()
+channel_url_list = opt.youtube_holo_channels()
 
 
 """

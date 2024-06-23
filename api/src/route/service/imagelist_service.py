@@ -1,4 +1,4 @@
-from api.src.route.service.module import imagelist
+from src.route.service.module import imagelist
 
 """
 画像一覧
