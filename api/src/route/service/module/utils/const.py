@@ -97,6 +97,12 @@ class Path:
         """
         return os.path.join(self.database(), 'youtube.db')
     
+    def db_pixiv(self):
+        """
+        ホロライブのpixivのDB
+        """
+        return os.path.join(self.database(), 'pixiv.db')
+    
 class Option:
 
     def __init__(self):
