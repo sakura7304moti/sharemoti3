@@ -5,8 +5,13 @@ export class APIClient {
   public route = useRoute();
 
   public apiEndpoint = function () {
-    const path = location.origin.replace(':9000', '').replace(':2000', ''); //http:xxx
-    return path + ':5000';
+    if (location.origin.includes('sakura0moti')) {
+      return 'http://api.sakura0moti.com';
+    } else {
+      const originUrl = new URL(window.location.origin);
+      originUrl.port = '5000';
+      return originUrl.toString();
+    }
   };
   public config = {
     headers: {
