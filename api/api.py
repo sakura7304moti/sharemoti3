@@ -31,6 +31,7 @@ from src.route import holosong_route
 from src.route import holomovie_route
 from src.route import holoarchive_route
 from src.route import hololewd_route
+from src.route import pixiv_route
 
 #sub
 from src.route import rembg_route
@@ -65,6 +66,7 @@ app.register_blueprint(holosong_route.app)
 app.register_blueprint(holomovie_route.app)
 app.register_blueprint(holoarchive_route.app)
 app.register_blueprint(hololewd_route.app)
+app.register_blueprint(pixiv_route.app)
 #sub
 app.register_blueprint(rembg_route.app)
 

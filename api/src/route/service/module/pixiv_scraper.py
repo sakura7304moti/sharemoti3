@@ -4,8 +4,10 @@
 import os
 import sys
 import time
+import sqlite3
 
 
+from tqdm import tqdm
 from pixivpy3 import *
 
 
@@ -14,6 +16,13 @@ from src.route.service.module.utils import const
 #-----------------------------------------
 # 必要な変数をセット
 #-----------------------------------------
+def get_api():
+    """
+    検索に使用する
+    """
+    api = AppPixivAPI()
+    api.auth(refresh_token="kBn2GtDM4l3JJiVXLJBsa0BOl0s_p2JUU9wQlTHalqk")
+    return api
 
 p = const.Path()
 dbname = p.db_pixiv()
@@ -26,15 +35,6 @@ api = get_api()
 #-----------------------------------------
 # API検索
 #-----------------------------------------
-
-def get_api():
-    """
-    検索に使用する
-    """
-    api = AppPixivAPI()
-    api.auth(refresh_token="kBn2GtDM4l3JJiVXLJBsa0BOl0s_p2JUU9wQlTHalqk")
-    return api
-
 def search_illusts(query:str):
     """
     pixivで指定したキーワードで全データ検索
@@ -368,6 +368,7 @@ def holo_pixiv_update():
     全ホロメンのPixivアートをDBに保存
     """
     for member in tqdm(members):
+        tqdm.write(f"\rName: \033[92m{member}\033[0m", end='')
         query = f"{member} 000user"
         illusts = search_illusts(query)
         for illust in illusts:

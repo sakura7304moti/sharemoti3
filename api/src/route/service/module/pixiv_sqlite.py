@@ -83,11 +83,11 @@ def search_illust(
             min_total_view
     )
     
-    offset = (max(page_no - 1,0))*page_size
+    offset = max(page_no - 1,1)*page_size
     
     query = f"""
         {base_query}
-        ORDER BY create_date, id desc
+        ORDER BY create_date desc, id desc
         LIMIT {page_size} OFFSET {offset}
     """
     with db_connection() as conn:

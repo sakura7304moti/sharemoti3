@@ -130,8 +130,9 @@ class Option:
         """
         ホロライブのハッシュタグの一覧 + アイコンの画像URL
         """
-        df_path = os.path.join(self.p.option(), 'holo_twitter_hashtag.csv')
+        df_path = os.path.join(self.p.option(), 'holo_names.csv')
         df = pd.read_csv(df_path)
+        df = df.drop_duplicates(subset='hashtag')
         records = []
         for _, row in df.iterrows():
             hashtag = row["hashtag"]
@@ -193,7 +194,9 @@ class Option:
         
     #ホロメン一覧
     def holo_wiki_members(self):
-        holo_path = os.path.join(self.p.option(), "holo_member_name.csv")
+        holo_path = os.path.join(self.p.option(), "holo_names.csv")
         df = pd.read_csv(holo_path)
-        word_list = df["member"].tolist()
-        return word_list
+        df = df[df["name"].notna()]
+        df = df.drop_duplicates(subset='name')
+        names = df["name"].tolist()
+        return names
