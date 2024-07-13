@@ -39,6 +39,7 @@ export class APIClient {
       const r = JSON.parse(res.data);
       return r;
     } catch (e) {
+      console.log('parse err', e);
       return null;
     }
   }

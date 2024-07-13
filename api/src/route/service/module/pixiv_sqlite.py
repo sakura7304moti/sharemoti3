@@ -14,8 +14,9 @@ def db_connection():
 
 # イラストの検索
 def search_illust_param_set(
+    text:str,
     hashtags:list[str],
-    user_id:int,
+    user_ids:list[int],
     min_total_bookmarks:int,
     min_total_view:int
 ):
@@ -23,7 +24,7 @@ def search_illust_param_set(
     検索用のクエリ・パラメータを取得
     """
     args = {
-        'user':user_id,
+        'text':f"%{text}%",
         'bookmark':min_total_bookmarks,
         'view':min_total_view
     }
@@ -33,7 +34,7 @@ def search_illust_param_set(
         id,
         title AS title,
         type AS type,
-        caption AS caption,
+        '' AS caption,
         user_id AS userId,
         create_date AS createDate,
         page_count AS pageCount,
@@ -49,8 +50,6 @@ def search_illust_param_set(
             LEFT JOIN hashtag AS hs ON il.id = hs.id
             where 1 = 1 
     """
-    if user_id > 0:
-        query = query + 'and il.user_id = :user '
     
     if min_total_bookmarks > 0:
         query = query + 'and il.total_bookmarks >= :bookmark '
@@ -63,11 +62,29 @@ def search_illust_param_set(
     for tag in hashtags:
         query = query + f"and id in (select id from hashtag where name = '{tag}') "
 
+    for user_id in user_ids:
+        query = query + f"and id in (select id from illust where user_id = '{user_id}')"
+
+    if text != '':
+        query = query + """
+        and id in (
+            select il.id from illust as il 
+            left join user as us on il.user_id = us.id 
+            where
+                il.title LIKE :text OR 
+                us.name LIKE :text
+        )
+        and id in (
+            select id from hashtag where name LIKE :text
+        )
+        """
+
     return query, args
 
 def search_illust(
+    text:str,
     hashtags:list[str] = [],
-    user_id:int = 0,
+    user_ids:list[int] = [],
     min_total_bookmarks:int = 0,
     min_total_view:int = 0,
     page_no:int = 1,
@@ -77,13 +94,14 @@ def search_illust(
     ページング検索
     """
     base_query,args = search_illust_param_set(
+            text,
             hashtags,
-            user_id,
+            user_ids,
             min_total_bookmarks,
             min_total_view
     )
     
-    offset = max(page_no - 1,1)*page_size
+    offset = max(page_no - 1,0)*page_size
     
     query = f"""
         {base_query}
@@ -95,8 +113,9 @@ def search_illust(
         return df
 
 def search_illust_count(
+    text:str,
     hashtags:list[str] = 0,
-    user_id:int = 0,
+    user_ids:list[int] = [],
     min_total_bookmarks:int = 0,
     min_total_view:int = 0
 ):
@@ -104,15 +123,44 @@ def search_illust_count(
     ページング無しの件数
     """
     base_query,args = search_illust_param_set(
+        text,
         hashtags,
-        user_id,
+        user_ids,
         min_total_bookmarks,
         min_total_view
     )
     query = f"SELECT count(*) as cn from ({base_query})"
     with db_connection() as conn:
         df = pd.read_sql(query, conn, params = args)
-        return df.iloc[0, 0]
+        return int(df.iloc[0, 0])
+
+def get_illust_data(id:int):
+    query = """
+        SELECT 
+            id,
+            title AS title,
+            type AS type,
+            '' AS caption,
+            user_id AS userId,
+            create_date AS createDate,
+            page_count AS pageCount,
+            width AS width,
+            height AS height,
+            sanity_level AS sanityLevel,
+            total_view AS totalView,
+            total_bookmarks AS totalBookmarks,
+            illust_ai_type AS illustAiType
+        FROM illust
+        where id = :id
+    """
+    with db_connection() as conn:
+        df = pd.read_sql(query, conn, params = {
+            "id" : id
+        })
+    illust_json = df.to_json(orient='records',force_ascii=False)[1:-1]
+    return illust_json
+    
+    
 
 def get_images(id:int):
     """
@@ -144,12 +192,14 @@ def search_hashtags(name:str):
         distinct(name) as name,
         translated_name as translatedName
     FROM hashtag
-    WHERE name like :name OR translated_name like :name
+    WHERE name like :name OR translated_name like :name 
     """
 
     args = {"name":f"%{name}%"}
     with db_connection() as conn:
         df = pd.read_sql(query, conn, params = args)
+        df['name'] = df['name'].astype(str)
+        df = df.sort_values('name')
         return df
 
 def search_users(name:str):
@@ -166,6 +216,7 @@ def search_users(name:str):
         profile_image_url_large as profileImageUrlLarge
     FROM user
     WHERE id = :name OR name like :likeName OR account = :name
+    order by name
     """
 
     args = {"name":name, "likeName":f"%{name}%"}

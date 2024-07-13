@@ -349,6 +349,10 @@ function usePage() {
       url: '/hololewd',
     },
     {
+      title:'pixiv',
+      url:'/pixiv'
+    },
+    {
       title: '歌みた',
       url: '/holosong',
     },

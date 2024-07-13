@@ -1,3 +1,5 @@
+import json
+
 from src.route.service.module import pixiv_scraper,pixiv_sqlite
 
 def scraping():
@@ -8,8 +10,9 @@ def scraping():
     pixiv_scraper.holo_pixiv_update()
 
 def search_illust(
+    text:str,
     hashtags:list[str] = [],
-    user_id:int = 0,
+    user_ids:list[int] = [],
     min_total_bookmarks:int = 0,
     min_total_view:int = 0,
     page_no:int = 1,
@@ -26,23 +29,44 @@ def search_illust(
         page_size : 取得最大レコード数
     Returns:
         DataFrame : 検索結果
-        totalCount : レコード件数
     """
     df = pixiv_sqlite.search_illust(
+        text = text,
         hashtags = hashtags,
-        user_id = user_id,
+        user_ids = user_ids,
         min_total_bookmarks = min_total_bookmarks,
         min_total_view = min_total_view,
         page_no = page_no,
         page_size = page_size
     )
+    return df
+
+def search_illust_count(
+    text:str,
+    hashtags:list[str] = [],
+    user_ids:list[int] = [],
+    min_total_bookmarks:int = 0,
+    min_total_view:int = 0
+):
     count = pixiv_sqlite.search_illust_count(
+        text = text,
         hashtags = hashtags,
-        user_id = user_id,
+        user_ids = user_ids,
         min_total_bookmarks = min_total_bookmarks,
         min_total_view = min_total_view
     )
-    return df,count
+    return count
+
+def get_illust(id:int):
+    """
+    イラストデータを取得
+    """
+    result = pixiv_sqlite.get_illust_data(id)
+    illust = json.loads(result)
+    images_df = pixiv_sqlite.get_images(id)
+    images_json = images_df.to_json(orient='records',force_ascii=False)
+    illust['images'] = json.loads(images_df.to_json(orient='records',force_ascii=False))
+    return illust
 
 def get_images(id:int):
     """

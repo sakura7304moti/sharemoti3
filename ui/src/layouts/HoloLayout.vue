@@ -107,6 +107,10 @@ export default defineComponent({
         title: 'reddit',
       },
       {
+        url:'/pixiv',
+        title:'pixiv'
+      },
+      {
         url: '/holosong',
         title: 'cover song',
       },

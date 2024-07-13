@@ -200,3 +200,11 @@ class Option:
         df = df.drop_duplicates(subset='name')
         names = df["name"].tolist()
         return names
+
+    #pixivのホロメン選択に使用
+    def holo_pixiv_selecter(self):
+        holo_path = os.path.join(self.p.option(), "holo_names.csv")
+        df = pd.read_csv(holo_path)
+        df = df[df["name"].notna()]
+        df = df.drop_duplicates(subset='name')
+        return df
