@@ -20,7 +20,6 @@ import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import PixivSearchArea from 'src/components/pixiv/PixivSearchArea.vue';
 import PixivImageCard from 'src/components/pixiv/PixivImageCard.vue';
 import { computed, defineComponent } from 'vue';
-import { RouteLocationRaw, useRoute, useRouter } from 'vue-router';
 export default defineComponent({
   name: 'pixiv-top',
   components: {

@@ -15,7 +15,13 @@
       />
     </template>
     <template v-slot:append>
-      <q-btn round dense flat icon="toc" @click="dialogOpen = true">
+      <q-btn
+        round
+        dense
+        flat
+        icon="toc"
+        @click.prevent.stop="dialogOpen = true"
+      >
         <q-tooltip> ユーザーを一覧から選ぶ </q-tooltip>
       </q-btn>
     </template>
@@ -35,7 +41,7 @@
             text-color="black"
             size="md"
             label="とじる"
-            @click="dialogOpen = false"
+            @click.prevent.stop="dialogOpen = false"
           />
         </div>
       </div>

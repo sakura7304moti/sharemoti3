@@ -32,10 +32,11 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       hashtags: [],
       userIds: [],
       minTotalBookmarks: 0,
-      minTotalView: 0,
+      minTotalView: 20000,
       pageNo: 1,
       pageSize: 20,
     } as Condition);
+    const isR18 = ref(false);
 
     const isExistsHashtag = function (hashtag: string) {
       return condition.value.hashtags.includes(hashtag);
@@ -81,6 +82,7 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       userCondition,
       findUsers,
       condition,
+      isR18,
       isExistsHashtag,
       isExistsUser,
       pageState,
@@ -142,10 +144,24 @@ export const PixivSearchStore = defineStore('pixiv-search', {
     // ------------------------------
     searchIllust: async function () {
       this.isLoading.illust = true;
+      const request = {
+        text: this.condition.text,
+        hashtags: this.condition.hashtags,
+        userIds: this.condition.userIds,
+        minTotalBookmarks: this.condition.minTotalBookmarks,
+        minTotalView: this.condition.minTotalView,
+        pageNo: this.condition.pageNo,
+        pageSize: this.condition.pageSize,
+      } as Condition;
+      console.log('isR18', this.isR18);
+      if (!request.hashtags.includes('R-18') && this.isR18) {
+        request.hashtags.push('R-18');
+      }
       await api
-        .search_illust(this.condition)
+        .search_illust(request)
         .then(async (response) => {
           if (response) {
+            console.log('search illust condition', this.condition);
             console.log('search illust', response);
             this.pageState.records.splice(0);
             response.forEach((it) => this.pageState.records.push(it));
@@ -212,6 +228,28 @@ export const PixivSearchStore = defineStore('pixiv-search', {
             message: 'ハッシュタグの検索失敗...',
           });
         });
+    },
+
+    getHashtags: async function (id: number) {
+      const hashtags = [] as Hashtag[];
+      this.isLoading.hashtag = true;
+      await api
+        .search_hashtags('', id)
+        .then((response) => {
+          if (response) {
+            console.log('search hashtags', response);
+            response.forEach((it) => hashtags.push(it));
+          }
+        })
+        .catch((err) => {
+          console.log('search hashtags err', err);
+          this.quasar.notify({
+            color: 'red',
+            position: 'top',
+            message: 'ハッシュタグの検索失敗...',
+          });
+        });
+      return hashtags;
     },
 
     searchUsers: async function () {

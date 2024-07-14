@@ -52,8 +52,9 @@ export class PixivApi extends ScraperAPIClient {
     }
   }
 
-  public search_hashtags(name: string): Promise<Array<Hashtag> | null> {
-    const url = '/pixiv/search/hashtags?name=' + name;
+  public search_hashtags(name: string, id = 0): Promise<Array<Hashtag> | null> {
+    const idQuery = id > 0 ? '' : `&id=${id}`;
+    const url = '/pixiv/search/hashtags?name=' + name + idQuery;
     const path = this.combineUrl(url);
     return this.httpGet<Array<Hashtag>>(path);
   }

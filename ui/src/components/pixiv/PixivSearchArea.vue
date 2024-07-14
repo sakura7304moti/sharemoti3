@@ -31,12 +31,7 @@
         v-model="condition.pageNo"
         :max="pageState.pageCount"
         :max-pages="10"
-        direction-links
-        boundary-links
-        icon-first="skip_previous"
-        icon-last="skip_next"
-        icon-prev="fast_rewind"
-        icon-next="fast_forward"
+        input
         @update:model-value="onPageClick"
         v-if="pageState.records.length > 0"
       />
@@ -46,14 +41,14 @@
   <q-dialog v-model="dialogView">
     <q-card class="q-pa-md">
       <q-card-section class="q-pa-md">
-        <div class="q-pa-md">
+        <div class="q-pa-md flex">
           <q-input
             dense
             v-model="condition.text"
             label="検索欄"
             outlined
             stack-label
-            style="width: 300px"
+            style="width: 220px"
           >
             <template v-slot:append>
               <q-btn flat icon="search" color="primary" @click="onSearchClick">
@@ -61,17 +56,20 @@
               </q-btn>
             </template>
           </q-input>
+          <q-checkbox v-model="isR18" label="R18" style="width: 40px">
+          </q-checkbox>
         </div>
         <div>
+          <div class="q-pa-md">
+            <holo-name-select />
+          </div>
           <div class="q-pa-md">
             <hashtag-input />
           </div>
           <div class="q-pa-md">
             <user-input />
           </div>
-          <div class="q-pa-md">
-            <holo-name-select />
-          </div>
+
           <div class="q-pa-md" style="display: none">
             <q-select
               v-model="condition.minTotalBookmarks"
@@ -116,8 +114,10 @@ export default defineComponent({
     const router = useRouter();
 
     const dialogView = ref(false);
+
     const store = PixivSearchStore();
     const condition = ref(store.condition);
+    const isR18 = ref(store.isR18);
     const holoname = ref(store.selectedHoloName);
 
     watch(holoname, (newValue, oldValue) => {
@@ -130,6 +130,7 @@ export default defineComponent({
     const onSearchClick = function () {
       dialogView.value = false;
       condition.value.pageNo = 1;
+      store.isR18 = isR18.value;
       store.searchIllust();
       replaceUrl(1);
     };
@@ -151,25 +152,36 @@ export default defineComponent({
         store.condition.text = route.query.text.toString();
       }
       if (route.query.tags) {
-        if (route.query.tags instanceof String) {
-          store.condition.hashtags.push(route.query.tags.toString());
-        }
+        const tags = route.query.tags.toString();
+        tags.split(',').forEach((tag) => {
+          if (tags.length > 0) {
+            store.condition.hashtags.push(tag);
+          }
+        });
       }
       if (route.query.user) {
-        if (route.query.user instanceof String) {
-          store.condition.userIds.push(Number(route.query.user));
-        }
+        const users = route.query.user.toString();
+        users.split(',').forEach((us) => {
+          if (Number(us) > 0) {
+            store.condition.userIds.push(Number(us));
+            store.addUser(Number(us));
+          }
+        });
       }
       if (route.query.minbookmark) {
         store.condition.minTotalBookmarks = Number(route.query.minbookmark);
       }
-      if (route.query.mintotal) {
-        store.condition.minTotalView = Number(route.query.mintotal);
+      if (route.query.minview) {
+        store.condition.minTotalView = Number(route.query.minview);
+      }
+      if (route.query.r18) {
+        store.isR18 = route.query.r18.toString() == 'true';
       }
       if (route.query.page) {
         store.condition.pageNo = Number(route.query.page);
       }
       if (route.query.fetch) {
+        console.log('condition', condition.value);
         store.searchIllust();
       }
     };
@@ -178,12 +190,17 @@ export default defineComponent({
 
     const replaceUrl = function (page: number) {
       router.push({
+        query: {},
+      });
+
+      router.push({
         query: {
           text: store.condition.text,
           tags: store.condition.hashtags,
           user: store.condition.userIds,
           minbookmark: store.condition.minTotalBookmarks,
           minview: store.condition.minTotalView,
+          r18: isR18.value ? 'true' : 'false',
           page: page,
           fetch: 'true',
         },
@@ -192,6 +209,7 @@ export default defineComponent({
 
     return {
       condition,
+      isR18,
       pageState,
       holoname,
       onSearchClick,
@@ -200,12 +218,6 @@ export default defineComponent({
     };
   },
 });
-interface ConditionState {
-  hashtags: string[];
-  userIds: number[];
-  minTotalBookmarks: number;
-  minTotalView: number;
-}
 </script>
 <style>
 @media only screen and(max-width:800px) {

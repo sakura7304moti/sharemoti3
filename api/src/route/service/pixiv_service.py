@@ -78,7 +78,7 @@ def get_images(id:int):
     """
     return pixiv_sqlite.get_images(id)
 
-def search_hashtags(name:str):
+def search_hashtags(name:str, id:int):
     """
     ハッシュタグの部分一致検索
     Args:
@@ -86,7 +86,7 @@ def search_hashtags(name:str):
     Returns:
         DataFrame
     """
-    return pixiv_sqlite.search_hashtags(name)
+    return pixiv_sqlite.search_hashtags(name, id)
 
 def search_users(name:str):
     """

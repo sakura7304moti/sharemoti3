@@ -70,12 +70,13 @@ def search_illust_param_set(
         and id in (
             select il.id from illust as il 
             left join user as us on il.user_id = us.id 
+            left join hashtag as hs on il.id = hs.id 
             where
                 il.title LIKE :text OR 
-                us.name LIKE :text
-        )
-        and id in (
-            select id from hashtag where name LIKE :text
+                us.name LIKE :text OR
+                hs.name LIKE :text OR
+                hs.translated_name LIKE :text
+            
         )
         """
 
@@ -183,7 +184,7 @@ def get_images(id:int):
         df = pd.read_sql(query, conn, params = args)
         return df
 
-def search_hashtags(name:str):
+def search_hashtags(name:str, id:int):
     """
     ハッシュタグの検索
     """
@@ -194,8 +195,10 @@ def search_hashtags(name:str):
     FROM hashtag
     WHERE name like :name OR translated_name like :name 
     """
+    if id > 0:
+        query = query + "id = :id"
 
-    args = {"name":f"%{name}%"}
+    args = {"name":f"%{name}%", "id":id}
     with db_connection() as conn:
         df = pd.read_sql(query, conn, params = args)
         df['name'] = df['name'].astype(str)

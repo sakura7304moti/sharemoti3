@@ -126,7 +126,8 @@ def pixiv_search_hashtags():
     ハッシュタグの検索
     """
     name = request.args.get('name', "")
-    df = pixiv_service.search_hashtags(name)
+    id = int(request.args.get('id', "0"))
+    df = pixiv_service.search_hashtags(name, id)
     records = df.to_json(orient='records',force_ascii=False)
     return jsonify(records)
 

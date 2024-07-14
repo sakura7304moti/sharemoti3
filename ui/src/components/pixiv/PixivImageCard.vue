@@ -1,11 +1,18 @@
 <template>
   <q-card
     style="width: 184px; height: 184px; overflow: hidden; position: relative"
-    class="q-mt-md q-mr-md q-ml-md q-mb-xs"
+    class="q-mt-md q-mr-md q-ml-md q-mb-xs pixiv-img-card"
     v-if="illustUrl.length > 0"
+    @click.prevent.stop="onClickIllust(illustId)"
   >
     <q-card-section class="q-pa-none img-wrap" v-if="illustUrl.length > 0">
       <img :src="illustUrl" class="pixiv-card-img" @error="illustUrl = ''" />
+      <q-btn
+        v-if="hover"
+        icon="zoom_in"
+        class="zoom-button"
+        @click="showDialog = true"
+      />
     </q-card-section>
   </q-card>
   <div
@@ -33,6 +40,7 @@
 import { defineComponent, ref, onMounted, watch } from 'vue';
 import api from 'src/api/scraper/PixivApi';
 import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
+import { useRoute, useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'pixiv-image-card',
@@ -44,9 +52,16 @@ export default defineComponent({
   },
   setup(props) {
     const store = PixivSearchStore();
+
+    const route = useRoute();
+    const router = useRouter();
+
+    const showDialog = ref(false);
+    const hover = ref(false);
     const illustUrl = ref('');
     const userUrl = ref('');
     const userName = ref('');
+
     const cardstate = ref({
       id: -1,
       title: '',
@@ -94,6 +109,15 @@ export default defineComponent({
       }
     };
 
+    const onClickIllust = function (id: number) {
+      router.push({
+        path: `/pixiv/illust/${id}`,
+        query: {
+          ...route.query,
+        },
+      });
+    };
+
     // 初回読み込み
     onMounted(() => {
       getImageCard(props.illustId);
@@ -108,10 +132,13 @@ export default defineComponent({
     );
 
     return {
+      showDialog,
+      hover,
       cardstate,
       illustUrl,
       userUrl,
       userName,
+      onClickIllust,
     };
   },
 });
@@ -155,13 +182,16 @@ interface User {
 
 <style>
 .pixiv-card-img {
-  width: 100%;
-  height: 100%;
+  width: 184px;
+  height: 184px;
   object-fit: cover;
 }
+/*画像の表示をなめらかにする */
 .img-wrap {
   overflow: hidden;
   position: relative;
+  width: 184px;
+  height: 184px;
 }
 
 .img-wrap::before {
@@ -178,5 +208,12 @@ interface User {
   100% {
     transform: translateX(100%);
   }
+}
+
+/*画像のカード */
+.pixiv-img-card:hover {
+  cursor: pointer;
+  opacity: 0.7;
+  transition: 0.3s;
 }
 </style>

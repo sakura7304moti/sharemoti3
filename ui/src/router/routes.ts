@@ -146,6 +146,17 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/pixiv/illust/:illustId',
+    component: () => import('layouts/HoloLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/pages/pixiv/PixivIllustPage.vue'),
+        props: true,
+      },
+    ],
+  },
+  {
     path: '/rembg',
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('pages/RembgPage.vue') }],
