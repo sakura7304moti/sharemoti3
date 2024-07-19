@@ -193,10 +193,12 @@ def search_hashtags(name:str, id:int):
         distinct(name) as name,
         translated_name as translatedName
     FROM hashtag
-    WHERE name like :name OR translated_name like :name 
+    WHERE 1 = 1 
     """
     if id > 0:
-        query = query + "id = :id"
+        query = query + "and id = :id "
+    if name != '':
+        query = query + "and name like :name OR translated_name like :name "
 
     args = {"name":f"%{name}%", "id":id}
     with db_connection() as conn:

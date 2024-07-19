@@ -1,16 +1,67 @@
 <template>
   <q-page class="">
     <div class="holo-page-title q-pb-md">pixiv illust</div>
-    <search-area
-      :hashtags="condition.hashtags"
-      :user-ids="condition.userIds"
-      :min-total-bookmarks="condition.minTotalBookmarks"
-      :min-total-view="condition.minTotalView"
-    />
 
-    <div class="row wrap" style="max-width: 1200px">
-      <div v-for="illust in illusts" :key="illust.id">
-        <image-card :illust-id="illust.id" />
+    <!--イラスト-->
+    <div class="q-ma-md">
+      <div v-for="il in mainIllust.images" :key="il.id">
+        <div class="pixiv-illust-img img-wrap" v-if="il.line == 0 || allView" >
+          <img :src="getImageUrl(il)" :style="{'aspect-ratio':mainIllust.width / mainIllust.height}" style="object-fit: contain;max-width:100vw;width:100%;max-height:70vh;height:100%"
+          />
+          <br />
+          <q-btn
+            :label="`全て見る : ${mainIllust.images.length}枚`"
+            color="primary"
+            @click="onDisplayClick()"
+            size="md"
+            class="text-bold q-py-xs q-px-md"
+            outline
+            icon="panorama"
+            v-if="il.line == 0 && !allView && mainIllust.images.length > 1 && !isLoading"
+          />
+        </div>
+      </div>
+      <!--イラスト説明-->
+      <div class="q-pa-md">
+        <div class="text-h6 text-bold">
+          {{ mainIllust.title }}
+        </div>
+        <div class="full-width row wrap">
+          <div v-for="tag in hashtags" :key="tag.name" class="text-primary text-bold q-pr-md cursor-pointer pixiv-tags">
+            {{ tag.name }}
+          </div>
+        </div>
+        <div class="row full-width" >
+          <div>
+            <q-avatar size="md" v-if="userProfileUrl">
+              <img :src="userProfileUrl" />
+            </q-avatar>
+          </div>
+          <div class="q-pl-sm q-pt-xs text-grey text-caption" v-if="findUser">
+            {{ findUser.name.substring(0, 8) }}
+            <span v-if="findUser.name.length > 8">...</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!--検索エリア-->
+    <div class="text-h5 text-primary q-pt-md">
+      検索<q-icon name="search" color="primary"></q-icon>
+    </div>
+    <div class="q-ma-md">
+      <search-area
+        :hashtags="condition.hashtags"
+        :user-ids="condition.userIds"
+        :min-total-bookmarks="condition.minTotalBookmarks"
+        :min-total-view="condition.minTotalView"
+      />
+
+      <div class="row wrap" style="max-width: 1200px">
+        <div v-for="illust in illusts" :key="illust.id">
+          <image-card :illust-id="illust.id" />
+        </div>
       </div>
     </div>
   </q-page>
@@ -20,7 +71,7 @@ import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import api from 'src/api/scraper/PixivApi';
 import PixivSearchArea from 'src/components/pixiv/PixivSearchArea.vue';
 import PixivImageCard from 'src/components/pixiv/PixivImageCard.vue';
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 export default defineComponent({
   name: 'pixiv-illust',
   props: {
@@ -34,6 +85,9 @@ export default defineComponent({
     'image-card': PixivImageCard,
   },
   setup(props) {
+    const allView = ref(false);
+    const userProfileUrl = ref('');
+    const findUser = ref(null as null | User) ;
     const hashtags = ref([] as Hashtag[]);
     const store = PixivSearchStore();
 
@@ -41,8 +95,8 @@ export default defineComponent({
       store.searchIllust();
     };
 
-    store.searchHashtags();
-    store.searchUsers();
+
+    const isLoading = ref(store.isLoading.illust);
     const illusts = computed(() => store.pageState.records);
 
     const mainIllust = ref({
@@ -68,6 +122,17 @@ export default defineComponent({
           if (response) {
             console.log('illust', response);
             mainIllust.value = response;
+
+            // 画像の非表示
+            onDisplayCloseClick();
+
+
+            // ユーザー情報の取得
+            const userUrl = getUserUrl();
+            if(userUrl){
+              userProfileUrl.value = store.getImageUrl(userUrl);
+              console.log('profile user',userProfileUrl.value);
+            }
           }
         })
         .catch((err) => {
@@ -87,16 +152,63 @@ export default defineComponent({
           console.log('get_hashtags err', err);
         });
     };
-    getIllust(props.illustId);
-    getHashtags(props.illustId);
+
+
+    const getImageUrl = function (image: Image) {
+      if (image.originalImageUrl) {
+        return store.getImageUrl(image.originalImageUrl ?? '');
+      } else {
+        return store.getImageUrl(image.imageUrlLarge ?? '');
+      }
+    };
+
+    const getUserUrl = function(){
+      const user = store.getUserbyId(mainIllust.value.userId);
+      if(user){
+        findUser.value = user;
+        return store.findUserImageUrl(user);
+      }
+    }
+
+    const onDisplayClick = function () {
+      allView.value = true;
+    };
+
+    const onDisplayCloseClick = function(){
+      allView.value = false;
+    }
+
+    const onReplaceCondition = function(first:boolean){
+      if(first){
+        store.searchHashtags();
+        store.searchUsers();
+      }
+      getIllust(props.illustId);
+      getHashtags(props.illustId);
+    }
+    onReplaceCondition(true);// ページの初期化
+
+
+    watch(props, () => {
+      onReplaceCondition(false);
+    });
 
     return {
+      // state
+      isLoading,
+      allView,
       condition: store.condition,
       hashtags,
       pageState: store.pageState,
       illusts,
-      onSearchClick,
       mainIllust,
+      userProfileUrl,
+      findUser,
+
+      // actions
+      onSearchClick,
+      onDisplayClick,
+      getImageUrl,
     };
   },
 });
@@ -142,3 +254,21 @@ interface Hashtag {
   translatedName: string;
 }
 </script>
+<style>
+
+/*
+メインのイラスト
+*/
+.pixiv-illust-img {
+  max-width:100vw;
+  width:100%;
+  height:auto;
+}
+
+/*
+ハッシュタグ
+*/
+.pixiv-tags:hover{
+  opacity: 0.7;
+}
+</style>

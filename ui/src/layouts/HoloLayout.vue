@@ -17,11 +17,12 @@
         <div
           v-for="item in pageList"
           :key="item.url"
-          class="row q-gutter-md holo-header-item holo-links-pc"
+          class="row q-gutter-none holo-header-item holo-links-pc"
           style="
             background: rgba(255, 255, 255, 0.5);
             border: solid 1px white; /*線*/
             border-radius: 10px; /*角の丸み*/
+            height:48px;
           "
         >
           <div>

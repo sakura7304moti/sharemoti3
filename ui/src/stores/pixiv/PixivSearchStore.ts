@@ -32,7 +32,7 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       hashtags: [],
       userIds: [],
       minTotalBookmarks: 0,
-      minTotalView: 20000,
+      minTotalView: 10000,
       pageNo: 1,
       pageSize: 20,
     } as Condition);
@@ -63,6 +63,24 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       }
     };
 
+    const isConditionDefault = function () {
+      if (condition.value.text.length > 0) {
+        return false;
+      } else if (condition.value.hashtags.length > 0) {
+        return false;
+      } else if (condition.value.userIds.length > 0) {
+        return false;
+      } else if (condition.value.minTotalBookmarks > 0) {
+        return false;
+      } else if (condition.value.minTotalView > 20000) {
+        return false;
+      } else if (isR18.value) {
+        return false;
+      } else {
+        return true;
+      }
+    };
+
     const pageState = ref({
       records: [],
       totalCount: 0,
@@ -85,6 +103,7 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       isR18,
       isExistsHashtag,
       isExistsUser,
+      isConditionDefault,
       pageState,
     };
   },
@@ -92,6 +111,17 @@ export const PixivSearchStore = defineStore('pixiv-search', {
     // ------------------------------
     // クリック等のアクション
     // ------------------------------
+    resetCondition: function () {
+      this.condition = {
+        text: '',
+        hashtags: [],
+        userIds: [],
+        minTotalBookmarks: 0,
+        minTotalView: 10000,
+        pageNo: 1,
+        pageSize: 20,
+      };
+    },
     addHashtag: function (hashtag: string) {
       if (!this.isExistsHashtag(hashtag)) {
         this.condition.hashtags.push(hashtag);
@@ -237,7 +267,7 @@ export const PixivSearchStore = defineStore('pixiv-search', {
         .search_hashtags('', id)
         .then((response) => {
           if (response) {
-            console.log('search hashtags', response);
+            console.log('select hashtags by id = ' + id, response);
             response.forEach((it) => hashtags.push(it));
           }
         })

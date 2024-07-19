@@ -12,8 +12,7 @@
           style="width: 300px"
         >
           <template v-slot:append>
-            <q-btn flat icon="search" color="primary" @click="onSearchClick">
-            </q-btn>
+            <q-btn flat icon="search" color="primary" @click="onSearchClick" />
           </template>
           <template v-slot:after>
             <q-btn
@@ -21,7 +20,7 @@
               flat
               text-color="gray"
               @click="dialogView = true"
-            ></q-btn>
+            />
           </template>
         </q-input>
       </div>
@@ -117,6 +116,7 @@ export default defineComponent({
 
     const store = PixivSearchStore();
     const condition = ref(store.condition);
+    const isConditionDefault = computed(() => store.isConditionDefault());
     const isR18 = ref(store.isR18);
     const holoname = ref(store.selectedHoloName);
 
@@ -139,6 +139,10 @@ export default defineComponent({
       dialogView.value = false;
       store.searchIllust();
       replaceUrl(condition.value.pageNo);
+    };
+
+    const onResetConditionclick = function () {
+      store.resetCondition();
     };
 
     store.searchHashtags();
@@ -194,6 +198,7 @@ export default defineComponent({
       });
 
       router.push({
+        path: '/pixiv',
         query: {
           text: store.condition.text,
           tags: store.condition.hashtags,
@@ -209,11 +214,13 @@ export default defineComponent({
 
     return {
       condition,
+      isConditionDefault,
       isR18,
       pageState,
       holoname,
       onSearchClick,
       onPageClick,
+      onResetConditionclick,
       dialogView,
     };
   },
