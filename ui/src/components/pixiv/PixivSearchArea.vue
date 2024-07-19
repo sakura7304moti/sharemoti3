@@ -1,8 +1,9 @@
 <template>
   <div class="pixiv-search-area-desktop">
     <div class="row q-gutter-sm">
-      <div>
-        <q-input
+
+        <div>
+          <q-input
           dense
           v-model="condition.text"
           label="検索欄"
@@ -18,12 +19,12 @@
             <q-btn
               icon="settings"
               flat
-              text-color="gray"
               @click="dialogView = true"
             />
           </template>
         </q-input>
-      </div>
+        </div>
+
     </div>
     <div class="q-pt-md">
       <q-pagination
@@ -40,6 +41,7 @@
   <q-dialog v-model="dialogView">
     <q-card class="q-pa-md">
       <q-card-section class="q-pa-md">
+
         <div class="q-pa-md flex">
           <q-input
             dense
@@ -155,22 +157,34 @@ export default defineComponent({
       if (route.query.text) {
         store.condition.text = route.query.text.toString();
       }
-      if (route.query.tags) {
-        const tags = route.query.tags.toString();
-        tags.split(',').forEach((tag) => {
+      if (route.query.hashtag) {
+        const tags = route.query.hashtag.toString();
+        if(tags.includes(',')){
+          tags.split(',').forEach((tag) => {
           if (tags.length > 0) {
             store.condition.hashtags.push(tag);
           }
         });
+        }
+        else{
+          store.condition.hashtags.push(tags);
+        }
+
       }
       if (route.query.user) {
         const users = route.query.user.toString();
-        users.split(',').forEach((us) => {
+        if(users.includes(',')){
+          users.split(',').forEach((us) => {
           if (Number(us) > 0) {
             store.condition.userIds.push(Number(us));
             store.addUser(Number(us));
           }
         });
+        }
+        else{
+          store.addUser(Number(users));
+        }
+
       }
       if (route.query.minbookmark) {
         store.condition.minTotalBookmarks = Number(route.query.minbookmark);

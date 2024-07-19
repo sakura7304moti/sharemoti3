@@ -59,11 +59,26 @@ def search_illust_param_set(
 
     query = query + ' )'
 
+    """
+    修正前
     for tag in hashtags:
         query = query + f"and id in (select id from hashtag where name = '{tag}') "
 
     for user_id in user_ids:
         query = query + f"and id in (select id from illust where user_id = '{user_id}')"
+    """
+    
+
+
+    for i, tag in enumerate(hashtags):
+        param_name = f"tag{i}"
+        query += f"and id in (select id from hashtag where name = :{param_name}) "
+        args[param_name] = tag
+    
+    for i, user_id in enumerate(user_ids):
+        param_name = f"user_id{i}"
+        query += f"and id in (select id from illust where user_id = :{param_name}) "
+        args[param_name] = user_id
 
     if text != '':
         query = query + """

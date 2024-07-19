@@ -9,7 +9,8 @@
           <img :src="getImageUrl(il)" :style="{'aspect-ratio':mainIllust.width / mainIllust.height}" style="object-fit: contain;max-width:100vw;width:100%;max-height:70vh;height:100%"
           />
           <br />
-          <q-btn
+          <div class="q-pl-md">
+            <q-btn
             :label="`全て見る : ${mainIllust.images.length}枚`"
             color="primary"
             @click="onDisplayClick()"
@@ -19,6 +20,8 @@
             icon="panorama"
             v-if="il.line == 0 && !allView && mainIllust.images.length > 1 && !isLoading"
           />
+          </div>
+
         </div>
       </div>
       <!--イラスト説明-->
@@ -27,11 +30,11 @@
           {{ mainIllust.title }}
         </div>
         <div class="full-width row wrap">
-          <div v-for="tag in hashtags" :key="tag.name" class="text-primary text-bold q-pr-md cursor-pointer pixiv-tags">
+          <div v-for="tag in hashtags" :key="tag.name" class="text-primary text-bold q-pr-md cursor-pointer pixiv-tags" @click="onHashtagClick(tag.name)">
             {{ tag.name }}
           </div>
         </div>
-        <div class="row full-width" >
+        <div class="row full-width cursor-pointer pixiv-user-icon" @click="onUserClick(findUser?.id ?? -1)">
           <div>
             <q-avatar size="md" v-if="userProfileUrl">
               <img :src="userProfileUrl" />
@@ -72,6 +75,8 @@ import api from 'src/api/scraper/PixivApi';
 import PixivSearchArea from 'src/components/pixiv/PixivSearchArea.vue';
 import PixivImageCard from 'src/components/pixiv/PixivImageCard.vue';
 import { computed, defineComponent, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useQuasar } from 'quasar';
 export default defineComponent({
   name: 'pixiv-illust',
   props: {
@@ -85,6 +90,9 @@ export default defineComponent({
     'image-card': PixivImageCard,
   },
   setup(props) {
+    const router = useRouter();
+    const route = useRoute();
+    const quasar = useQuasar();
     const allView = ref(false);
     const userProfileUrl = ref('');
     const findUser = ref(null as null | User) ;
@@ -170,6 +178,43 @@ export default defineComponent({
       }
     }
 
+    const onHashtagClick = function(hashtag:string){
+      store.resetCondition();
+      router.push({
+        path: '/pixiv',
+        query: {
+          hashtag:hashtag,
+          minview:1000,
+          fetch:'true'
+        },
+      });
+      quasar.notify({
+          color: 'secondary',
+          position: 'top',
+          message: '検索ハッシュタグ : ' + hashtag,
+        });
+    }
+
+    const onUserClick = function(userId:number){
+      if(userId == -1){
+        return;
+      }
+      store.resetCondition();
+      router.push({
+        path: '/pixiv',
+        query: {
+          user:userId,
+          minview:1000,
+          fetch:'true'
+        },
+      });
+      quasar.notify({
+          color: 'secondary',
+          position: 'top',
+          message: 'ユーザー名で検索',
+        });
+    }
+
     const onDisplayClick = function () {
       allView.value = true;
     };
@@ -208,7 +253,9 @@ export default defineComponent({
       // actions
       onSearchClick,
       onDisplayClick,
+      onHashtagClick,
       getImageUrl,
+      onUserClick
     };
   },
 });
@@ -269,6 +316,12 @@ interface Hashtag {
 ハッシュタグ
 */
 .pixiv-tags:hover{
+  opacity: 0.7;
+}
+/*
+ユーザーアイコン
+*/
+.pixiv-user-icon:hover{
   opacity: 0.7;
 }
 </style>

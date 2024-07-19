@@ -72,7 +72,7 @@ export const PixivSearchStore = defineStore('pixiv-search', {
         return false;
       } else if (condition.value.minTotalBookmarks > 0) {
         return false;
-      } else if (condition.value.minTotalView > 20000) {
+      } else if (condition.value.minTotalView > 10000) {
         return false;
       } else if (isR18.value) {
         return false;
