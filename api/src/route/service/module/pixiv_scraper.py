@@ -367,6 +367,7 @@ def holo_pixiv_update():
     """
     全ホロメンのPixivアートをDBに保存
     """
+    make_tables()
     for member in tqdm(members):
         tqdm.write(f"\rName: \033[92m{member}\033[0m", end='')
         query = f"{member} 000user"
