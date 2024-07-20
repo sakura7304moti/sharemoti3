@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { useQuasar } from 'quasar';
 import api from 'src/api/scraper/PixivApi';
-import { ref } from 'vue';
 /*
  * イラストの検索
  * 検索用オプション
@@ -10,24 +9,24 @@ import { ref } from 'vue';
 export const PixivSearchStore = defineStore('pixiv-search', {
   state: () => {
     const quasar = useQuasar();
-    const isLoading = ref({
+    const isLoading = {
       illust: false,
       holoname: false,
       hashtag: false,
       user: false,
-    } as Loading);
-    const holonames = ref([] as HoloName[]);
+    } as Loading;
+    const holonames = [] as HoloName[];
 
-    const hashtagCondition = ref('');
-    const findHashtags = ref([] as Hashtag[]);
+    const hashtagCondition = '';
+    const findHashtags = [] as Hashtag[];
 
-    const userCondition = ref('');
-    const selectedUsers = ref([] as User[]);
-    const findUsers = ref([] as User[]);
-    const userProfileUrl = ref('');
+    const userCondition = '';
+    const selectedUsers = [] as User[];
+    const findUsers = [] as User[];
+    let userProfileUrl = '';
 
-    const selectedHoloName = ref('');
-    const condition = ref({
+    const selectedHoloName = '';
+    const condition = {
       text: '',
       hashtags: [],
       userIds: [],
@@ -35,21 +34,21 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       minTotalView: 10000,
       pageNo: 1,
       pageSize: 20,
-    } as Condition);
-    const isR18 = ref(false);
+    } as Condition;
+    const isR18 = false;
 
     const isExistsHashtag = function (hashtag: string) {
-      return condition.value.hashtags.includes(hashtag);
+      return condition.hashtags.includes(hashtag);
     };
 
     const isExistsUser = function (userId: number) {
-      return condition.value.userIds.includes(userId);
+      return condition.userIds.includes(userId);
     };
 
     const updateUserProfileImage = function () {
-      userProfileUrl.value = '';
-      if (selectedUsers.value.length > 0) {
-        const user = selectedUsers.value[0];
+      userProfileUrl = '';
+      if (selectedUsers.length > 0) {
+        const user = selectedUsers[0];
         let imageUrl = '';
         if (user.profileImageUrlSquareMedium) {
           imageUrl = user.profileImageUrlSquareMedium;
@@ -58,34 +57,34 @@ export const PixivSearchStore = defineStore('pixiv-search', {
         } else if (user.profileImageUrlLarge) {
           imageUrl = user.profileImageUrlLarge;
         }
-        userProfileUrl.value =
+        userProfileUrl =
           api.apiEndpoint() + '/pixiv/image/download?url=' + imageUrl;
       }
     };
 
     const isConditionDefault = function () {
-      if (condition.value.text.length > 0) {
+      if (condition.text.length > 0) {
         return false;
-      } else if (condition.value.hashtags.length > 0) {
+      } else if (condition.hashtags.length > 0) {
         return false;
-      } else if (condition.value.userIds.length > 0) {
+      } else if (condition.userIds.length > 0) {
         return false;
-      } else if (condition.value.minTotalBookmarks > 0) {
+      } else if (condition.minTotalBookmarks > 0) {
         return false;
-      } else if (condition.value.minTotalView > 10000) {
+      } else if (condition.minTotalView > 10000) {
         return false;
-      } else if (isR18.value) {
+      } else if (isR18) {
         return false;
       } else {
         return true;
       }
     };
 
-    const pageState = ref({
+    const pageState = {
       records: [],
       totalCount: 0,
       pageCount: 0,
-    } as PageState);
+    } as PageState;
 
     return {
       quasar,
