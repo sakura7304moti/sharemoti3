@@ -34,7 +34,7 @@
             {{ tag.name }}
           </div>
         </div>
-        <user-area :user-id="mainIllust.userId"/>
+        <user-area :user-id="mainIllust.userId" :short-view="false"/>
       </div>
 
     </div>
@@ -176,7 +176,7 @@ export default defineComponent({
         path: '/pixiv',
         query: {
           hashtag:hashtag,
-          minview:1000,
+          minview:10000,
           fetch:'true'
         },
       });

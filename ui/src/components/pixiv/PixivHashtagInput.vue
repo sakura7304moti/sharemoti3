@@ -1,7 +1,7 @@
 <template>
   <q-select
     label="ハッシュタグ"
-    v-model="condition.hashtags"
+    v-model="condition"
     use-input
     use-chips
     multiple
@@ -65,7 +65,7 @@
           </template>
           <template v-slot:top-right>
             <div class="full-width row wrap">
-              <div v-for="tag in condition.hashtags" :key="tag">
+              <div v-for="tag in condition" :key="tag">
                 <q-chip
                   @remove="removeHashtag(tag)"
                   removable
@@ -91,7 +91,7 @@
             <q-tr :props="props">
               <q-td
                 class="text-center cursor-pointer"
-                v-if="condition.hashtags.includes(props.row.name)"
+                v-if="condition.includes(props.row.name)"
                 @click="removeHashtag(props.row.name)"
               >
                 <q-icon name="check_box" size="md" color="primary" />
@@ -126,12 +126,15 @@
 import { defineComponent, ref, watch } from 'vue';
 import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import { QTableColumn } from 'quasar';
+import { useRoute } from 'vue-router';
 export default defineComponent({
   name: 'pixiv-hashtag-input',
   setup() {
+    const route = useRoute();
+
     const store = PixivSearchStore();
     const isLoading = ref(store.isLoading.hashtag);
-    const condition = ref(store.condition);
+    const condition = ref(store.condition.hashtags);
 
     const addHashtag = function (hashtag: string) {
       store.addHashtag(hashtag);
@@ -142,8 +145,8 @@ export default defineComponent({
     };
 
     watch(condition, (newValue, oldValue) => {
-      oldValue.hashtags.forEach((it) => store.removeHashtag(it));
-      newValue.hashtags.forEach((it) => store.addHashtag(it));
+      oldValue.forEach((it) => store.removeHashtag(it));
+      newValue.forEach((it) => store.addHashtag(it));
     });
     // -------------------
     // テーブル

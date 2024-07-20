@@ -161,22 +161,28 @@ export default defineComponent({
         const tags = route.query.hashtag.toString();
         if(tags.includes(',')){
           tags.split(',').forEach((tag) => {
-          if (tags.length > 0) {
+          if (tags.length > 0 && !store.condition.hashtags.includes(tag)) {
             store.condition.hashtags.push(tag);
           }
         });
         }
         else{
-          store.condition.hashtags.push(tags);
+          if(!store.condition.hashtags.includes(tags) && tags.length > 0){
+            store.condition.hashtags.push(tags);
+          }
         }
-
+      }
+      if(store.condition.hashtags.includes('')){
+        const findIndex = store.condition.hashtags.findIndex(() => '');
+        if(findIndex > -1){
+          store.condition.hashtags.splice(findIndex);
+        }
       }
       if (route.query.user) {
         const users = route.query.user.toString();
         if(users.includes(',')){
           users.split(',').forEach((us) => {
             if (Number(us) > 0) {
-              store.condition.userIds.push(Number(us));
               store.addUser(Number(us));
             }
           })
@@ -217,7 +223,7 @@ export default defineComponent({
         path: '/pixiv',
         query: {
           text: store.condition.text,
-          tags: store.condition.hashtags,
+          hashtag: store.condition.hashtags,
           user: store.condition.userIds,
           minbookmark: store.condition.minTotalBookmarks,
           minview: store.condition.minTotalView,

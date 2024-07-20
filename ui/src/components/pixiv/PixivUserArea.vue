@@ -6,8 +6,14 @@
         </q-avatar>
       </div>
       <div class="q-pl-sm q-pt-xs text-grey text-caption" v-if="findUser">
-        {{ findUser.name.substring(0, 8) }}
-        <span v-if="findUser.name.length > 8">...</span>
+        <div v-if="shortView">
+          {{ findUser.name.substring(0, 8) }}
+        </div>
+        <div v-else>
+          {{ findUser.name }}
+        </div>
+
+        <span v-if="findUser.name.length > 8 && shortView">...</span>
       </div>
     </div>
 </template>
@@ -23,7 +29,13 @@ export default defineComponent({
     userId:{
       type: Number,
       required: true
-    }
+    },
+      shortView:{
+        type:Boolean,
+        required:false,
+        default:true
+      }
+
   },
   setup(props){
     const store = PixivSearchStore();
@@ -82,7 +94,7 @@ export default defineComponent({
     return {
       findUser,
       userProfileUrl,
-      onUserClick
+      onUserClick,
     }
   }
 })

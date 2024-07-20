@@ -101,17 +101,30 @@
 import { computed, defineComponent, ref } from 'vue';
 import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import { QTableColumn } from 'quasar';
+import { useRoute } from 'vue-router';
 export default defineComponent({
   name: 'pixiv-user-input',
   setup() {
-    const userImageUrl = computed(() => store.userProfileUrl);
+    const route = useRoute();
+
     const dialogOpen = ref(false);
 
     const store = PixivSearchStore();
+    const selectedUser = ref(store.selectedUsers);
+    if((route.query?.user?.toString() ?? '').length > 0){
+      const userId = Number(route.query.user?.toString());
+      if(userId > 0){
+        const user = store.getUserbyId(userId);
+        if(user){
+          store.userProfileUrl = store.getImageUrl(store.findUserImageUrl(user));
+          selectedUser.value.push(user)
+        }
+      }
+    }
+    const userImageUrl = computed(() => store.userProfileUrl);
     const isLoading = ref(store.isLoading.user);
     const condition = ref(store.userCondition);
-    const selectedUserIds = ref(store.condition.userIds);
-    const selectedUser = ref(store.selectedUsers);
+
     const findUsers = ref(store.findUsers);
 
     const searchUser = async function () {
@@ -153,7 +166,6 @@ export default defineComponent({
       isLoading,
       condition,
       filter: ref(''),
-      selectedUserIds,
       selectedUser,
       findUsers,
       searchUser,
