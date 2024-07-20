@@ -56,10 +56,10 @@ export default defineComponent({
           fetch:'true'
         },
       });
+
       console.log('beforePath',beforePath);
       if(beforePath == '/pixiv'){
-        store.condition.userIds.push(userId);
-        store.condition.minTotalView = 1000;
+        store.addUser(userId);
         store.searchIllust();
       }
       quasar.notify({

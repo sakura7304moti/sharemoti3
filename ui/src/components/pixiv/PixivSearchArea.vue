@@ -175,17 +175,16 @@ export default defineComponent({
         const users = route.query.user.toString();
         if(users.includes(',')){
           users.split(',').forEach((us) => {
-          if (Number(us) > 0) {
-            store.condition.userIds.push(Number(us));
-            store.addUser(Number(us));
-          }
-        });
+            if (Number(us) > 0) {
+              store.condition.userIds.push(Number(us));
+              store.addUser(Number(us));
+            }
+          })
         }
         else{
           if(Number(users) > 0){
             store.addUser(Number(users));
           }
-
         }
 
       }
