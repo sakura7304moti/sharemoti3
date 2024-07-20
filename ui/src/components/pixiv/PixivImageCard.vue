@@ -22,17 +22,9 @@
   >
     {{ cardstate.title.substring(0, 10) }}
     <span v-if="cardstate.title.length > 10">...</span>
-    <div class="row full-width" v-if="illustUrl.length > 0">
-      <div>
-        <q-avatar size="md">
-          <img :src="userUrl" />
-        </q-avatar>
-      </div>
-      <div class="q-pl-sm q-pt-xs text-grey text-caption">
-        {{ userName.substring(0, 8) }}
-        <span v-if="userName.length > 8">...</span>
-      </div>
-    </div>
+
+    <!--ユーザーアイコンや名前-->
+    <user-area :user-id="cardstate.userId" />
   </div>
 </template>
 
@@ -41,9 +33,13 @@ import { defineComponent, ref, onMounted, watch } from 'vue';
 import api from 'src/api/scraper/PixivApi';
 import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import { useRoute, useRouter } from 'vue-router';
+import PixivUserArea from './PixivUserArea.vue';
 
 export default defineComponent({
   name: 'pixiv-image-card',
+  components:{
+    'user-area':PixivUserArea
+  },
   props: {
     illustId: {
       type: Number,
@@ -110,6 +106,7 @@ export default defineComponent({
     };
 
     const onClickIllust = function (id: number) {
+      console.log('query',route.query)
       router.push({
         path: `/pixiv/illust/${id}`,
         query: {

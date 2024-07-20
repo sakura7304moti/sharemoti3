@@ -182,7 +182,10 @@ export default defineComponent({
         });
         }
         else{
-          store.addUser(Number(users));
+          if(Number(users) > 0){
+            store.addUser(Number(users));
+          }
+
         }
 
       }

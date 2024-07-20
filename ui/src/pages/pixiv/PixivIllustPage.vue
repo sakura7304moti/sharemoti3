@@ -34,17 +34,7 @@
             {{ tag.name }}
           </div>
         </div>
-        <div class="row full-width cursor-pointer pixiv-user-icon" @click="onUserClick(findUser?.id ?? -1)">
-          <div>
-            <q-avatar size="md" v-if="userProfileUrl">
-              <img :src="userProfileUrl" />
-            </q-avatar>
-          </div>
-          <div class="q-pl-sm q-pt-xs text-grey text-caption" v-if="findUser">
-            {{ findUser.name.substring(0, 8) }}
-            <span v-if="findUser.name.length > 8">...</span>
-          </div>
-        </div>
+        <user-area :user-id="mainIllust.userId"/>
       </div>
 
     </div>
@@ -74,6 +64,7 @@ import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import api from 'src/api/scraper/PixivApi';
 import PixivSearchArea from 'src/components/pixiv/PixivSearchArea.vue';
 import PixivImageCard from 'src/components/pixiv/PixivImageCard.vue';
+import PixivUserArea from 'src/components/pixiv/PixivUserArea.vue';
 import { computed, defineComponent, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
@@ -88,6 +79,7 @@ export default defineComponent({
   components: {
     'search-area': PixivSearchArea,
     'image-card': PixivImageCard,
+    'user-area':PixivUserArea
   },
   setup(props) {
     const router = useRouter();
