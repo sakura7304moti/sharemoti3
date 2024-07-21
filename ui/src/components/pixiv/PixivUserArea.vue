@@ -64,7 +64,7 @@ export default defineComponent({
         path: '/pixiv',
         query: {
           user:userId,
-          minview:1000,
+          minview:10000,
           fetch:'true'
         },
       });

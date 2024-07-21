@@ -126,11 +126,9 @@
 import { defineComponent, ref, watch } from 'vue';
 import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import { QTableColumn } from 'quasar';
-import { useRoute } from 'vue-router';
 export default defineComponent({
   name: 'pixiv-hashtag-input',
   setup() {
-    const route = useRoute();
 
     const store = PixivSearchStore();
     const isLoading = ref(store.isLoading.hashtag);

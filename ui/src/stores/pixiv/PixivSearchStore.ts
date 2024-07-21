@@ -23,7 +23,7 @@ export const PixivSearchStore = defineStore('pixiv-search', {
     const userCondition = '';
     const selectedUsers = [] as User[];
     const findUsers = [] as User[];
-    let userProfileUrl = '';
+    const userProfileUrl = '';
 
     const selectedHoloName = '';
     const condition = {
@@ -36,49 +36,6 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       pageSize: 20,
     } as Condition;
     const isR18 = false;
-
-    const isExistsHashtag = function (hashtag: string) {
-      return condition.hashtags.includes(hashtag);
-    };
-
-    const isExistsUser = function (userId: number) {
-      return condition.userIds.includes(userId);
-    };
-
-    const updateUserProfileImage = function () {
-      userProfileUrl = '';
-      if (selectedUsers.length > 0) {
-        const user = selectedUsers[0];
-        let imageUrl = '';
-        if (user.profileImageUrlSquareMedium) {
-          imageUrl = user.profileImageUrlSquareMedium;
-        } else if (user.profileImageUrlMedium) {
-          imageUrl = user.profileImageUrlMedium;
-        } else if (user.profileImageUrlLarge) {
-          imageUrl = user.profileImageUrlLarge;
-        }
-        userProfileUrl =
-          api.apiEndpoint() + '/pixiv/image/download?url=' + imageUrl;
-      }
-    };
-
-    const isConditionDefault = function () {
-      if (condition.text.length > 0) {
-        return false;
-      } else if (condition.hashtags.length > 0) {
-        return false;
-      } else if (condition.userIds.length > 0) {
-        return false;
-      } else if (condition.minTotalBookmarks > 0) {
-        return false;
-      } else if (condition.minTotalView > 10000) {
-        return false;
-      } else if (isR18) {
-        return false;
-      } else {
-        return true;
-      }
-    };
 
     const pageState = {
       records: [],
@@ -93,16 +50,12 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       selectedHoloName,
       selectedUsers,
       userProfileUrl,
-      updateUserProfileImage,
       hashtagCondition,
       findHashtags,
       userCondition,
       findUsers,
       condition,
       isR18,
-      isExistsHashtag,
-      isExistsUser,
-      isConditionDefault,
       pageState,
     };
   },
@@ -141,8 +94,10 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       }
     },
     addUser: function (userId: number) {
-      if (!this.isExistsUser(userId)) {
+      if(!this.condition.userIds.includes(userId)){
         this.condition.userIds.push(userId);
+      }
+      if (!this.selectedUsers.find(it => it.id == userId)) {
         const user = this.findUsers.find((it) => it.id == userId);
         if (user) {
           this.selectedUsers.push(user);
@@ -151,16 +106,11 @@ export const PixivSearchStore = defineStore('pixiv-search', {
       }
     },
     removeUser: function (userId: number) {
-      if (!this.isExistsUser(userId)) {
-        const index = this.condition.userIds.findIndex((it) => it == userId);
-        if (index != -1) {
-          this.condition.userIds.splice(index, 1);
-          this.selectedUsers = this.selectedUsers.filter(
-            (it) => it.id != userId
-          );
-          this.updateUserProfileImage();
-        }
-      }
+      this.condition.userIds = this.condition.userIds.filter(it => it != userId)
+      this.selectedUsers = this.selectedUsers.filter(
+        (it) => it.id != userId
+      );
+      this.updateUserProfileImage();
     },
     clearUser: function () {
       this.condition.userIds.splice(0);
@@ -290,6 +240,13 @@ export const PixivSearchStore = defineStore('pixiv-search', {
             console.log('serach user', response);
             this.findUsers.splice(0);
             response.forEach((it) => this.findUsers.push(it));
+
+            // conditionに追加してselectedUserに追加してないやつは追加
+            this.condition.userIds.forEach(usr => {
+              if(!this.selectedUsers.find(it => it.id == usr)){
+                this.addUser(usr);
+              }
+            })
           }
         })
         .catch((err) => {
@@ -334,6 +291,49 @@ export const PixivSearchStore = defineStore('pixiv-search', {
         return user.profileImageUrlLarge;
       }
     },
+
+    isExistsHashtag : function (hashtag: string) {
+      return this.condition.hashtags.includes(hashtag);
+    },
+
+    isExistsUser : function (userId: number) {
+      return this.condition.userIds.includes(userId);
+    },
+
+    updateUserProfileImage : function () {
+      this.userProfileUrl = '';
+      if (this.selectedUsers.length > 0) {
+        const user = this.selectedUsers[0];
+        let imageUrl = '';
+        if (user.profileImageUrlSquareMedium) {
+          imageUrl = user.profileImageUrlSquareMedium;
+        } else if (user.profileImageUrlMedium) {
+          imageUrl = user.profileImageUrlMedium;
+        } else if (user.profileImageUrlLarge) {
+          imageUrl = user.profileImageUrlLarge;
+        }
+        this.userProfileUrl =
+          api.apiEndpoint() + '/pixiv/image/download?url=' + imageUrl;
+      }
+    },
+
+    isConditionDefault : function () {
+      if (this.condition.text.length > 0) {
+        return false;
+      } else if (this.condition.hashtags.length > 0) {
+        return false;
+      } else if (this.condition.userIds.length > 0) {
+        return false;
+      } else if (this.condition.minTotalBookmarks > 0) {
+        return false;
+      } else if (this.condition.minTotalView > 10000) {
+        return false;
+      } else if (this.isR18) {
+        return false;
+      } else {
+        return true;
+      }
+    }
   },
 });
 interface Loading {

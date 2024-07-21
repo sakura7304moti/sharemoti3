@@ -1,13 +1,7 @@
 <template>
   <q-page class="">
     <div class="holo-page-title q-pb-md">pixiv</div>
-    <search-area
-      :hashtags="condition.hashtags"
-      :user-ids="condition.userIds"
-      :min-total-bookmarks="condition.minTotalBookmarks"
-      :min-total-view="condition.minTotalView"
-    />
-
+    <search-area />
     <div class="row wrap" style="max-width: 1200px">
       <div v-for="illust in illusts" :key="illust.id">
         <image-card :illust-id="illust.id" />
@@ -38,8 +32,6 @@ export default defineComponent({
     const illusts = computed(() => store.pageState.records);
 
     return {
-      condition: store.condition,
-      pageState: store.pageState,
       illusts,
       onSearchClick,
     };

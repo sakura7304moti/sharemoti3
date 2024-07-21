@@ -131,7 +131,7 @@ export default defineComponent({
 
     const onSearchClick = function () {
       dialogView.value = false;
-      condition.value.pageNo = 1;
+      store.condition.pageNo = 1;
       store.isR18 = isR18.value;
       store.searchIllust();
       replaceUrl(1);
@@ -140,7 +140,7 @@ export default defineComponent({
     const onPageClick = function () {
       dialogView.value = false;
       store.searchIllust();
-      replaceUrl(condition.value.pageNo);
+      replaceUrl(store.condition.pageNo);
     };
 
     const onResetConditionclick = function () {

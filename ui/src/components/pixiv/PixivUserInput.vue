@@ -98,19 +98,18 @@
   </q-dialog>
 </template>
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import { QTableColumn } from 'quasar';
-import { useRoute } from 'vue-router';
 export default defineComponent({
   name: 'pixiv-user-input',
   setup() {
-    const route = useRoute();
-
     const dialogOpen = ref(false);
 
     const store = PixivSearchStore();
     const selectedUser = ref(store.selectedUsers);
+
+    /*
     if((route.query?.user?.toString() ?? '').length > 0){
       const userId = Number(route.query.user?.toString());
       if(userId > 0){
@@ -120,7 +119,13 @@ export default defineComponent({
           selectedUser.value.push(user)
         }
       }
-    }
+    }*/
+
+    watch(store.selectedUsers, (newValue,oldValue) => {
+      oldValue.forEach(it => store.removeUser(it.id));
+      newValue.forEach(it => store.addUser(it.id));
+    })
+
     const userImageUrl = computed(() => store.userProfileUrl);
     const isLoading = ref(store.isLoading.user);
     const condition = ref(store.userCondition);
@@ -176,12 +181,5 @@ export default defineComponent({
     };
   },
 });
-interface User {
-  id: number;
-  name: string;
-  account: string;
-  profileImageUrlSquareMedium: string;
-  profileImageUrlMedium: string;
-  profileImageUrlLarge: string;
-}
+
 </script>

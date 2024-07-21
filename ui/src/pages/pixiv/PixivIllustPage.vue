@@ -66,7 +66,7 @@ import PixivSearchArea from 'src/components/pixiv/PixivSearchArea.vue';
 import PixivImageCard from 'src/components/pixiv/PixivImageCard.vue';
 import PixivUserArea from 'src/components/pixiv/PixivUserArea.vue';
 import { computed, defineComponent, ref, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { useQuasar } from 'quasar';
 export default defineComponent({
   name: 'pixiv-illust',
@@ -83,7 +83,6 @@ export default defineComponent({
   },
   setup(props) {
     const router = useRouter();
-    const route = useRoute();
     const quasar = useQuasar();
     const allView = ref(false);
     const userProfileUrl = ref('');
