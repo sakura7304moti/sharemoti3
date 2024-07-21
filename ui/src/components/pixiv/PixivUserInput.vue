@@ -10,7 +10,7 @@
       <q-btn
         flat
         icon="close"
-        @click="onClearUser"
+        @click.prevent.stop="onClearUser"
         v-if="userImageUrl.length > 0"
       />
     </template>
@@ -107,19 +107,7 @@ export default defineComponent({
     const dialogOpen = ref(false);
 
     const store = PixivSearchStore();
-    const selectedUser = ref(store.selectedUsers);
-
-    /*
-    if((route.query?.user?.toString() ?? '').length > 0){
-      const userId = Number(route.query.user?.toString());
-      if(userId > 0){
-        const user = store.getUserbyId(userId);
-        if(user){
-          store.userProfileUrl = store.getImageUrl(store.findUserImageUrl(user));
-          selectedUser.value.push(user)
-        }
-      }
-    }*/
+    const selectedUser = computed(() => store.selectedUsers);
 
     watch(store.selectedUsers, (newValue,oldValue) => {
       oldValue.forEach(it => store.removeUser(it.id));
