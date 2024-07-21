@@ -1,4 +1,11 @@
-import { RouteRecordRaw } from 'vue-router';
+import { useQuerySupport } from 'src/utils/QuerySupport';
+import { RouteRecordRaw, useRoute } from 'vue-router';
+const {decodeQueryString,
+  decodeQueryNumber,
+  decodeQueryStringArray,
+  decodeQueryNumberArray,
+  decodeQueryBoolean} = useQuerySupport();
+const route = useRoute();
 
 const routes: RouteRecordRaw[] = [
   /*おばあちゃんち */
@@ -153,6 +160,26 @@ const routes: RouteRecordRaw[] = [
         path: '',
         component: () => import('src/pages/pixiv/PixivIllustPage.vue'),
         props: true,
+      },
+    ],
+  },
+  {
+    path: '/pixiv/query',
+    component: () => import('layouts/HoloLayout.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('src/components/pixiv/PixivSearchArea.vue'),
+        props: {
+          text : decodeQueryString(route?.query.text),
+          hashtags : decodeQueryStringArray(route?.query.hashtag),
+          userIds : decodeQueryNumberArray(route?.query.user),
+          minTotalBookmarks : decodeQueryNumber(route?.query.minbookmark),
+          minTotalView : decodeQueryNumber(route?.query.minview),
+          r18 : decodeQueryBoolean(route?.query.r18),
+          page : decodeQueryNumber(route?.query.page),
+          fetch : decodeQueryBoolean(route?.query.fetch)
+        },
       },
     ],
   },

@@ -97,7 +97,7 @@
   </q-dialog>
 </template>
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch ,PropType} from 'vue';
 import PixivHoloNameSelect from '../selects/PixivHoloNameSelect.vue';
 import PixivHashtagInput from './PixivHashtagInput.vue';
 import PixivUserInput from './PixivUserInput.vue';
@@ -105,6 +105,40 @@ import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import { useRoute, useRouter } from 'vue-router';
 export default defineComponent({
   name: 'pixiv-search-area',
+  props:{
+    text :{
+      type:String,
+      required:false
+    },
+    hashtags:{
+      type:Array as PropType<string[]>,
+      required:false
+    },
+    userIds:{
+      type:Array as PropType<number[]>,
+      required:false
+    },
+    minTotalBookmarks:{
+      type:Number,
+      required:false
+    },
+    minTotalView:{
+      type:Number,
+      required:false
+    },
+    r18:{
+      type:Boolean,
+      required:false,
+    },
+    page:{
+      type:Number,
+      required:false
+    },
+    fetch:{
+      type:Boolean,
+      required:false,
+    }
+  },
   components: {
     'holo-name-select': PixivHoloNameSelect,
     'hashtag-input': PixivHashtagInput,
