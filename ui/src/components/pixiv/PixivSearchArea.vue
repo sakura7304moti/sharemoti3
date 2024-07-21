@@ -103,42 +103,14 @@ import PixivHashtagInput from './PixivHashtagInput.vue';
 import PixivUserInput from './PixivUserInput.vue';
 import { PixivSearchStore } from 'src/stores/pixiv/PixivSearchStore';
 import { useRoute, useRouter } from 'vue-router';
+import { useQuerySupport } from 'src/utils/QuerySupport';
+const {decodeQueryString,
+  decodeQueryNumber,
+  decodeQueryStringArray,
+  decodeQueryNumberArray,
+  decodeQueryBoolean} = useQuerySupport();
 export default defineComponent({
   name: 'pixiv-search-area',
-  props:{
-    text :{
-      type:String,
-      required:false
-    },
-    hashtags:{
-      type:Array as PropType<string[]>,
-      required:false
-    },
-    userIds:{
-      type:Array as PropType<number[]>,
-      required:false
-    },
-    minTotalBookmarks:{
-      type:Number,
-      required:false
-    },
-    minTotalView:{
-      type:Number,
-      required:false
-    },
-    r18:{
-      type:Boolean,
-      required:false,
-    },
-    page:{
-      type:Number,
-      required:false
-    },
-    fetch:{
-      type:Boolean,
-      required:false,
-    }
-  },
   components: {
     'holo-name-select': PixivHoloNameSelect,
     'hashtag-input': PixivHashtagInput,
@@ -187,60 +159,42 @@ export default defineComponent({
     const pageState = computed(() => store.pageState);
 
     const handleProps = function () {
-      console.log('query', route.query);
-      if (route.query.text) {
-        store.condition.text = route.query.text.toString();
+      console.log('props',route.query)
+      const queryText = decodeQueryString(route.query.text);
+      if (queryText) {
+        store.condition.text = queryText;
       }
-      if (route.query.hashtag) {
-        const tags = route.query.hashtag.toString();
-        if(tags.includes(',')){
-          tags.split(',').forEach((tag) => {
-          if (tags.length > 0 && !store.condition.hashtags.includes(tag)) {
-            store.condition.hashtags.push(tag);
-          }
-        });
-        }
-        else{
-          if(!store.condition.hashtags.includes(tags) && tags.length > 0){
-            store.condition.hashtags.push(tags);
-          }
-        }
-      }
-      if(store.condition.hashtags.includes('')){
-        const findIndex = store.condition.hashtags.findIndex(() => '');
-        if(findIndex > -1){
-          store.condition.hashtags.splice(findIndex);
-        }
-      }
-      if (route.query.user) {
-        const users = route.query.user.toString();
-        if(users.includes(',')){
-          users.split(',').forEach((us) => {
-            if (Number(us) > 0) {
-              store.addUser(Number(us));
-            }
-          })
-        }
-        else{
-          if(Number(users) > 0){
-            store.addUser(Number(users));
-          }
-        }
 
+      const queryHashtags = decodeQueryStringArray(route.query.hashtag)
+      if (queryHashtags) {
+        store.condition.hashtags = queryHashtags;
       }
-      if (route.query.minbookmark) {
-        store.condition.minTotalBookmarks = Number(route.query.minbookmark);
+
+      const queryUserIds = decodeQueryNumberArray(route.query.user);
+      if (queryUserIds) {
+        queryUserIds.forEach(it => it > 0 ? store.addUser(it) : null);
       }
-      if (route.query.minview) {
-        store.condition.minTotalView = Number(route.query.minview);
+
+      const queryMinBookmarks = decodeQueryNumber(route.query.minbookmark)
+      if (queryMinBookmarks) {
+        store.condition.minTotalBookmarks = queryMinBookmarks;
       }
-      if (route.query.r18) {
-        store.isR18 = route.query.r18.toString() == 'true';
+
+      const queryMinTotalView = decodeQueryNumber(route.query.minview);
+      if (queryMinTotalView) {
+        store.condition.minTotalView = queryMinTotalView;
       }
-      if (route.query.page) {
-        store.condition.pageNo = Number(route.query.page);
+
+      const queryR18 = decodeQueryBoolean(route.query.r18);
+      if (queryR18 != undefined) {
+        store.isR18 = queryR18;
       }
-      if (route.query.fetch) {
+
+      const queryPage = decodeQueryNumber(route.query.page);
+      if (queryPage) {
+        store.condition.pageNo = queryPage;
+      }
+      if (decodeQueryBoolean(route.query.fetch)) {
         console.log('condition', condition.value);
         store.searchIllust();
       }
