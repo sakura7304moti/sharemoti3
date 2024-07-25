@@ -56,6 +56,15 @@
           <image-card :illust-id="illust.id" />
         </div>
       </div>
+      <div class="q-pt-md">
+      <q-pagination
+        v-model="condition.pageNo"
+        :max="pageState.pageCount"
+        :max-pages="10"
+        input
+        v-if="pageState.records.length > 0"
+      />
+    </div>
     </div>
   </q-page>
 </template>
@@ -152,12 +161,25 @@ export default defineComponent({
         });
     };
 
+    const formatOriginalImageUrl = function(url:string){
+      let imgUrl = 'https://i.pximg.net/img-master/img/'
+      const ls = url.split('img/');
+      if(ls.length > 1){
+        imgUrl = imgUrl + ls[1];
+        return imgUrl.replace('_square','')
+      }
+    }
 
     const getImageUrl = function (image: Image) {
       if (image.originalImageUrl) {
         return store.getImageUrl(image.originalImageUrl ?? '');
-      } else {
-        return store.getImageUrl(image.imageUrlLarge ?? '');
+      } else if(image.imageUrlLarge) {
+        return store.getImageUrl(formatOriginalImageUrl(image.imageUrlLarge) ?? image.imageUrlLarge)
+      }else if(image.imageUrlMedium){
+        return store.getImageUrl(formatOriginalImageUrl(image.imageUrlMedium) ?? image.imageUrlMedium)
+      }
+      else{
+        return store.getImageUrl(formatOriginalImageUrl(image.imageUrlSquareMedium ?? '') ?? image.imageUrlSquareMedium ?? '')
       }
     };
 

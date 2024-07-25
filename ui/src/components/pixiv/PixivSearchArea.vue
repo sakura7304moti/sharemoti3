@@ -32,7 +32,6 @@
         :max="pageState.pageCount"
         :max-pages="10"
         input
-        @update:model-value="onPageClick"
         v-if="pageState.records.length > 0"
       />
     </div>
@@ -221,6 +220,12 @@ export default defineComponent({
         },
       });
     };
+
+    watch(() => condition.value.pageNo,(newCondition, oldCondition) => {
+      if(newCondition != oldCondition){
+        onPageClick();
+      }
+    })
 
     return {
       condition,
