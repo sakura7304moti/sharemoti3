@@ -9,7 +9,7 @@
           label="検索欄"
           outlined
           stack-label
-          @keydown.enter="onSearchClick"
+          @keypress.enter="onSearchClick"
           style="width: 300px"
         >
           <template v-slot:append>
@@ -122,6 +122,7 @@ export default defineComponent({
     const dialogView = ref(false);
 
     const store = PixivSearchStore();
+    const loading = ref(store.isLoading.illust);
     const condition = ref(store.condition);
     const isConditionDefault = computed(() => store.isConditionDefault());
     const isR18 = ref(store.isR18);
@@ -228,6 +229,7 @@ export default defineComponent({
     })
 
     return {
+      loading,
       condition,
       isConditionDefault,
       isR18,
