@@ -143,10 +143,10 @@ export default defineComponent({
       replaceUrl(1);
     };
 
-    const onPageClick = function () {
+    const onPageClick = function (pageNo:number) {
       dialogView.value = false;
       store.searchIllust();
-      replaceUrl(store.condition.pageNo);
+      replaceUrl(pageNo);
     };
 
     const onResetConditionclick = function () {
@@ -224,7 +224,9 @@ export default defineComponent({
 
     watch(() => condition.value.pageNo,(newCondition, oldCondition) => {
       if(newCondition != oldCondition){
-        onPageClick();
+        console.log('page',newCondition);
+        store.condition.pageNo = newCondition;
+        onPageClick(newCondition);
       }
     })
 
