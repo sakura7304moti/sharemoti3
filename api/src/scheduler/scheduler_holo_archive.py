@@ -1,2 +1,2 @@
-from scraper.src.modules import holo_archive
-holo_archive.update_archives()
+from src.route.service import holoarchive_service
+holoarchive_service.update_archives()

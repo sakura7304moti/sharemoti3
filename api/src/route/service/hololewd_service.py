@@ -19,7 +19,6 @@ def flair_texts_update():
 def update_db():
     """
     ポストテーブルを更新
-    検索も実行される
     """
     hololewd_scraper.update_db()
 

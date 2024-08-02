@@ -1,2 +1,2 @@
-from scraper.src.modules import hololewd_scraper
-hololewd_scraper.update_db()
+from src.route.service import hololewd_service
+hololewd_service.update_db()
