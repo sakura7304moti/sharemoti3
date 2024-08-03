@@ -1,6 +1,6 @@
-from src.route.service.module import twitter_sqlite
-from src.route.service import twitter_service
-from src.route.service.module.utils import const
+from ..route.service.module import twitter_sqlite
+from ..route.service import twitter_service
+from ..route.service.module.utils import const
 from tqdm import tqdm
 
 DATE_RANGE = 14
