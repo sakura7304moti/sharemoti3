@@ -47,7 +47,7 @@ def get_original_songs() -> list[interface.SongQueryRecord]:
     elements = soup.find_all('div',class_="wiki-section-3")
     for element in elements:
         text = element.text
-        title = text.splitlines()[0]
+        title = text.splitlines()[0].replace('"','”')
         member_match = re.search(r"メンバー：(.+?)\n", text)
         if member_match:
             members = member_match.group(1)
