@@ -4,6 +4,8 @@ import datetime
 import time
 import pandas as pd
 
+from src.route.service.module.utils import interface
+
 def parse_date(epoch_seconds:int):
     """
     エポック時間をyyyy-mm-ddに変換
