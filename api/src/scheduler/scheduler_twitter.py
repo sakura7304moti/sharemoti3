@@ -1,6 +1,12 @@
-from ..route.service.module import twitter_sqlite
-from ..route.service import twitter_service
-from ..route.service.module.utils import const
+import os
+import sys
+api_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+print(api_path)
+sys.path.append(api_path)
+
+from src.route.service.module import twitter_sqlite
+from src.route.service import twitter_service
+from src.route.service.module.utils import const
 from tqdm import tqdm
 
 DATE_RANGE = 14
