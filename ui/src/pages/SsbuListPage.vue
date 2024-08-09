@@ -407,8 +407,13 @@ export default defineComponent({
 #ssbu-table {
   height: 80vh;
   overflow-y: auto;
-  max-width: 800px;
+  max-width: 830px;
   width: 100%;
+
+  .q-table{
+    max-width: 830px;
+    width: 100%;
+  }
 }
 #ssbu-option-mobile {
   display: flex;
@@ -421,7 +426,7 @@ export default defineComponent({
   height: 320px;
 }
 /*スマホ用 */
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 830px) {
   #ssbu-option-desktop {
     display: none;
   }
@@ -439,7 +444,7 @@ export default defineComponent({
   }
 }
 /*PC用 */
-@media screen and (min-width: 800px) {
+@media screen and (min-width: 830px) {
   #ssbu-option-mobile {
     display: none;
   }
