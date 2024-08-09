@@ -221,16 +221,18 @@ class ssbuListRecord:#スマブラのクリップ
                  id:int,
                  file_name:str,
                  date:str,
-                 year:str):
+                 year:str,
+                 path:str):
         self.id = id
         self.file_name = file_name
         self.date = date
         self.year = year
+        self.path = path
         
     def __dict__(self):
-        return {"id":self.id,"fileName":self.file_name,"date":self.date,"year":self.year}
+        return {"id":self.id,"fileName":self.file_name,"date":self.date,"year":self.year, "path":self.path}
     def __str__(self):
-        return f"ID: {self.id}, File Name: {self.file_name}, Date: {self.date}, Year: {self.year}"
+        return f"ID: {self.id}, File Name: {self.file_name}, Date: {self.date}, Year: {self.year}, Path :{self.path}"
     
 class SsbuNameRecord:#スマブラのキャラ名と画像URL
     def __init__(self,name:str,url:str,icon:str):

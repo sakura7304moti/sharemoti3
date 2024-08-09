@@ -21,23 +21,23 @@ def search():
         date = os.path.basename(dir_path)
         dir_path_u = os.path.dirname(dir_path)
         year = os.path.basename(dir_path_u)
-        rec = interface.ssbuListRecord(id,file_name,date,year)
+        file_path = os.path.join(year, date, os.path.basename(path))
+        rec = interface.ssbuListRecord(id,file_name,date,year, file_path)
+        
         records.append(rec)
     return records
 
 """
 IDをもとに動画の要素を取得
 """
-def select(select_id:int):
-    path_list = glob.glob(os.path.join(DATA_PATH,'スマブラ','切り抜き','*','*','*.mp4'))
-    for path in path_list:
-        id = path_list.index(path)
-        if id == select_id:
-            file_name = os.path.basename(path).split('.')[0]
-            dir_path = os.path.dirname(path)
-            date = os.path.basename(dir_path)
-            dir_path_u = os.path.dirname(dir_path)
-            year = os.path.basename(dir_path_u)
-            rec = interface.ssbuListRecord(id,file_name,date,year)
-            break
-    return rec
+def select(path:str):
+    movie_path = os.path.join(DATA_PATH,'スマブラ','切り抜き', path)
+    if os.path.exists(movie_path):
+        file_name = os.path.basename(path).split('.')[0]
+        dir_path = os.path.dirname(path)
+        date = os.path.basename(dir_path)
+        dir_path_u = os.path.dirname(dir_path)
+        year = os.path.basename(dir_path_u)
+        file_path = os.path.join(year, date, os.path.basename(path))
+        rec = interface.ssbuListRecord(id,file_name,date,year, file_path)
+        return rec

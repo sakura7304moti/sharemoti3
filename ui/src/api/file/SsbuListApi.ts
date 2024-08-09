@@ -9,8 +9,8 @@ export class SsbuListApi extends FileAPIClient {
     return this.httpGet<SsbuListResponse>(path);
   }
 
-  public async download(id: number) {
-    const url = `/ssbu/download?id=${id}`;
+  public async download(filePath: string) {
+    const url = `/ssbu/download?path=${filePath}`;
     const path = this.combineUrl(url);
 
     await axios({
@@ -38,4 +38,5 @@ export interface SsbuListRec {
   fileName: string;
   date: string;
   year: string;
+  path:string;
 }

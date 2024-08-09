@@ -435,12 +435,12 @@ body {
   width: calc(100% - 300px);
   height: 100%;
 }
-@media (max-width: 700px) {
+@media (max-width: 1030px) {
   .nav-top {
     display: none;
   }
 }
-@media (max-width: 700px) {
+@media (max-width: 1030px) {
   /*========= ボタンのためのCSS ===============*/
   .top-menu-button {
     position: fixed;

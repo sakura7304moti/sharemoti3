@@ -211,6 +211,7 @@ export function useSsbuListModel() {
               year: it.year,
               icon:
                 ssbuNames.value.find((it) => it.name == charName)?.icon ?? '',
+                path:it.path
             });
             if (!dateList.value.includes(displayDate)) {
               dateList.value.push(displayDate);
@@ -318,6 +319,7 @@ interface DataState {
   displayDate: string;
   year: string;
   icon: string;
+  path:string;
 }
 
 interface FilterState {

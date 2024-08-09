@@ -166,11 +166,11 @@
             <q-td>
               <q-btn
                 icon="play_arrow"
-                :href="api.apiEndpoint() + '/ssbu/download?id=' + props.row.id"
+                :href="api.apiEndpoint() + '/ssbu/download?path=' + props.row.path"
                 @click.prevent="
                   console.log('play', props.row);
                   playUrlDesktop =
-                    api.apiEndpoint() + '/ssbu/download?id=' + props.row.id;
+                    api.apiEndpoint() + '/ssbu/download?path=' + props.row.path;
                   playNameDesktop = props.row.fileName;
                 "
               />
@@ -198,7 +198,7 @@
               @click.prevent="
                 console.log('play', props.row);
                 playUrlMobile =
-                  api.apiEndpoint() + '/ssbu/download?id=' + props.row.id;
+                  api.apiEndpoint() + '/ssbu/download?path=' + props.row.path;
                 playNameMobile = props.row.fileName;
               "
             >
@@ -399,7 +399,7 @@ export default defineComponent({
 });
 </script>
 <style>
-@media screen and (min-width: 1370px) {
+@media screen and (min-width: 1412px) {
   .ssbu-vt {
     display: flex;
   }
@@ -407,11 +407,11 @@ export default defineComponent({
 #ssbu-table {
   height: 80vh;
   overflow-y: auto;
-  max-width: 830px;
+  max-width: 810px;
   width: 100%;
 
   .q-table{
-    max-width: 830px;
+    max-width: 810px;
     width: 100%;
   }
 }
@@ -426,7 +426,7 @@ export default defineComponent({
   height: 320px;
 }
 /*スマホ用 */
-@media screen and (max-width: 830px) {
+@media screen and (max-width: 810px) {
   #ssbu-option-desktop {
     display: none;
   }
@@ -444,7 +444,7 @@ export default defineComponent({
   }
 }
 /*PC用 */
-@media screen and (min-width: 830px) {
+@media screen and (min-width: 810px) {
   #ssbu-option-mobile {
     display: none;
   }

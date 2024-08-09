@@ -9,8 +9,8 @@ def search():
     """
     return ssbulist.search()
 
-def select(select_id:int):
+def select(path:str):
     """
     動画データを取得
     """
-    return ssbulist.select(select_id)
+    return ssbulist.select(path)
