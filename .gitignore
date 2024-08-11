@@ -8,3 +8,5 @@ api/src/route/__pycache__
 api/archive
 api/option/ssbu_icons/base
 api/option/ssbu_icons/char
+*.ipynb
+api/option/ssbu_icons
