@@ -5,4 +5,10 @@ print(api_path)
 sys.path.append(api_path)
 
 from src.route.service.module import pixiv_scraper
-pixiv_scraper.holo_pixiv_update()
+from src.route.service.module.utils import const
+
+@const.line_handler
+def main():
+    pixiv_scraper.holo_pixiv_update()
+
+main()

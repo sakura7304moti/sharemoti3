@@ -3,6 +3,7 @@ import os
 from typing import List
 import pandas as pd
 import yaml
+import requests
 
 from .interface import HoloName, SsbuNameRecord
 
@@ -16,6 +17,29 @@ def tmp_file_name(ext:str):
     os.makedirs(tmp_dir,exist_ok=True)
     files = glob.glob(os.path.join(tmp_dir,'*'))
     return os.path.join(tmp_dir, f"{str(len(files)).zfill(8)}.{ext}")
+
+def  line_notify(notification_message:str):
+    """
+    LINEに通知する
+    """
+    line_notify_token = 'dMby6IiqpTb24ZwgV2T3wQyHw5CBII7uky7fR38nuQv'
+    line_notify_api = 'https://notify-api.line.me/api/notify'
+    headers = {'Authorization': f'Bearer {line_notify_token}'}
+    data = {'message': f'message: {notification_message}'}
+    requests.post(line_notify_api, headers = headers, data = data)
+
+def line_handler(func):
+    """
+    エラー時にlineに通知するデコレータ
+    """
+    def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                line_notify(f"""{func.__name__}
+{e}""")
+    return wrapper
+
 
 class Path:
     """
@@ -68,6 +92,12 @@ class Path:
             return share_path
         except Exception as e:
             print(f"\033[31m 共有フォルダのパス取得エラー {e.with_traceback} \033[0m")
+
+    def holo_album(self):
+        """
+        ホロライブのアルバムのcsv
+        """
+        return os.path.join(self.archive(), 'holo_album', 'album.csv')
     
 
     def db_main_share(self):
