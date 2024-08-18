@@ -2,6 +2,7 @@
   <q-layout>
     <q-header style="background-color: rgba(0, 0, 0, 0)">
       <!--ヘッダー-->
+
       <div
         style="
           height: 60px;
@@ -19,8 +20,9 @@
             color: rgb(51, 51, 51);
           "
           class="fadeDown"
+          v-if="!menuView"
         >
-          韓国の<br />おばあちゃんち
+          韓国のおばあちゃんち
         </div>
 
         <!--ヘッダーの右側(PC用)-->
@@ -118,18 +120,6 @@
                 />
               </div>
 
-              <div
-                class="nav-child-page q-pa-sm"
-                :class="{ 'nav-child-select': head.id == 5 }"
-                style="width: 100px"
-                @click="otherPageClick(nextcloudUrl)"
-              >
-                <img
-                  src="../assets/nextcloud_icon.png"
-                  style="height: 32px"
-                  v-if="head.id == 5"
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -156,7 +146,7 @@
                 menuView = false;
               "
             >
-              トップに戻る
+              <q-icon name="home"/>トップに戻る
             </a>
           </li>
           <q-separator style="padding-top: 2px" />
@@ -195,6 +185,43 @@
               "
             >
               {{ item.title }}
+            </a>
+          </li>
+
+          <q-separator style="padding-top: 2px" />
+
+          <li v-for="item in callPageList(4)" :key="item.url">
+            <a
+              href="#"
+              @click.prevent="
+                router.replace(item.url);
+                menuView = false;
+              "
+            >
+              {{ item.title }}
+            </a>
+          </li>
+
+          <q-separator style="padding-top: 2px" />
+
+          <li>
+            <a href="https://drive.google.com/drive/folders/1XSRGqBx5FeJaOSJj9UtF3e2M7S3Z3PsG?usp=sharing">
+              Google Drive
+            </a>
+          </li>
+          <li>
+            <a href="https://brindle-spring-0d6.notion.site/URL-2998ca28318d430cbdd7d5b7ad034ccf?pvs=4">
+              Notion
+            </a>
+          </li>
+          <li>
+            <a href="https://brindle-spring-0d6.notion.site/e2d3e427b3574e9e8e25c729b8f7abe9?pvs=4">
+              俺たちの<br />旅の思い出
+            </a>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/playlist?list=PLbP5km9K7tgfHKxHvk9nOx7hcbLbnHSuS">
+              YouTube
             </a>
           </li>
         </ul>
@@ -519,21 +546,23 @@ body {
 /*ナビゲーションの縦スクロール*/
 #g-nav.panelactive #g-nav-list {
   /*ナビの数が増えた場合縦スクロール*/
+  margin-top:50px;
   position: fixed;
   width: 100%;
-  height: 100vh; /*表示する高さ*/
+  height: calc(100vh - 60px); /*表示する高さ*/
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
 }
 
 /*ナビゲーション*/
 #g-nav ul {
-  /*ナビゲーション天地中央揃え*/
   position: absolute;
   z-index: 999;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  /*ナビゲーション天地中央揃え*/
+  top:60px;
+  left:50%;
+  transform: translate(-50%,-60px);
+
 }
 
 /*リストのレイアウト設定*/
