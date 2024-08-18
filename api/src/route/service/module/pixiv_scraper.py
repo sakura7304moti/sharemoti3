@@ -53,14 +53,18 @@ def search_illusts(query:str):
         illusts.extend(json_result.illusts)
         
         # 次のページが存在する場合は次のページを取得
-        if 'next_url' in json_result:
-            next_qs = api.parse_qs(json_result.next_url)
-            if next_qs is None:
-                return illusts
-            json_result = api.search_illust(**next_qs)
-            time.sleep(1)
-        else:
+        if json_result is None:
             return illusts
+        else:
+            if 'next_url' in json_result:
+                next_qs = api.parse_qs(json_result.next_url)
+                if next_qs is None:
+                    return illusts
+                json_result = api.search_illust(**next_qs)
+                time.sleep(1)
+            else:
+                return illusts
+        
 
 #-----------------------------------------
 # テーブル追加
@@ -372,5 +376,8 @@ def holo_pixiv_update():
         tqdm.write(f"\rName: \033[92m{member}\033[0m", end='')
         query = f"{member} 000user"
         illusts = search_illusts(query)
-        for illust in illusts:
-            update_db(illust)
+        if illusts is not None:
+            for illust in illusts:
+                update_db(illust)
+        else:
+            print(f'illusts is None : {member}')

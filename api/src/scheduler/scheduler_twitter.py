@@ -30,3 +30,4 @@ def main():
     for hashtag in tqdm(holo_hashtags,desc='holo'):
         df = twitter_service.get_tweet(hashtag,DATE_RANGE)
         twitter_sqlite.update(df,hashtag,'holo')
+main()
