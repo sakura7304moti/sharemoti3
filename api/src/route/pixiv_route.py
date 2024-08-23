@@ -4,8 +4,11 @@ pixivのルーティング
 import pandas as pd
 import json
 import ast
-import requests
 import mimetypes
+
+import cloudscraper  # type: ignore[import]
+
+requests = cloudscraper.create_scraper()
 
 
 from io import BytesIO
