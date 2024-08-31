@@ -10,3 +10,5 @@ api/option/ssbu_icons/base
 api/option/ssbu_icons/char
 *.ipynb
 api/option/ssbu_icons
+token.json
+client_secret.json
