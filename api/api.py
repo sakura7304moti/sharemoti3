@@ -14,6 +14,7 @@ from src.route import nameList2_route
 from src.route import yakiList_route
 from src.route import yakiList_route
 from src.route import schoolList_route
+from src.route import schoollist2_route
 from src.route import haikuList_route
 from src.route import imageList_route
 
@@ -36,6 +37,13 @@ from src.route import pixiv_route
 #sub
 from src.route import rembg_route
 
+#make table
+from src.route.service import create_table_service
+"""
+Initialize server
+"""
+create_table_service.make_table()
+
 """
 Flask run
 """
@@ -51,6 +59,7 @@ app.register_blueprint(nameList_route.app)
 app.register_blueprint(nameList2_route.app)
 app.register_blueprint(yakiList_route.app)
 app.register_blueprint(schoolList_route.app)
+app.register_blueprint(schoollist2_route.app)
 app.register_blueprint(haikuList_route.app)
 app.register_blueprint(imageList_route.app)
 #file

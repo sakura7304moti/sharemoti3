@@ -515,3 +515,79 @@ class HololewdQueryRecord:
             'date': self.date,
             'score': self.score
         }
+    
+# schoolのテーブル
+class SchoolQueryRecord:
+    def __init__(
+            self,
+            id:int,
+            school_name:str,
+            principal:str,
+            detail:str,
+            slogan:str
+    ):
+        self.id = id
+        self.school_name = school_name
+        self.principal = principal
+        self.detail = detail
+        self.slogan = slogan
+
+    def __str__(self):
+        return f"""id : {self.id}
+学校名:{self.school_name}
+校長先生:{self.principal}
+詳細:{self.detail}
+スローガン:{self.slogan}
+"""
+    
+    def to_args(self) -> dict:
+        """
+        クエリパラメータを取得
+        """
+        return {
+            "id" : self.id,
+            "schoolName":self.school_name,
+            "principal":self.principal,
+            "detail":self.detail,
+            "slogan":self.slogan
+        }
+    
+# school_commentのテーブル
+class SchoolCommentQueryRecord:
+    def __init__(
+        self,
+        id:int,
+        school_id:int,
+        star:int,
+        title:str,
+        comment:str,
+        post_person:str
+    ):
+        self.id = id
+        self.school_id = school_id
+        self.star = star
+        self.title = title
+        self.comment = comment
+        self.post_person = post_person
+
+    def __str__(self):
+        return f"""id : {self.id}
+学校ID : {self.school_id}
+評価 : {self.star}
+タイトル : {self.title}
+コメント内容 : {self.comment}
+投稿者 : {self.post_person}
+"""
+    
+    def to_args(self):
+        """
+        クエリパラメータを取得
+        """
+        return {
+            "id" : self.id,
+            "schoolId" : self.school_id,
+            "star" : self.star,
+            "title" : self.title,
+            "comment" : self.comment,
+            "postPerson" : self.post_person
+        }

@@ -4,6 +4,8 @@ from typing import List
 import pandas as pd
 import yaml
 import requests
+import sqlite3
+import datetime
 
 from .interface import HoloName, SsbuNameRecord
 
@@ -238,3 +240,45 @@ class Option:
         df = df[df["name"].notna()]
         df = df.drop_duplicates(subset='name')
         return df
+    
+
+class DbBase:
+    def __init__(self, dbname:str):
+        self.dbname = dbname
+
+    def db_connection(self):
+        """
+        メインのdbの接続情報
+        """
+        return sqlite3.connect(self.dbname)
+
+    def execute_commit(self, query:str, param: dict | None = None):
+        """
+        クエリを実行するだけ。commitが必要な場合はこっち。
+        """
+        con = sqlite3.connect(self.dbname)
+        cur = con.cursor()
+        if param is None:
+            cur.execute(query)
+        else:
+            cur.execute(query, param)
+        
+        con.commit()
+        con.close()
+
+    def execute_df(self, query:str, param: dict | None = None):
+        """
+        クエリを実行してデータフレームを取得
+        """
+        with self.db_connection() as conn:
+            if param is None:
+                return pd.read_sql(query, conn)
+            else:
+                return pd.read_sql(query, conn, param)
+
+    def current_time(self):
+        """
+        現在の日時を取得。
+        create_atやupdate_atの日時セットに。
+        """
+        return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
