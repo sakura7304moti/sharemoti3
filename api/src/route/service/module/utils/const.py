@@ -272,9 +272,9 @@ class DbBase:
         """
         with self.db_connection() as conn:
             if param is None:
-                return pd.read_sql(query, conn)
+                return pd.read_sql(sql = query, con = conn)
             else:
-                return pd.read_sql(query, conn, param)
+                return pd.read_sql(sql = query, con = conn, params = param)
 
     def current_time(self):
         """

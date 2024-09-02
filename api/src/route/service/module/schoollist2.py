@@ -37,7 +37,7 @@ def make_table():
         comment STRING,
         post_person STRING,
         create_at STRING,
-        updatea_at STRING
+        update_at STRING
     )
     """
 
@@ -56,7 +56,7 @@ def get_school():
         detail as Detail,
         slogan as Slogan,
         create_at as CreateAt,
-        updaet_at as UpdateAt
+        update_at as UpdateAt
     from school
     order by id
     """
@@ -77,7 +77,7 @@ def get_comment(id:int):
         create_at as CreateAt,
         update_at as UpdateAt
     from school_comment
-    where school_id = :schoolId
+
     order by id
     """
     args = {"schoolId":id}
@@ -94,7 +94,7 @@ def create_school(condition:interface.SchoolQueryRecord):
         detail, 
         slogan, 
         create_at, 
-        updaet_at
+        update_at
     )
     VALUES(
         :schoolName,
@@ -148,7 +148,7 @@ def update_school(condition:interface.SchoolQueryRecord):
         principal = :principal,
         detail = :detail,
         slogan = :slogan,
-        update_at = :current_time
+        update_at = :currentTime
     where
         id = :id
     """
@@ -168,7 +168,7 @@ def update_comment(condition:interface.SchoolCommentQueryRecord):
         title = :title,
         comment = :comment,
         post_person = :postPerson,
-        update_at = :update_at
+        update_at = :currentTime
     where 
         id = :id
     """
@@ -184,7 +184,7 @@ def delete_school(id:int):
 
     # 学校
     query = "DELETE FROM school where id = :id"
-    query_base.execute(query, args)
+    query_base.execute_commit(query, args)
 
     # コメント
     query = "DELETE FROM school_comment where school_id = :id"
