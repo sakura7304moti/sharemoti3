@@ -58,6 +58,20 @@ export class APIClient {
     }
   }
 
+  //http get
+  public async httpDelete<T>(url: string): Promise<T | null> {
+    try {
+      const res: AxiosResponse<string> = await axios.delete<
+        T,
+        AxiosResponse<string>
+      >(url);
+      const r = JSON.parse(res.data);
+      return r;
+    } catch {
+      return null;
+    }
+  }
+
   //file upload
   public async httpUpload<T>(url: string, file: File): Promise<T | null> {
     try {
