@@ -50,14 +50,20 @@ def get_school():
     """
     query = """
     SELECT
-        id as Id,
-        school_name as SchoolName,
-        principal as Principal,
-        detail as Detail,
-        slogan as Slogan,
-        create_at as CreateAt,
-        update_at as UpdateAt
-    from school
+        sc.id as id,
+        sc.school_name as schoolName,
+        sc.principal as principal,
+        sc.detail as detail,
+        sc.slogan as slogan,
+        (
+            SELECT 
+                round(avg(cm.star),1) 
+            FROM school_comment as cm 
+            WHERE cm.school_id = sc.id
+        ) as avgStar,
+        create_at as createAt,
+        update_at as updateAt
+    from school as sc
     order by id
     """
     return query_base.execute_df(query)
@@ -68,14 +74,14 @@ def get_comment(id:int):
     """
     query = """
     SELECT
-        id as Id,
-        school_id as SchoolId,
-        star as Star,
-        title as Title,
-        comment as Comment,
-        post_person as PostPerson,
-        create_at as CreateAt,
-        update_at as UpdateAt
+        id,
+        school_id as schoolId,
+        star as star,
+        title as title,
+        comment as comment,
+        post_person as postPerson,
+        create_at as createAt,
+        update_at as updateAt
     from school_comment
 
     order by id

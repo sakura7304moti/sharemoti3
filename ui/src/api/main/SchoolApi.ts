@@ -74,9 +74,12 @@ export class SchoolApi extends MainAPIClient{
   }
 }
 
+const api = new SchoolApi();
+export default api;
+
 interface SchoolState extends School{
-  create_at:string;
-  update_at:string;
+  createAt:string;
+  updateAt:string;
 }
 
 interface School{
@@ -85,11 +88,12 @@ interface School{
   principal:string;
   detail:string;
   slogan:string;
+  avgStar:null |number;
 }
 
 interface SchoolCommentState extends SchoolComment{
-  create_at:string;
-  update_at:string;
+  createAt:string;
+  updateAt:string;
 }
 
 interface SchoolComment{
