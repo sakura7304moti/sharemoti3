@@ -64,7 +64,7 @@ def get_school():
         create_at as createAt,
         update_at as updateAt
     from school as sc
-    order by id
+    order by sc.school_name
     """
     return query_base.execute_df(query)
     

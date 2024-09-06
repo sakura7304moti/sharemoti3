@@ -11,7 +11,7 @@
       >
         <q-spinner v-if="isLoading" color="primary" class="q-ml-md" />
         <div class="q-pr-sm">
-          <q-btn label="開校する" color="primary" icon="add" />
+          <create-school-button @created="getSchools" />
         </div>
 
         <q-toggle
@@ -29,12 +29,14 @@
       :editting="editting"
       @updated="getSchools"
       @deleted="getSchools"
+      class="q-mt-lg"
     />
   </q-page>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import SchoolCard from 'src/components/school/SchoolCard.vue';
+import CreateSchoolButton from 'src/components/school/CreateSchoolButton.vue';
 import api from 'src/api/main/SchoolApi';
 import { useQuasar } from 'quasar';
 const quasar = useQuasar();
@@ -42,6 +44,7 @@ export default defineComponent({
   name: 'school-page',
   components: {
     SchoolCard,
+    CreateSchoolButton,
   },
   setup() {
     const { isLoading, schools, getSchools } = useSearchModel();

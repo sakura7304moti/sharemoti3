@@ -43,7 +43,7 @@ def to_comment_condition():
     return condition
 
 def success_status():
-    return jsonify({"status": "success"})
+    return jsonify({"status": 'success'})
 
 
 

@@ -9,10 +9,12 @@
         <q-btn icon="delete" color="negative" />
       </div>
     </div>
-    <div class="q-pt-sm school-principal q-pb-sm">
+    <div class="q-pt-sm school-principal q-pb-sm" v-if="state.principal">
       校長先生：<span>{{ state.principal }}</span>
     </div>
     <hr />
+    <school-slogan v-if="state.slogan" v-model="state.slogan" />
+
     <div class="q-pa-md" style="overflow-wrap: break-word">
       {{ state.detail }}
     </div>
@@ -35,6 +37,7 @@ import { computed, defineComponent, PropType, ref } from 'vue';
 import { defineEmits } from 'vue';
 import api from 'src/api/main/SchoolApi';
 import { useQuasar } from 'quasar';
+import SchoolSlogan from './SchoolSlogan.vue';
 
 const quasar = useQuasar();
 const emit = defineEmits(['updated', 'deleted']);
@@ -50,6 +53,7 @@ export default defineComponent({
       required: true,
     },
   },
+  components: { SchoolSlogan },
   setup(props) {
     const state = ref({
       id: props.dataState.id,
