@@ -41,7 +41,7 @@ def search_illusts(query:str):
     """
     # 検索条件
     illusts = []
-    keyword = f"{query} 000user"
+    keyword = f"{query}"#000userだった
     
     # 初回検索（最初のページを取得）
     json_result = api.search_illust(word=keyword)
@@ -50,7 +50,7 @@ def search_illusts(query:str):
     
     # 検索結果が無くなるまで検索
     while json_result:
-        illusts.extend(json_result.illusts)
+        illusts.extend([i for i in json_result.illusts if i.total_bookmarks > 1000])# bookmarks
         
         # 次のページが存在する場合は次のページを取得
         if json_result is None:
