@@ -6,7 +6,7 @@ import math
 
 from typing import List
 from tqdm import tqdm
-
+from pytube import YouTube
 
 from src.route.service.module.utils import const, interface
 
@@ -115,6 +115,7 @@ def inferece_channenl(url:str) -> interface.Archive:
     return archive
 
 def get_upload_date(url:str):
+    """
     # オプションを設定
     ydl_opts = {
         'quiet': True,  # 出力を非表示
@@ -140,6 +141,15 @@ def get_upload_date(url:str):
             return stamp
         else:
             return str(datetime.datetime.fromtimestamp(stamp))
+    """
+    # YouTubeオブジェクトの作成
+    yt = YouTube(url)
+
+    # 投稿日の取得
+    publish_date = yt.publish_date
+    return publish_date
+
+    
         
 
 def holo_archives() -> List[interface.Archive]:
