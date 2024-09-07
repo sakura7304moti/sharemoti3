@@ -97,7 +97,8 @@ export default defineComponent({
     const createSchol = async function (school: School) {
       await api
         .createSchool(school)
-        .then((_) => {
+        .then((response) => {
+          console.log('create response', response);
           context.emit('created');
           dialog.value = false;
           condition.value = {

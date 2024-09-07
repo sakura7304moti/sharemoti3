@@ -1,17 +1,41 @@
 <template>
-  <q-card class="q-pa-md" style="max-width: 600px; margin-bottom: 24px">
+  <q-card
+    class="q-pa-md"
+    :class="{
+      'bg-grey-4': editDialog || deleteDialog,
+    }"
+    style="max-width: 600px; margin-bottom: 24px"
+  >
     <div class="row">
-      <div class="col-9 school-title">
+      <div
+        class="school-title"
+        :class="{
+          'col-8': editIconDisplay,
+        }"
+      >
         {{ state.schoolName }}
       </div>
-      <div class="col-3 row q-gutter-xs" v-if="editIconDisplay">
-        <q-btn
-          icon="edit"
-          color="primary"
-          class="q-mr-md"
-          @click="editDalogOpen"
-        />
-        <q-btn icon="delete" color="negative" />
+      <div class="col-4 row q-gutter-xs" v-if="editIconDisplay">
+        <div>
+          <q-btn
+            icon="edit"
+            color="primary"
+            class="q-mr-md"
+            @click="editDalogOpen"
+            label="編集"
+            dense
+          />
+        </div>
+
+        <div>
+          <q-btn
+            icon="delete"
+            color="negative"
+            @click="deleteDialog = true"
+            label="削除"
+            dense
+          />
+        </div>
       </div>
     </div>
     <div class="q-pt-sm school-principal q-pb-sm" v-if="state.principal">
@@ -108,9 +132,44 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <!--削除ダイアログ-->
+  <q-dialog v-model="deleteDialog">
+    <q-card style="min-width: 300px">
+      <q-card-section>
+        <div class="text-h6">削除確認</div>
+        <hr />
+      </q-card-section>
+      <q-card-section class="q-mx-md">
+        <div class="text-subtitle1">次の学校を取り壊す？</div>
+        <q-field label="学校名" class="q-pt-sm" stack-label filled readonly>
+          {{ state.schoolName }}
+        </q-field>
+      </q-card-section>
+      <div class="q-mx-md">
+        <hr />
+      </div>
+
+      <q-card-actions class="q-mb-md q-mx-sm">
+        <div class="row justify-between" style="max-width: 100%; width: 100%">
+          <div class="col text-left">
+            <q-btn label="キャンセル" @click="deleteDialog = false" dense />
+          </div>
+          <div class="col text-right">
+            <q-btn
+              color="negative"
+              label="削除する"
+              @click="deleteSchool(state.id)"
+              dense
+            />
+          </div>
+        </div>
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 <script lang="ts">
-import { computed, defineComponent, PropType, ref } from 'vue';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import api from 'src/api/main/SchoolApi';
 import { useQuasar } from 'quasar';
 import SchoolSlogan from './SchoolSlogan.vue';
@@ -151,12 +210,40 @@ export default defineComponent({
       updateAt: props.dataState.updateAt,
     } as SchoolState);
 
+    watch(props, () => {
+      state.value = {
+        id: props.dataState.id,
+        schoolName: props.dataState.schoolName,
+        principal: props.dataState.principal,
+        detail: props.dataState.detail,
+        slogan: props.dataState.slogan,
+        avgStar: props.dataState.avgStar,
+        createAt: props.dataState.createAt,
+        updateAt: props.dataState.updateAt,
+      };
+
+      editState.value = {
+        id: props.dataState.id,
+        schoolName: props.dataState.schoolName,
+        principal: props.dataState.principal,
+        detail: props.dataState.detail,
+        slogan: props.dataState.slogan,
+        avgStar: props.dataState.avgStar,
+        createAt: props.dataState.createAt,
+        updateAt: props.dataState.updateAt,
+      };
+    });
+
     const editIconDisplay = computed(() => props.editting);
 
     const editDialog = ref(false);
     const deleteDialog = ref(false);
 
     const editDalogOpen = function () {
+      /**
+       * 編集ダイアログを開く
+       * このとき入力欄を初期値に初期化
+       */
       editState.value = {
         id: props.dataState.id,
         schoolName: props.dataState.schoolName,
@@ -197,15 +284,13 @@ export default defineComponent({
       await api
         .deleteSchool(id)
         .then((response) => {
-          if (response) {
-            console.log('delete response', response);
-            context.emit('deleted');
-            quasar.notify({
-              color: 'primary',
-              position: 'top',
-              message: '消したよ！',
-            });
-          }
+          console.log('delete response', response);
+          context.emit('deleted');
+          quasar.notify({
+            color: 'primary',
+            position: 'top',
+            message: '消したよ！',
+          });
         })
         .catch((err) => {
           console.log('delete err', err);
