@@ -83,8 +83,8 @@ def get_comment(id:int):
         create_at as createAt,
         update_at as updateAt
     from school_comment
-
-    order by id
+    where school_id = :schoolId
+    order by update_at desc
     """
     args = {"schoolId":id}
     return query_base.execute_df(query, args)

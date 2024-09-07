@@ -54,14 +54,84 @@
         size="2em"
         :max="5"
         color="yellow-7"
+        readonly
       />
       <div class="q-pt-xs q-pl-sm text-bold" style="font-size: 20px">
         {{ state.avgStar }}
       </div>
     </div>
+    <!--コメント欄 表示モードのときだけ表示させる-->
+    <div style="padding-top: 32px" v-if="comments.length > 0">
+      <div class="q-pb-sm">
+        <div>コメント：{{ comments.length }}件</div>
+        <div class="q-py-md">
+          <q-card>
+            <q-card-section>
+              <div class="text-h6">コメント作成</div>
+              <div class="q-pt-sm">
+                <q-input
+                  v-model="commentCreateState.comment"
+                  type="textarea"
+                  label="コメント内容"
+                  outlined
+                  dense
+                />
+              </div>
+              <div class="q-pt-sm">
+                <q-input
+                  v-model="commentCreateState.postPerson"
+                  label="投稿者"
+                  outlined
+                  dense
+                />
+              </div>
+              <div class="q-pt-sm">
+                <span class="q-pr-sm">学校の評価</span>
+                <q-rating
+                  v-model="commentCreateState.star"
+                  size="2em"
+                  :max="5"
+                  color="yellow-7"
+                />
+              </div>
+              <div class="q-pt-sm text-right">
+                <div>
+                  <q-btn
+                    label="作成する"
+                    color="primary"
+                    :disable="
+                      commentCreateState.star == 0 ||
+                      commentCreateState.comment == ''
+                    "
+                    @click="createComment()"
+                  />
+                </div>
+              </div>
+            </q-card-section>
+          </q-card>
+        </div>
+      </div>
+      <div v-for="cm in comments" :key="cm.id" class="q-pl-sm q-pb-md">
+        <q-chat-message
+          :stamp="cm.updateAt.split(' ')[0]"
+          :name="cm.postPerson"
+        >
+          <q-rating
+            v-model="cm.star"
+            size="1.5em"
+            :max="5"
+            color="yellow-7"
+            readonly
+          />
+          <div class="q-pb-xs">
+            {{ cm.comment }}
+          </div>
+        </q-chat-message>
+      </div>
+    </div>
   </q-card>
 
-  <!--編集ダイアログ-->
+  <!--学校編集ダイアログ-->
   <q-dialog v-model="editDialog">
     <q-card style="min-width: 300px">
       <q-card-section style="max-width: 100%; width: 100%">
@@ -133,7 +203,7 @@
     </q-card>
   </q-dialog>
 
-  <!--削除ダイアログ-->
+  <!--学校削除ダイアログ-->
   <q-dialog v-model="deleteDialog">
     <q-card style="min-width: 300px">
       <q-card-section>
@@ -209,6 +279,26 @@ export default defineComponent({
       createAt: props.dataState.createAt,
       updateAt: props.dataState.updateAt,
     } as SchoolState);
+
+    const commentCreateState = ref({
+      id: 0, //ここは未使用。API側でもチェックしてない
+      schoolId: props.dataState.id,
+      star: 0,
+      comment: '',
+      title: '',
+      postPerson: '',
+    } as SchoolComment);
+
+    const commentEditState = ref({
+      id: 0, //ここは未使用。API側でもチェックしてない
+      schoolId: props.dataState.id,
+      star: 0,
+      comment: '',
+      title: '',
+      postPerson: '',
+    } as SchoolComment);
+
+    const comments = ref([] as SchoolCommentState[]);
 
     watch(props, () => {
       state.value = {
@@ -301,15 +391,75 @@ export default defineComponent({
           });
         });
     };
+
+    const getComments = async function (id: number) {
+      await api
+        .comment(id)
+        .then((response) => {
+          if (response) {
+            console.log('comment response', response);
+            comments.value.splice(0);
+            response.forEach((it) => comments.value.push(it));
+          }
+        })
+        .catch((err) => {
+          console.log('delete err', err);
+          quasar.notify({
+            color: 'red',
+            position: 'top',
+            message: '削除でエラーになった...',
+          });
+        });
+    };
+
+    const createComment = async function () {
+      await api.createComment(commentCreateState.value).then((response) => {
+        console.log('create comment', response);
+        getComments(props.dataState.id);
+        commentCreateState.value = {
+          id: 0, //ここは未使用。API側でもチェックしてない
+          schoolId: props.dataState.id,
+          star: 0,
+          comment: '',
+          title: '',
+          postPerson: '',
+        };
+        quasar.notify({
+          color: 'primary',
+          position: 'top',
+          message: 'コメント追加した！',
+        });
+      });
+    };
+
+    const selectComment = function (com: SchoolCommentState) {
+      commentEditState.value = {
+        id: 0,
+        schoolId: com.schoolId,
+        star: com.star,
+        title: '',
+        comment: com.comment,
+        postPerson: com.postPerson,
+      };
+    };
+    /**初期化処理 */
+    getComments(props.dataState.id);
+
+    watch(props, () => {
+      getComments(props.dataState.id);
+    });
     return {
       state,
+      comments,
       editState,
+      commentCreateState,
       editIconDisplay,
       editDialog,
       deleteDialog,
       editDalogOpen,
       editSchool,
       deleteSchool,
+      createComment,
     };
   },
 });
@@ -326,12 +476,25 @@ interface School {
   slogan: string;
   avgStar: null | number;
 }
+interface SchoolCommentState extends SchoolComment {
+  createAt: string;
+  updateAt: string;
+}
+
+interface SchoolComment {
+  id: number;
+  schoolId: number;
+  star: number;
+  title: string;
+  comment: string;
+  postPerson: string;
+}
 </script>
 
 <style>
 .school-title {
   font-size: 24px;
-  color: rgb(102, 163, 224);
+  color: rgb(51, 51, 51);
 }
 .school-principal {
   font-size: 16px;
