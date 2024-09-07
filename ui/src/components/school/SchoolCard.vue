@@ -15,8 +15,8 @@
       >
         {{ state.schoolName }}
       </div>
-      <div class="col-4 row q-gutter-xs" v-if="editIconDisplay">
-        <div>
+      <div class="col-4 row" v-if="editIconDisplay">
+        <div class="col text-right">
           <q-btn
             icon="edit"
             color="primary"
@@ -27,7 +27,7 @@
           />
         </div>
 
-        <div>
+        <div class="col text-right">
           <q-btn
             icon="delete"
             color="negative"
@@ -60,8 +60,19 @@
         {{ state.avgStar }}
       </div>
     </div>
+    <div class="q-pt-sm">
+      <q-btn
+        icon-right="chat"
+        label="コメントを見る"
+        color="primary"
+        dense
+        @click="navigateDetail"
+        v-if="!commentView"
+      />
+    </div>
+
     <!--コメント欄 表示モードのときだけ表示させる-->
-    <div style="padding-top: 32px" v-if="comments.length > 0">
+    <div style="padding-top: 32px" v-if="commentView">
       <div class="q-pb-sm">
         <div>コメント：{{ comments.length }}件</div>
         <div class="q-py-md">
@@ -243,6 +254,7 @@ import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import api from 'src/api/main/SchoolApi';
 import { useQuasar } from 'quasar';
 import SchoolSlogan from './SchoolSlogan.vue';
+import { useRouter } from 'vue-router';
 export default defineComponent({
   name: 'school-card',
   props: {
@@ -254,10 +266,17 @@ export default defineComponent({
       type: Boolean,
       required: true,
     },
+    detail: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
   },
   components: { SchoolSlogan },
   setup(props, context) {
     const quasar = useQuasar();
+    const router = useRouter();
+    const commentView = computed(() => props.detail);
     const state = ref({
       id: props.dataState.id,
       schoolName: props.dataState.schoolName,
@@ -345,6 +364,12 @@ export default defineComponent({
         updateAt: props.dataState.updateAt,
       };
       editDialog.value = true;
+    };
+
+    const navigateDetail = function () {
+      router.push({
+        path: '/school/' + props.dataState.id,
+      });
     };
 
     const editSchool = async function (state: School) {
@@ -460,6 +485,8 @@ export default defineComponent({
       editSchool,
       deleteSchool,
       createComment,
+      commentView,
+      navigateDetail,
     };
   },
 });

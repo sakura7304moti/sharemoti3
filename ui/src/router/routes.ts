@@ -20,8 +20,17 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/school',
     component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: () => import('pages/SchoolPage.vue') }],
+  },
+  {
+    path: '/school/:id',
+    component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/SchoolPage.vue') },
+      {
+        path: '',
+        component: () => import('src/pages/SchoolPageDetail.vue'),
+        props: true,
+      },
     ],
   },
   {

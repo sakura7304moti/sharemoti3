@@ -1,5 +1,11 @@
 <template>
-  <q-btn label="開校する" color="primary" icon="add" @click="dialog = true" />
+  <q-btn
+    label="開校する"
+    color="primary"
+    icon="add"
+    @click="dialog = true"
+    dense
+  />
   <q-dialog v-model="dialog">
     <q-card style="min-width: 300px">
       <q-card-section style="max-width: 100%; width: 100%">

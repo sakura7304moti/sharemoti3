@@ -19,14 +19,16 @@
           v-model="editting"
           icon="edit"
           color="primary"
+          label="編集の切替"
         />
       </div>
     </div>
     <school-card
+      :editting="editting"
       :data-state="sc"
+      :detail="false"
       v-for="sc in schools"
       :key="sc.id"
-      :editting="editting"
       @updated="getSchools"
       @deleted="getSchools"
       class="q-mt-lg"
