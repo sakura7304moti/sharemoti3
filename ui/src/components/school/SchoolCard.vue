@@ -44,7 +44,7 @@
     <hr />
     <school-slogan v-if="state.slogan" v-model="state.slogan" />
 
-    <div class="q-pa-md" style="overflow-wrap: break-word">
+    <div class="q-pa-md" style="white-space: pre-wrap; word-wrap: break-word">
       {{ state.detail }}
     </div>
     <div class="row">
@@ -78,7 +78,22 @@
         <div class="q-py-md">
           <q-card>
             <q-card-section>
-              <div class="text-h6">コメント作成</div>
+              <div class="row justify-between">
+                <div class="text-h6">コメント作成</div>
+                <div>
+                  <q-icon
+                    name="info"
+                    size="sm"
+                    color="primary"
+                    class="cursor-pointer"
+                  >
+                    <q-tooltip class="text-body2">
+                      ここからコメント書いてね！コメントだけ必須よ
+                    </q-tooltip></q-icon
+                  >
+                </div>
+              </div>
+
               <div class="q-pt-sm">
                 <q-input
                   v-model="commentCreateState.comment"
@@ -110,10 +125,7 @@
                   <q-btn
                     label="作成する"
                     color="primary"
-                    :disable="
-                      commentCreateState.star == 0 ||
-                      commentCreateState.comment == ''
-                    "
+                    :disable="commentCreateState.comment == ''"
                     @click="createComment()"
                   />
                 </div>
@@ -127,15 +139,20 @@
           :stamp="cm.updateAt.split(' ')[0]"
           :name="cm.postPerson"
         >
-          <q-rating
-            v-model="cm.star"
-            size="1.5em"
-            :max="5"
-            color="yellow-7"
-            readonly
-          />
-          <div class="q-pb-xs">
-            {{ cm.comment }}
+          <div style="white-space: pre-wrap; word-wrap: break-word">
+            <div class="q-pb-xs">
+              <q-rating
+                v-model="cm.star"
+                size="1.5em"
+                :max="5"
+                color="yellow-7"
+                readonly
+                v-if="(cm.star ?? 0) > 0"
+              />
+            </div>
+            <div>
+              {{ cm.comment }}
+            </div>
           </div>
         </q-chat-message>
       </div>

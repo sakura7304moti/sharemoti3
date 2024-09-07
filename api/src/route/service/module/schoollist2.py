@@ -59,7 +59,7 @@ def get_school():
             SELECT 
                 round(avg(cm.star),1) 
             FROM school_comment as cm 
-            WHERE cm.school_id = sc.id
+            WHERE cm.school_id = sc.id and cm.star > 0
         ) as avgStar,
         create_at as createAt,
         update_at as updateAt

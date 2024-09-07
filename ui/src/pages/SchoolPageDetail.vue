@@ -53,7 +53,16 @@
       </div>
     </div>
 
-    <school-card :data-state="school" :editting="editting" :detail="true" />
+    <school-card
+      :data-state="school"
+      :editting="editting"
+      :detail="true"
+      @updated="
+        getSchool();
+        editting = false;
+      "
+      @deleted="navigateSchool"
+    />
   </q-page>
 </template>
 <script lang="ts">
@@ -132,6 +141,7 @@ export default defineComponent({
       editting,
       school,
       navigateSchool,
+      getSchool,
     };
   },
 });
