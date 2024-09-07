@@ -1,11 +1,16 @@
 <template>
-  <q-card class="q-pa-md" style="max-width: 600px">
+  <q-card class="q-pa-md" style="max-width: 600px; margin-bottom: 24px">
     <div class="row">
       <div class="col-9 school-title">
         {{ state.schoolName }}
       </div>
       <div class="col-3 row q-gutter-xs" v-if="editIconDisplay">
-        <q-btn icon="edit" color="primary" class="q-mr-md" />
+        <q-btn
+          icon="edit"
+          color="primary"
+          class="q-mr-md"
+          @click="editDalogOpen"
+        />
         <q-btn icon="delete" color="negative" />
       </div>
     </div>
@@ -31,16 +36,84 @@
       </div>
     </div>
   </q-card>
+
+  <!--編集ダイアログ-->
+  <q-dialog v-model="editDialog">
+    <q-card style="min-width: 300px">
+      <q-card-section style="max-width: 100%; width: 100%">
+        <div class="text-h6 row">
+          <div class="col text-left">学校編集画面！</div>
+          <div>
+            <q-btn
+              label="変更を保存する"
+              class="col"
+              color="primary"
+              dense
+              :disable="editState.schoolName == ''"
+              @click="editSchool(editState)"
+            />
+          </div>
+        </div>
+      </q-card-section>
+      <q-card-section>
+        <q-input
+          class="q-mb-md"
+          v-model="editState.schoolName"
+          label="学校名"
+          :rules="[(val) => !!val || '入力必須']"
+          dense
+          outlined
+          type="textarea"
+        />
+        <q-input
+          class="q-mb-md"
+          v-model="editState.principal"
+          label="校長先生"
+          dense
+          outlined
+          type="textarea"
+        />
+        <q-input
+          v-model="editState.detail"
+          label="説明書き"
+          dense
+          outlined
+          type="textarea"
+        />
+      </q-card-section>
+      <div class="q-pa-md">
+        <hr />
+      </div>
+
+      <q-card-section>
+        <q-input
+          v-model="editState.slogan"
+          label="スローガン"
+          dense
+          outlined
+          type="textarea"
+        />
+        <div class="text-caption text-grey">スローガンのイメージ</div>
+        <school-slogan v-model="editState.slogan" />
+      </q-card-section>
+      <q-card-actions class="q-pa-md row" align="right">
+        <span class="text-caption text-grey q-pr-md">学校名以外は空でもok</span>
+        <q-btn
+          label="変更を保存する"
+          color="primary"
+          dense
+          :disable="editState.schoolName == ''"
+          @click="editSchool(editState)"
+        />
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
-import { defineEmits } from 'vue';
 import api from 'src/api/main/SchoolApi';
 import { useQuasar } from 'quasar';
 import SchoolSlogan from './SchoolSlogan.vue';
-
-const quasar = useQuasar();
-const emit = defineEmits(['updated', 'deleted']);
 export default defineComponent({
   name: 'school-card',
   props: {
@@ -54,8 +127,20 @@ export default defineComponent({
     },
   },
   components: { SchoolSlogan },
-  setup(props) {
+  setup(props, context) {
+    const quasar = useQuasar();
     const state = ref({
+      id: props.dataState.id,
+      schoolName: props.dataState.schoolName,
+      principal: props.dataState.principal,
+      detail: props.dataState.detail,
+      slogan: props.dataState.slogan,
+      avgStar: props.dataState.avgStar,
+      createAt: props.dataState.createAt,
+      updateAt: props.dataState.updateAt,
+    } as SchoolState);
+
+    const editState = ref({
       id: props.dataState.id,
       schoolName: props.dataState.schoolName,
       principal: props.dataState.principal,
@@ -68,76 +153,81 @@ export default defineComponent({
 
     const editIconDisplay = computed(() => props.editting);
 
-    const { editDialog, deleteDialog, editSchool, deleteSchool } = apiModel();
+    const editDialog = ref(false);
+    const deleteDialog = ref(false);
 
-    return {
-      state,
-      editIconDisplay,
-      editDialog,
-      deleteDialog,
-      editSchool,
-      deleteSchool,
+    const editDalogOpen = function () {
+      editState.value = {
+        id: props.dataState.id,
+        schoolName: props.dataState.schoolName,
+        principal: props.dataState.principal,
+        detail: props.dataState.detail,
+        slogan: props.dataState.slogan,
+        avgStar: props.dataState.avgStar,
+        createAt: props.dataState.createAt,
+        updateAt: props.dataState.updateAt,
+      };
+      editDialog.value = true;
     };
-  },
-});
-const apiModel = function () {
-  const editDialog = ref(false);
-  const deleteDialog = ref(false);
 
-  const editSchool = async function (state: School) {
-    await api
-      .editSchool(state)
-      .then((response) => {
-        if (response) {
+    const editSchool = async function (state: School) {
+      await api
+        .editSchool(state)
+        .then((response) => {
           console.log('update response', response);
-          emit('updated');
+          context.emit('updated');
           quasar.notify({
             color: 'primary',
             position: 'top',
             message: '更新したよ！',
           });
-        }
-      })
-      .catch((err) => {
-        console.log('update err', err);
-        quasar.notify({
-          color: 'red',
-          position: 'top',
-          message: '更新でエラーになった...',
-        });
-      });
-  };
-
-  const deleteSchool = async function (id: number) {
-    await api
-      .deleteSchool(id)
-      .then((response) => {
-        if (response) {
-          console.log('delete response', response);
-          emit('deleted');
+          editDialog.value = false;
+        })
+        .catch((err) => {
+          console.log('update err', err);
           quasar.notify({
-            color: 'primary',
+            color: 'red',
             position: 'top',
-            message: '消したよ！',
+            message: '更新でエラーになった...',
           });
-        }
-      })
-      .catch((err) => {
-        console.log('delete err', err);
-        quasar.notify({
-          color: 'red',
-          position: 'top',
-          message: '削除でエラーになった...',
         });
-      });
-  };
-  return {
-    editDialog,
-    deleteDialog,
-    editSchool,
-    deleteSchool,
-  };
-};
+    };
+
+    const deleteSchool = async function (id: number) {
+      await api
+        .deleteSchool(id)
+        .then((response) => {
+          if (response) {
+            console.log('delete response', response);
+            context.emit('deleted');
+            quasar.notify({
+              color: 'primary',
+              position: 'top',
+              message: '消したよ！',
+            });
+          }
+        })
+        .catch((err) => {
+          console.log('delete err', err);
+          quasar.notify({
+            color: 'red',
+            position: 'top',
+            message: '削除でエラーになった...',
+          });
+        });
+    };
+    return {
+      state,
+      editState,
+      editIconDisplay,
+      editDialog,
+      deleteDialog,
+      editDalogOpen,
+      editSchool,
+      deleteSchool,
+    };
+  },
+});
 interface SchoolState extends School {
   createAt: string;
   updateAt: string;
