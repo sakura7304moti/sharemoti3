@@ -75,7 +75,6 @@
 import { defineComponent, ref } from 'vue';
 import api from 'src/api/main/SchoolApi';
 import { useQuasar } from 'quasar';
-import { defineEmits } from 'vue';
 
 import SchoolSlogan from 'src/components/school/SchoolSlogan.vue';
 export default defineComponent({
@@ -83,9 +82,8 @@ export default defineComponent({
   components: {
     SchoolSlogan,
   },
-  setup() {
+  setup(_, context) {
     const quasar = useQuasar();
-    const emit = defineEmits(['created']);
     const dialog = ref(false);
     const condition = ref({
       id: 0,
@@ -100,7 +98,7 @@ export default defineComponent({
       await api
         .createSchool(school)
         .then((_) => {
-          emit('created');
+          context.emit('created');
           dialog.value = false;
           condition.value = {
             id: 0,
