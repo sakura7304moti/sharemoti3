@@ -153,6 +153,29 @@
             <div>
               {{ cm.comment }}
             </div>
+            <div v-if="editIconDisplay" class="row justify-evenly">
+              <div class="col">
+                <q-btn
+                  icon="edit"
+                  dense
+                  flat
+                  color="primary"
+                  @click="selectComment(cm)"
+                />
+              </div>
+              <div class="col">
+                <q-btn
+                  icon="delete"
+                  dense
+                  flat
+                  color="negative"
+                  @click="selectDeleteComment(cm.id)"
+                />
+              </div>
+            </div>
+            <div v-if="commentDeleteId == cm.id && commentDeleteDialog">
+              <q-chip>選択中...</q-chip>
+            </div>
           </div>
         </q-chat-message>
       </div>
@@ -265,6 +288,116 @@
       </q-card-actions>
     </q-card>
   </q-dialog>
+
+  <!--コメント編集ダイアログ-->
+  <q-dialog v-model="commentEditDialog">
+    <q-card style="min-width: 300px; max-width: 600px; width: 100%">
+      <q-card-section>
+        <div class="row justify-between">
+          <div class="text-h6">コメント編集</div>
+          <div>
+            <q-icon
+              name="info"
+              size="sm"
+              color="primary"
+              class="cursor-pointer"
+            >
+              <q-tooltip class="text-body2">
+                ここからコメント書いてね！コメントだけ必須よ
+              </q-tooltip></q-icon
+            >
+          </div>
+        </div>
+
+        <div class="q-pt-sm">
+          <q-input
+            v-model="commentEditState.comment"
+            type="textarea"
+            label="コメント内容"
+            outlined
+            dense
+          />
+        </div>
+        <div class="q-pt-sm">
+          <q-input
+            v-model="commentEditState.postPerson"
+            label="投稿者"
+            outlined
+            dense
+          />
+        </div>
+        <div class="q-pt-sm">
+          <span class="q-pr-sm">学校の評価</span>
+          <q-rating
+            v-model="commentEditState.star"
+            size="2em"
+            :max="5"
+            color="yellow-7"
+          />
+        </div>
+        <div class="q-pt-sm text-right">
+          <div>
+            <q-btn
+              label="保存する"
+              color="primary"
+              :disable="commentEditState.comment == ''"
+              @click="editComment()"
+            />
+          </div>
+        </div>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
+
+  <!--コメント削除ダイアログ-->
+  <q-dialog v-model="commentDeleteDialog">
+    <q-card style="min-width: 300px">
+      <q-card-section>
+        <div class="text-h6">削除確認</div>
+        <hr />
+      </q-card-section>
+      <q-card-section class="q-mx-md">
+        <div class="text-subtitle1">次のコメントを消す？</div>
+        <q-field
+          label="コメント"
+          class="q-pt-sm"
+          stack-label
+          filled
+          readonly
+          type="textarea"
+          v-if="comments.find((it) => it.id == commentDeleteId)"
+        >
+          {{ comments.find((it) => it.id == commentDeleteId)?.comment }}
+        </q-field>
+        <div class="text-grey text-caption">
+          {{ comments.find((it) => it.id == commentDeleteId)?.postPerson }}
+        </div>
+      </q-card-section>
+      <div class="q-mx-md">
+        <hr />
+      </div>
+
+      <q-card-actions class="q-mb-md q-mx-sm">
+        <div class="row justify-between" style="max-width: 100%; width: 100%">
+          <div class="col text-left">
+            <q-btn
+              label="キャンセル"
+              @click="commentDeleteDialog = false"
+              dense
+            />
+          </div>
+          <div class="col text-right">
+            <q-btn
+              color="negative"
+              label="削除する"
+              @click="deleteComment(commentDeleteId)"
+              dense
+            />
+          </div>
+        </div>
+      </q-card-actions>
+    </q-card>
+  </q-dialog>
 </template>
 <script lang="ts">
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
@@ -364,6 +497,9 @@ export default defineComponent({
 
     const editDialog = ref(false);
     const deleteDialog = ref(false);
+    const commentEditDialog = ref(false);
+    const commentDeleteDialog = ref(false);
+    const commentDeleteId = ref(0);
 
     const editDalogOpen = function () {
       /**
@@ -455,34 +591,104 @@ export default defineComponent({
     };
 
     const createComment = async function () {
-      await api.createComment(commentCreateState.value).then((response) => {
-        console.log('create comment', response);
-        getComments(props.dataState.id);
-        commentCreateState.value = {
-          id: 0, //ここは未使用。API側でもチェックしてない
-          schoolId: props.dataState.id,
-          star: 0,
-          comment: '',
-          title: '',
-          postPerson: '',
-        };
-        quasar.notify({
-          color: 'primary',
-          position: 'top',
-          message: 'コメント追加した！',
+      await api
+        .createComment(commentCreateState.value)
+        .then((response) => {
+          console.log('create comment', response);
+          getComments(props.dataState.id);
+          commentCreateState.value = {
+            id: 0, //ここは未使用。API側でもチェックしてない
+            schoolId: props.dataState.id,
+            star: 0,
+            comment: '',
+            title: '',
+            postPerson: '',
+          };
+          quasar.notify({
+            color: 'primary',
+            position: 'top',
+            message: 'コメント追加した！',
+          });
+        })
+        .catch((err) => {
+          console.log('delete err', err);
+          quasar.notify({
+            color: 'red',
+            position: 'top',
+            message: 'コメント追加でエラーになった...',
+          });
         });
-      });
+    };
+
+    const editComment = async function () {
+      await api
+        .editComment(commentEditState.value)
+        .then((response) => {
+          console.log('edit comment', response);
+          getComments(props.dataState.id);
+          commentCreateState.value = {
+            id: 0,
+            schoolId: props.dataState.id,
+            star: 0,
+            comment: '',
+            title: '',
+            postPerson: '',
+          };
+          commentEditDialog.value = false;
+          quasar.notify({
+            color: 'primary',
+            position: 'top',
+            message: '更新した！',
+          });
+        })
+        .catch((err) => {
+          console.log('delete err', err);
+          quasar.notify({
+            color: 'red',
+            position: 'top',
+            message: 'コメント更新でエラーになった...',
+          });
+        });
+    };
+
+    const deleteComment = async function (id: number) {
+      await api
+        .deleteComment(id)
+        .then((response) => {
+          console.log('delete comment', response);
+          getComments(props.dataState.id);
+          commentDeleteDialog.value = false;
+          quasar.notify({
+            color: 'primary',
+            position: 'top',
+            message: '削除した！',
+          });
+        })
+        .catch((err) => {
+          console.log('delete err', err);
+          quasar.notify({
+            color: 'red',
+            position: 'top',
+            message: 'コメント削除でエラーになった...',
+          });
+        });
     };
 
     const selectComment = function (com: SchoolCommentState) {
       commentEditState.value = {
-        id: 0,
+        id: com.id,
         schoolId: com.schoolId,
         star: com.star,
         title: '',
         comment: com.comment,
         postPerson: com.postPerson,
       };
+      commentEditDialog.value = true;
+    };
+
+    const selectDeleteComment = function (id: number) {
+      commentDeleteId.value = id;
+      commentDeleteDialog.value = true;
     };
     /**初期化処理 */
     getComments(props.dataState.id);
@@ -495,13 +701,21 @@ export default defineComponent({
       comments,
       editState,
       commentCreateState,
+      commentEditState,
+      commentDeleteId,
       editIconDisplay,
       editDialog,
       deleteDialog,
+      commentEditDialog,
+      commentDeleteDialog,
       editDalogOpen,
       editSchool,
       deleteSchool,
       createComment,
+      editComment,
+      deleteComment,
+      selectComment,
+      selectDeleteComment,
       commentView,
       navigateDetail,
     };

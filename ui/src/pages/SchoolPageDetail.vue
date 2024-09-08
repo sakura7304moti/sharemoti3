@@ -63,6 +63,16 @@
       "
       @deleted="navigateSchool"
     />
+
+    <div class="q-pt-md text-right" style="max-width: 600px">
+      <q-toggle
+        class="text-subtitle1"
+        v-model="editting"
+        icon="edit"
+        color="primary"
+        label="編集の切替"
+      />
+    </div>
   </q-page>
 </template>
 <script lang="ts">
