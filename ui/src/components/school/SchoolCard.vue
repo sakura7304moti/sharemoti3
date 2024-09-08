@@ -186,6 +186,16 @@
   <q-dialog v-model="editDialog">
     <q-card style="min-width: 300px">
       <q-card-section style="max-width: 100%; width: 100%">
+        <div class="q-pb-sm">
+          <q-btn
+            label="キャンセル"
+            icon="close"
+            class="col"
+            dense
+            @click="editDialog = false"
+          />
+        </div>
+
         <div class="text-h6 row">
           <div class="col text-left">学校編集画面！</div>
           <div>
@@ -303,7 +313,7 @@
               class="cursor-pointer"
             >
               <q-tooltip class="text-body2">
-                ここからコメント書いてね！コメントだけ必須よ
+                コメントだけ必須よ
               </q-tooltip></q-icon
             >
           </div>
