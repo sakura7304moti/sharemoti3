@@ -28,6 +28,7 @@ from src.route import movieList_route
 
 #scraper
 from src.route import twitter_route
+from src.route import holotwitter_route
 from src.route import holosong_route
 from src.route import holomovie_route
 from src.route import holoarchive_route
@@ -71,6 +72,7 @@ app.register_blueprint(support_route.app)
 app.register_blueprint(movieList_route.app)
 #scraper
 app.register_blueprint(twitter_route.app)
+app.register_blueprint(holotwitter_route.app)
 app.register_blueprint(holosong_route.app)
 app.register_blueprint(holomovie_route.app)
 app.register_blueprint(holoarchive_route.app)

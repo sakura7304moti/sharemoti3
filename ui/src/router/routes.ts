@@ -117,6 +117,13 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/TwitterPage.vue') }],
   },
   {
+    path: '/holotwitter',
+    component: () => import('layouts/HoloLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/HolotwitterPage.vue') },
+    ],
+  },
+  {
     path: '/holosong',
     component: () => import('layouts/HoloLayout.vue'),
     children: [{ path: '', component: () => import('pages/HoloSongPage.vue') }],

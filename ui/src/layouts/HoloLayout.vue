@@ -22,7 +22,7 @@
             background: rgba(255, 255, 255, 0.5);
             border: solid 1px white; /*線*/
             border-radius: 10px; /*角の丸み*/
-            height:48px;
+            height: 48px;
           "
         >
           <div>
@@ -104,12 +104,16 @@ export default defineComponent({
         title: 'twitter',
       },
       {
+        url: '/HoloTwitter',
+        title: 'HoloTwitter',
+      },
+      {
         url: '/hololewd',
         title: 'reddit',
       },
       {
-        url:'/pixiv',
-        title:'pixiv'
+        url: '/pixiv',
+        title: 'pixiv',
       },
       {
         url: '/holosong',

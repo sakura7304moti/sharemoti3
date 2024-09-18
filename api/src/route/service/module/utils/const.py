@@ -122,6 +122,12 @@ class Path:
         """
         return os.path.join(self.database(), 'twitter.db')
     
+    def db_holotwitter(self):
+        """
+        ホロメンのツイート保存用twitterのDB
+        """
+        return os.path.join(self.database(), 'holotwitter.db')
+    
 
     def db_youtube(self):
         """

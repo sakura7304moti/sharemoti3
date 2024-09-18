@@ -591,3 +591,128 @@ class SchoolCommentQueryRecord:
             "comment" : self.comment,
             "postPerson" : self.post_person
         }
+    
+
+# ホロTwitter
+class HolotwitterTweet:
+    def __init__(
+            self,
+            id:int, 
+            text:str, 
+            created_at:str,
+            rt_count:int, 
+            likes_count:int,
+            user_screen_name:str):
+        self.id = id
+        self.text = text
+        self.created_at = created_at
+        self.rt_count = rt_count
+        self.likes_count = likes_count
+        self.user_screen_name = user_screen_name
+
+    def __str__(self):
+        return f"""id : {self.id}
+text : {self.text}
+created_at : {self.created_at}
+rt_count : {self.rt_count}
+likes_count : {self.likes_count}
+user_screen_name : {self.user_screen_name}
+"""
+    
+    def to_args(self) -> dict:
+        return {
+            "id" : self.id,
+            "text" : self.text,
+            "createdAt" : self.created_at,
+            'rtCount' : self.rt_count,
+            'likesCount' : self.likes_count,
+            'userScreenName' : self.user_screen_name
+        }
+    
+class HolotwitterUser:
+    def __init__(
+            self,
+            name:str,
+            screen_name:str,
+            profile_image:str
+    ):
+        self.name = name
+        self.screen_name = screen_name
+        self.profile_image = profile_image
+
+    def __str__(self):
+        return f"""name : {self.name}
+screen_name : {self.screen_name}
+profile_image : {self.profile_image}
+"""
+    
+    def to_args(self):
+        return {
+            "name" : self.name,
+            "screenName" : self.screen_name,
+            "profileImage" : self.profile_image
+        }
+    
+class HolotwitterMedia:
+    def __init__(
+        self,
+        tweet_id:int,
+        type:str,
+        url:str,
+        media_url:str,
+        meta_image_url:str
+    ):
+        self.tweet_id = tweet_id
+        self.type = type
+        self.url = url
+        self.media_url = media_url
+        self.meta_image_url = meta_image_url
+
+    def to_args(self) -> dict:
+        return {
+            "tweetId" : self.tweet_id,
+            "type" : self.type,
+            "url" : self.url,
+            "mediaUrl" : self.media_url,
+            "metaImageUrl" : self.meta_image_url
+        }
+    
+class HolotwitterUrl:
+    def __init__(
+        self,
+        tweet_id:int,
+        expanded_url:str
+    ):
+        self.tweet_id = tweet_id
+        self.expanded_url = expanded_url
+
+    def to_args(self) -> dict:
+        return {
+            "tweetId":self.tweet_id,
+            "expandedUrl":self.expanded_url
+        }
+    
+class HoloTwitterSearchCondition:
+    def __init__(
+        self,
+        text:str,
+        acount_name:str,
+        start_date:str,
+        page_no:int,
+        page_size:int
+    ):
+        self.text = text
+        self.acount_name = acount_name
+        self.page_no = page_no
+        self.page_size = page_size
+        self.start_date = start_date
+
+    def to_args(self):
+        return {
+            "text":self.text,
+            "likeText":f"%{self.text}%",
+            "acountName":self.acount_name,
+            "startDate":self.start_date,
+            "pageNo":self.page_no,
+            "pageSize":self.page_size
+        }
