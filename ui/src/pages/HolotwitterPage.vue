@@ -1,83 +1,92 @@
 <template>
   <q-page class="">
     <div class="holo-page-title q-pb-md">ホロメンのつぶやき</div>
-    <div class="row q-gutter-md wrap q-mb-sm">
-      <div>
-        <q-input label="テキスト" v-model="condition.text" dense stack-label />
+    <q-form @submit="onSearchClick">
+      <div class="row q-gutter-md wrap q-mb-sm">
+        <div>
+          <q-input
+            label="テキスト"
+            v-model="condition.text"
+            dense
+            stack-label
+          />
+        </div>
+        <div>
+          <q-select
+            v-model="condition.acountName"
+            :options="acounts"
+            option-value="screenName"
+            option-label="screenName"
+            emit-value
+            map-options
+            dense
+            stack-label
+            label="ホロメン"
+            transition-show="jump-up"
+            transition-hide="jump-up"
+            counter
+            style="width: 200px"
+          >
+            <!--クリアー-->
+            <template v-slot:append>
+              <q-icon
+                id="holo-select-clear-icon"
+                v-if="condition.acountName != ''"
+                name="clear"
+                @click.stop.prevent="condition.acountName = ''"
+              />
+            </template>
+
+            <!--開いた時-->
+            <template v-slot:option="scope">
+              <q-item v-bind="scope.itemProps" class="holo-name-item-selected">
+                <q-avatar>
+                  <img :src="scope.opt.profileImage" />
+                </q-avatar>
+
+                <q-item-label class="holo-select-text-container text-bold">
+                  {{ scope.opt.name }}
+                </q-item-label>
+              </q-item>
+            </template>
+
+            <!--選択時-->
+            <template v-slot:selected>
+              <q-chip
+                v-if="selectedUser?.name != ''"
+                dense
+                square
+                color="white"
+                class="q-my-none q-ml-xs q-mr-none"
+              >
+                <q-avatar text-color="white">
+                  <q-img :src="selectedUser?.profileImage" />
+                </q-avatar>
+                {{ selectedUser?.screenName }}
+              </q-chip>
+            </template>
+
+            <!--ヒント-->
+            <template v-slot:hint>
+              {{ selectedUser?.name }}
+            </template>
+
+            <!--カウンター-->
+            <template v-slot:counter> </template>
+          </q-select>
+        </div>
+        <div>
+          <q-btn
+            label="検索"
+            @click="onSearchClick"
+            icon="search"
+            color="primary"
+            type="submit"
+          />
+        </div>
       </div>
-      <div>
-        <q-select
-          v-model="condition.acountName"
-          :options="acounts"
-          option-value="screenName"
-          option-label="screenName"
-          emit-value
-          map-options
-          dense
-          stack-label
-          label="ホロメン"
-          transition-show="jump-up"
-          transition-hide="jump-up"
-          counter
-          style="width: 200px"
-        >
-          <!--クリアー-->
-          <template v-slot:append>
-            <q-icon
-              id="holo-select-clear-icon"
-              v-if="condition.acountName != ''"
-              name="clear"
-              @click.stop.prevent="condition.acountName = ''"
-            />
-          </template>
+    </q-form>
 
-          <!--開いた時-->
-          <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps" class="holo-name-item-selected">
-              <q-avatar>
-                <img :src="scope.opt.profileImage" />
-              </q-avatar>
-
-              <q-item-label class="holo-select-text-container text-bold">
-                {{ scope.opt.name }}
-              </q-item-label>
-            </q-item>
-          </template>
-
-          <!--選択時-->
-          <template v-slot:selected>
-            <q-chip
-              v-if="selectedUser?.name != ''"
-              dense
-              square
-              color="white"
-              class="q-my-none q-ml-xs q-mr-none"
-            >
-              <q-avatar text-color="white">
-                <q-img :src="selectedUser?.profileImage" />
-              </q-avatar>
-              {{ selectedUser?.screenName }}
-            </q-chip>
-          </template>
-
-          <!--ヒント-->
-          <template v-slot:hint>
-            {{ selectedUser?.screenName }}
-          </template>
-
-          <!--カウンター-->
-          <template v-slot:counter> </template>
-        </q-select>
-      </div>
-      <div>
-        <q-btn
-          label="検索"
-          @click="search(condition)"
-          icon="search"
-          color="primary"
-        />
-      </div>
-    </div>
     <div
       v-for="item in dataState.records"
       :key="item.id"
@@ -89,8 +98,32 @@
         :avatar="item.profileImage"
         bg-color="light-blue-1"
       >
-        <div style="white-space: pre-wrap; word-wrap: break-word">
-          {{ item.text }}
+        <div>
+          <div style="white-space: pre-wrap; word-wrap: break-word">
+            {{ item.text }}
+          </div>
+          <div
+            v-for="media in item.medias"
+            :key="media.url"
+            style="max-width: 800px; width: 100%"
+          >
+            <div v-if="media.type == 'image'">
+              <img
+                :src="media.metaImageUrl"
+                style="max-width: 800px; width: 100%"
+              />
+            </div>
+            <div v-if="media.type == 'video'">
+              <div class="text-grey">
+                todo : サーバーサイドから動画を送信できるようにしよう
+              </div>
+
+              <img
+                :src="media.metaImageUrl"
+                style="max-width: 800px; width: 100%"
+              />
+            </div>
+          </div>
         </div>
       </q-chat-message>
     </div>
@@ -118,6 +151,10 @@ export default defineComponent({
 
     window.addEventListener('scroll', handleScroll);
 
+    const onSearchClick = function () {
+      search(condition.value, true);
+    };
+
     return {
       isloading,
       condition,
@@ -127,6 +164,7 @@ export default defineComponent({
       getAcount,
       selectedUser,
       topScroll,
+      onSearchClick,
     };
   },
 });
@@ -244,11 +282,19 @@ interface Tweet {
   userScreenName: string;
   userName: string;
   profileImage: string;
+  medias: Media[];
 }
 
 interface User {
   name: string;
   screenName: string;
   profileImage: string;
+}
+
+interface Media {
+  type: string;
+  url: string;
+  mediaUrl: string;
+  metaImageUrl: string;
 }
 </script>

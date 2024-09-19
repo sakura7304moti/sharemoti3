@@ -11,6 +11,12 @@ export class HolotwitterApi extends ScraperAPIClient {
     const path = this.combineUrl(url);
     return this.httpGet<Array<User>>(path);
   }
+
+  public getMedia(id: number): Promise<Array<Media> | null> {
+    const url = '/holotwitter/media/' + id;
+    const path = this.combineUrl(url);
+    return this.httpGet<Array<Media>>(path);
+  }
 }
 
 const api = new HolotwitterApi();
@@ -35,10 +41,18 @@ interface Tweet {
   userScreenName: string;
   userName: string;
   profileImage: string;
+  medias: Media[];
 }
 
 interface User {
   name: string;
   screenName: string;
   profileImage: string;
+}
+
+interface Media {
+  type: string;
+  url: string;
+  mediaUrl: string;
+  metaImageUrl: string;
 }

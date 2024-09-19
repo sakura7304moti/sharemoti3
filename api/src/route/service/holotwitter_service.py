@@ -19,3 +19,9 @@ def search(condition:interface.HoloTwitterSearchCondition):
     ホロメンのツイートを検索する
     """
     return queryServce.search_tweet(condition)
+
+def get_media(id:int):
+    """
+    ツイートのメディアを取得
+    """
+    return queryServce.get_media(id)

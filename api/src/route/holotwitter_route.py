@@ -38,6 +38,12 @@ def search_tweet():
 
     #1つのjsonにまとめる
     records_json = json.loads(records)
+
+    #メディアの取得
+    for rec in records_json:
+        medias = service.get_media(rec.get("id"))
+        rec["medias"] = json.loads(medias.to_json(orient='records',force_ascii=False))
+
     response = {
         "records" : records_json,
         "totalCount":total_count
@@ -51,5 +57,14 @@ def get_acount():
     アカウントの一覧を取得
     """
     df = service.get_acount()
+    records = df.to_json(orient='records',force_ascii=False)
+    return jsonify(records)
+
+@app.route("/holotwitter/media/<int:id>",methods=["GET"])
+def get_media(id:int):
+    """
+    メディアの一覧を取得
+    """
+    df = service.get_media(id)
     records = df.to_json(orient='records',force_ascii=False)
     return jsonify(records)

@@ -44,7 +44,7 @@ def search_tweet(condition:interface.HoloTwitterSearchCondition):
         SELECT
             tw.id,
             tw.text,
-            tw.created_at as createdAt,
+            datetime(tw.created_at, '+9 hours') as createdAt,
             tw.user_screen_name as userScreenName,
             us.name as userName,
             us.profile_image as profileImage 
@@ -91,3 +91,18 @@ def search_tweet(condition:interface.HoloTwitterSearchCondition):
 ・IDに対するメディアのリスト
 ・動画のURLをもとにダウンロード yt-dlp
 """
+
+def get_media(id:int):
+    """
+    メディアのリスト
+    """
+    query = """
+    SELECT
+        type,
+        url,
+        media_url as mediaUrl,
+        meta_image_url as metaImageUrl
+    from media
+        where tweet_id = :id
+    """
+    return query_base.execute_df(query, {"id":id})
