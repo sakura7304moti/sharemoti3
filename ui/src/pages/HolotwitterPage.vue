@@ -104,17 +104,35 @@
             {{ item.text }}
           </div>
           <div
+            class="q-py-md q-px-sm"
             v-for="media in item.medias"
             :key="media.url"
-            style="max-width: 800px; width: 100%"
+            style="
+              max-width: 800px;
+              width: 100%;
+              max-height: calc(70vh + 32px);
+              height: 100%;
+            "
           >
             <div v-if="media.type == 'image'">
               <img
                 :src="media.metaImageUrl"
-                style="max-width: 800px; width: 100%"
+                style="
+                  max-width: 800px;
+                  width: 100%;
+                  max-height: 70vh;
+                  height: 100%;
+                "
               />
             </div>
             <div v-if="media.type == 'video'">
+              <q-video
+                class="backgroud-video"
+                v-if="media.playUrl"
+                :src="media.playUrl"
+                style="min-width: 100%; max-width: 800px; width: 100%"
+                :ratio="16 / 9"
+              />
               <div
                 style="
                   position: relative;
@@ -152,13 +170,6 @@
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </div>
-                <q-video
-                  class="backgroud-video"
-                  v-if="media.playUrl"
-                  :src="media.playUrl"
-                  style="min-width: 100%; max-width: 800px; width: 100%"
-                  :ratio="16 / 9"
-                />
               </div>
             </div>
           </div>
