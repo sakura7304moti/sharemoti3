@@ -2,13 +2,24 @@
 ホロメンのツイートのルーティング
 """
 import json
+import uuid
+import yt_dlp
+import os
 
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from src.route.service import holotwitter_service as service
-from src.route.service.module.utils import interface
+from src.route.service.module.utils import interface, const
+
+
+path_model = const.Path()
+DOWNLOAD_DIR = path_model.yt_dlp_temp()
+
 
 def to_search_condition():
+    """
+    jsonを検索条件に変換する
+    """
     json_data = request.json
     text = json_data.get("text", "")
     acount_name = json_data.get("acountName", "")
@@ -68,3 +79,43 @@ def get_media(id:int):
     df = service.get_media(id)
     records = df.to_json(orient='records',force_ascii=False)
     return jsonify(records)
+
+@app.route("/holotwitter/movie", methods=["GET"])
+def download_movie():
+    """
+    動画のダウンロード
+    """
+    # クエリパラメータからURLを取得
+    video_url = request.args.get('url')
+    
+    if not video_url:
+        return jsonify({"error": "URLパラメータが必要です"}), 400
+    
+    # ファイルを保存する一時ファイル名を生成
+    temp_file = os.path.join(DOWNLOAD_DIR, f"{uuid.uuid4()}.mp4")
+    
+    # yt-dlpの設定
+    ydl_opts = {
+        #'format': 'best',  # 最高品質を選択
+        'outtmpl': temp_file,  # 出力ファイルの名前を指定
+        #'merge_output_format': 'mp4',  # MP4形式で保存
+        #'hls_prefer_native': True,  # ネイティブHLSダウンローダーを使用
+    }
+    
+    try:
+        # 動画をダウンロード
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([video_url])
+        
+        # ダウンロードしたファイルを送信
+        return send_file(temp_file, download_name='video.mp4')
+    
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    """
+    finally:
+        # ダウンロードしたファイルを削除
+        if os.path.exists(temp_file):
+            os.remove(temp_file)
+    """
+    

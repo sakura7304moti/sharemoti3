@@ -84,6 +84,12 @@ class Path:
         """
         return os.path.join(self.archive(), 'rembg_temp')
     
+    def yt_dlp_temp(self):
+        """
+        YouTubeの動画データの置き場
+        """
+        return os.path.join(self.archive(), 'yt_dlp')
+    
 
     def share_folder(self):
         """

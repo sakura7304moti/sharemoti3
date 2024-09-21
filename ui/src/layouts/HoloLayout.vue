@@ -104,8 +104,8 @@ export default defineComponent({
         title: 'twitter',
       },
       {
-        url: '/HoloTwitter',
-        title: 'HoloTwitter',
+        url: '/Holotwitter',
+        title: 'tweet',
       },
       {
         url: '/hololewd',

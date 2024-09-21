@@ -119,7 +119,6 @@
                   v-if="head.id == 5"
                 />
               </div>
-
             </div>
           </div>
         </div>
@@ -146,7 +145,7 @@
                 menuView = false;
               "
             >
-              <q-icon name="home"/>トップに戻る
+              <q-icon name="home" />トップに戻る
             </a>
           </li>
           <q-separator style="padding-top: 2px" />
@@ -205,22 +204,30 @@
           <q-separator style="padding-top: 2px" />
 
           <li>
-            <a href="https://drive.google.com/drive/folders/1XSRGqBx5FeJaOSJj9UtF3e2M7S3Z3PsG?usp=sharing">
+            <a
+              href="https://drive.google.com/drive/folders/1XSRGqBx5FeJaOSJj9UtF3e2M7S3Z3PsG?usp=sharing"
+            >
               Google Drive
             </a>
           </li>
           <li>
-            <a href="https://brindle-spring-0d6.notion.site/URL-2998ca28318d430cbdd7d5b7ad034ccf?pvs=4">
+            <a
+              href="https://brindle-spring-0d6.notion.site/URL-2998ca28318d430cbdd7d5b7ad034ccf?pvs=4"
+            >
               Notion
             </a>
           </li>
           <li>
-            <a href="https://brindle-spring-0d6.notion.site/e2d3e427b3574e9e8e25c729b8f7abe9?pvs=4">
+            <a
+              href="https://brindle-spring-0d6.notion.site/e2d3e427b3574e9e8e25c729b8f7abe9?pvs=4"
+            >
               俺たちの<br />旅の思い出
             </a>
           </li>
           <li>
-            <a href="https://www.youtube.com/playlist?list=PLbP5km9K7tgfHKxHvk9nOx7hcbLbnHSuS">
+            <a
+              href="https://www.youtube.com/playlist?list=PLbP5km9K7tgfHKxHvk9nOx7hcbLbnHSuS"
+            >
               YouTube
             </a>
           </li>
@@ -372,12 +379,16 @@ function usePage() {
       url: '/twitter',
     },
     {
+      title: 'つぶやき',
+      url: '/holotwitter',
+    },
+    {
       title: 'reddit',
       url: '/hololewd',
     },
     {
-      title:'pixiv',
-      url:'/pixiv'
+      title: 'pixiv',
+      url: '/pixiv',
     },
     {
       title: '歌みた',
@@ -546,7 +557,7 @@ body {
 /*ナビゲーションの縦スクロール*/
 #g-nav.panelactive #g-nav-list {
   /*ナビの数が増えた場合縦スクロール*/
-  margin-top:50px;
+  margin-top: 50px;
   position: fixed;
   width: 100%;
   height: calc(100vh - 60px); /*表示する高さ*/
@@ -559,10 +570,9 @@ body {
   position: absolute;
   z-index: 999;
   /*ナビゲーション天地中央揃え*/
-  top:60px;
-  left:50%;
-  transform: translate(-50%,-60px);
-
+  top: 60px;
+  left: 50%;
+  transform: translate(-50%, -60px);
 }
 
 /*リストのレイアウト設定*/

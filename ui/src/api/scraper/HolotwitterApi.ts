@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ScraperAPIClient } from './ScraperBaseApi';
 export class HolotwitterApi extends ScraperAPIClient {
   public searchTweet(request: SearchRequest): Promise<SearchResponse | null> {
@@ -16,6 +17,22 @@ export class HolotwitterApi extends ScraperAPIClient {
     const url = '/holotwitter/media/' + id;
     const path = this.combineUrl(url);
     return this.httpGet<Array<Media>>(path);
+  }
+
+  public async movieDownload(movieUrl: string) {
+    const url = `/holotiwtter/movie?url=${movieUrl}`;
+    const path = this.combineUrl(url);
+
+    await axios({
+      url: path,
+      method: 'GET',
+      responseType: 'blob',
+    }).then((response) => {
+      if (response) {
+        console.log('download', response);
+        return response;
+      }
+    });
   }
 }
 

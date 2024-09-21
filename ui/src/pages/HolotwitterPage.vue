@@ -26,6 +26,7 @@
             transition-hide="jump-up"
             counter
             style="width: 200px"
+            @update:model-value="onSearchClick"
           >
             <!--クリアー-->
             <template v-slot:append>
@@ -33,7 +34,7 @@
                 id="holo-select-clear-icon"
                 v-if="condition.acountName != ''"
                 name="clear"
-                @click.stop.prevent="condition.acountName = ''"
+                @click.stop.prevent="onAcountClearClick"
               />
             </template>
 
@@ -114,17 +115,62 @@
               />
             </div>
             <div v-if="media.type == 'video'">
-              <div class="text-grey">
-                todo : サーバーサイドから動画を送信できるようにしよう
+              <div
+                style="
+                  position: relative;
+                  display: inline-block;
+                  max-width: 800px;
+                  width: 100%;
+                "
+              >
+                <img
+                  v-if="!media.playUrl"
+                  :src="media.metaImageUrl"
+                  style="max-width: 800px; width: 100%"
+                  class="cursor-pointer holotwitter-movie-img"
+                  @click="media.playUrl = movieDownloadUrl(media.mediaUrl)"
+                />
+                <!-- 再生ボタン -->
+                <div
+                  v-if="!media.playUrl"
+                  style="
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                  "
+                  class="cursor-pointer"
+                  @click="media.playUrl = movieDownloadUrl(media.mediaUrl)"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="64px"
+                    height="64px"
+                    fill="#fff"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <q-video
+                  class="backgroud-video"
+                  v-if="media.playUrl"
+                  :src="media.playUrl"
+                  style="min-width: 100%; max-width: 800px; width: 100%"
+                  :ratio="16 / 9"
+                />
               </div>
-
-              <img
-                :src="media.metaImageUrl"
-                style="max-width: 800px; width: 100%"
-              />
             </div>
           </div>
         </div>
+        <template v-slot:avatar>
+          <q-avatar
+            class="q-mr-sm cursor-pointer holotwitter-user-icon"
+            @click="onAcountClick(item.userScreenName)"
+          >
+            <img :src="item.profileImage" />
+          </q-avatar>
+        </template>
       </q-chat-message>
     </div>
   </q-page>
@@ -132,28 +178,37 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import api from 'src/api/scraper/HolotwitterApi';
+import { LocationQueryRaw, useRoute, useRouter } from 'vue-router';
+import { useQuerySupport } from 'src/utils/QuerySupport';
+import { useQuasar } from 'quasar';
+const { decodeQueryString } = useQuerySupport();
 export default defineComponent({
   name: 'holotwitter-page',
   setup() {
     const {
+      handleProps,
       isloading,
       condition,
       dataState,
       selectedUser,
       acounts,
       search,
+      onSearchClick,
+      onAcountClick,
+      onAcountClearClick,
       handleScroll,
       topScroll,
       getAcount,
+      movieDownloadUrl,
     } = useModel();
-    getAcount();
-    search(condition.value);
 
-    window.addEventListener('scroll', handleScroll);
-
-    const onSearchClick = function () {
-      search(condition.value, true);
+    const onMount = function () {
+      getAcount();
+      window.addEventListener('scroll', handleScroll);
+      handleProps();
     };
+
+    onMount(); // 初期で実行する処理
 
     return {
       isloading,
@@ -165,11 +220,48 @@ export default defineComponent({
       selectedUser,
       topScroll,
       onSearchClick,
+      onAcountClick,
+      onAcountClearClick,
+      movieDownloadUrl,
     };
   },
 });
 /*スクリプト */
 const useModel = function () {
+  const route = useRoute();
+  const router = useRouter();
+  const quasar = useQuasar();
+
+  const setProps = function (condition: ConditionState) {
+    const query = {} as LocationQueryRaw;
+    if (condition.text) {
+      query.text = condition.text;
+    }
+    if (condition.acountName) {
+      query.name = condition.acountName;
+    }
+
+    router.push({
+      path: '/holotwitter',
+      query: query,
+    });
+  };
+
+  const handleProps = function () {
+    console.log('props', route.query);
+    const queryText = decodeQueryString(route.query.text);
+    if (queryText) {
+      condition.value.text = queryText;
+    }
+
+    const queryAcountName = decodeQueryString(route.query.name);
+    if (queryAcountName) {
+      condition.value.acountName = queryAcountName;
+    }
+
+    search(condition.value);
+  };
+
   const isloading = ref(false);
   const condition = ref({
     text: '',
@@ -216,14 +308,63 @@ const useModel = function () {
           if (clear) {
             dataState.value.records.splice(0);
           }
-          response.records.forEach((it) => dataState.value.records.push(it));
+          response.records.forEach((it) =>
+            dataState.value.records.push({
+              id: it.id,
+              text: it.text,
+              createdAt: it.createdAt,
+              userScreenName: it.userScreenName,
+              userName: it.userName,
+              profileImage: it.profileImage,
+              medias: it.medias.map((m) => {
+                return {
+                  type: m.type,
+                  url: m.url,
+                  mediaUrl: m.mediaUrl,
+                  metaImageUrl: m.metaImageUrl,
+                  playUrl: null,
+                };
+              }),
+            })
+          );
           dataState.value.totalCount = response.totalCount;
         }
       })
       .catch((err) => {
         console.log('search err', err);
+        quasar.notify({
+          color: 'negative',
+          position: 'top',
+          message: '検索でエラーになった...',
+        });
       });
     isloading.value = false;
+  };
+
+  const onSearchClick = function () {
+    setProps(condition.value);
+    search(condition.value, true);
+  };
+
+  const onAcountClick = function (acountName: string) {
+    if (condition.value.acountName == acountName) {
+      console.log('検索条件が変化しないため、検索しません');
+      return;
+    }
+    condition.value.acountName = acountName;
+    condition.value.text = '';
+    onSearchClick();
+
+    quasar.notify({
+      color: 'secondary',
+      position: 'top',
+      message: selectedUser.value?.name + 'で検索！',
+    });
+  };
+
+  const onAcountClearClick = function () {
+    condition.value.acountName = '';
+    onSearchClick();
   };
 
   const onScrollSearch = async function () {
@@ -250,18 +391,33 @@ const useModel = function () {
       })
       .catch((err) => {
         console.log('acount err', err);
+        quasar.notify({
+          color: 'negative',
+          position: 'top',
+          message: 'ホロメンの取得でエラーになった...',
+        });
       });
   };
+
+  const movieDownloadUrl = function (movieUrl: string) {
+    return `${api.apiEndpoint()}/holotwitter/movie?url=${movieUrl}`;
+  };
   return {
+    setProps,
+    handleProps,
     isloading,
     condition,
     dataState,
     selectedUser,
     acounts,
     search,
+    onSearchClick,
+    onAcountClick,
+    onAcountClearClick,
     handleScroll,
     topScroll,
     getAcount,
+    movieDownloadUrl,
   };
 };
 interface ConditionState {
@@ -296,5 +452,27 @@ interface Media {
   url: string;
   mediaUrl: string;
   metaImageUrl: string;
+  playUrl: string | null;
 }
 </script>
+<style>
+.holotwitter-user-icon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+.holotwitter-movie-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+</style>
