@@ -213,9 +213,6 @@
                 />
               </div>
             </div>
-
-            <!--gif-->
-            <div v-if="media.type == 'animatedGif'"></div>
           </div>
         </div>
         <template v-slot:avatar>
@@ -228,6 +225,18 @@
         </template>
       </q-chat-message>
     </div>
+    <!-- ページトップに戻るボタン -->
+    <button
+      v-if="isShowTopButton"
+      class="scroll-to-top"
+      @click="onTopScrollClick"
+    >
+      <img
+        style="height: 70px"
+        class="holotwitter-top-scroll-img"
+        src="	https://hololive.hololivepro.com/wp-content/themes/hololive/images/totop.png"
+      />
+    </button>
   </q-page>
 </template>
 <script lang="ts">
@@ -258,11 +267,15 @@ export default defineComponent({
       topScroll,
       getAcount,
       movieDownloadUrl,
+      isShowTopButton,
+      checkTopButton,
+      onTopScrollClick,
     } = useModel();
 
     const onMount = function () {
       getAcount();
       window.addEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', checkTopButton);
       handleProps();
     };
 
@@ -282,6 +295,8 @@ export default defineComponent({
       onAcountClick,
       onAcountClearClick,
       movieDownloadUrl,
+      isShowTopButton,
+      onTopScrollClick,
     };
   },
 });
@@ -322,6 +337,7 @@ const useModel = function () {
   };
 
   const isloading = ref(false);
+  const isShowTopButton = ref(false);
   const condition = ref({
     text: '',
     acountName: '',
@@ -487,6 +503,19 @@ const useModel = function () {
   const movieDownloadUrl = function (movieUrl: string) {
     return `${api.apiEndpoint()}/holotwitter/movie?url=${movieUrl}`;
   };
+
+  const checkTopButton = function () {
+    isShowTopButton.value = window.scrollY > 100;
+  };
+
+  const onTopScrollClick = function () {
+    // スムーズにページのトップに戻る
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   return {
     setProps,
     handleProps,
@@ -504,6 +533,9 @@ const useModel = function () {
     topScroll,
     getAcount,
     movieDownloadUrl,
+    isShowTopButton,
+    checkTopButton,
+    onTopScrollClick,
   };
 };
 interface ConditionState {
@@ -582,6 +614,29 @@ interface IsLink {
  */
 @media (max-width: 800px) {
   .holotwitter-youtube-container {
+    display: none;
+  }
+}
+/*
+  トップスクロール
+*/
+.scroll-to-top {
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.scroll-to-top:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+@media (max-width: 940px) {
+  .holotwitter-top-scroll-img {
     display: none;
   }
 }
