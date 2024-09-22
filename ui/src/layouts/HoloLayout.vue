@@ -188,25 +188,25 @@ interface pageState {
   background-color: rgba(255, 255, 255, 0);
 }
 /*ヘッダー全体*/
-@media (max-width: 700px) {
+@media (max-width: 1100px) {
   .holo-header-item {
     height: 50px;
   }
 }
-@media (min-width: 700px) {
+@media (min-width: 1100px) {
   .holo-header-item {
     height: 70px;
   }
 }
 
 /*PC用のヘッダーリンク */
-@media (max-width: 700px) {
+@media (max-width: 1100px) {
   .holo-links-pc {
     display: none;
   }
 }
 /*スマホ用のヘッダーリンク */
-@media (min-width: 700px) {
+@media (min-width: 1100px) {
   .holo-links-android {
     display: none;
   }

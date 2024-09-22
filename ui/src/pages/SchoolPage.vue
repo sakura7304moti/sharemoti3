@@ -41,6 +41,7 @@ import SchoolCard from 'src/components/school/SchoolCard.vue';
 import CreateSchoolButton from 'src/components/school/CreateSchoolButton.vue';
 import api from 'src/api/main/SchoolApi';
 import { useQuasar } from 'quasar';
+import { useRoute, useRouter } from 'vue-router';
 const quasar = useQuasar();
 export default defineComponent({
   name: 'school-page',
@@ -51,8 +52,25 @@ export default defineComponent({
   setup() {
     const { isLoading, schools, getSchools } = useSearchModel();
     const editting = ref(false);
+    const route = useRoute();
 
-    getSchools();
+    const scrollScholl = function () {
+      const id = route.query.id;
+      if (id) {
+        const element = document.getElementById('school-card-' + id.toString());
+        if (element) {
+          element.scrollIntoView({ behavior: 'instant' });
+        }
+      }
+    };
+
+    const onMount = async function () {
+      await getSchools();
+      scrollScholl();
+    };
+
+    onMount();
+
     return {
       isLoading,
       schools,

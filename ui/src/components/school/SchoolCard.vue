@@ -1,5 +1,6 @@
 <template>
   <q-card
+    :id="'school-card-' + state.id"
     class="q-pa-md"
     :class="{
       'bg-grey-4': editDialog || deleteDialog,

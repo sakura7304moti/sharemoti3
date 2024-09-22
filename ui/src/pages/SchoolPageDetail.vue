@@ -141,7 +141,10 @@ export default defineComponent({
 
     const navigateSchool = function () {
       router.push({
-        path: '/school/',
+        path: '/school',
+        query: {
+          id: school.value.id,
+        },
       });
     };
 
