@@ -100,7 +100,10 @@
         bg-color="light-blue-1"
       >
         <div>
-          <div style="white-space: pre-wrap; word-wrap: break-word">
+          <div
+            class="text-body2"
+            style="white-space: pre-wrap; word-wrap: break-word"
+          >
             <span v-for="(part, index) in getLinkText(item.text)" :key="index">
               <a
                 v-if="part.isLink"
@@ -132,6 +135,7 @@
               height: 100%;
             "
           >
+            <!--画像-->
             <div v-if="media.type == 'image'">
               <img
                 :src="media.metaImageUrl"
@@ -143,7 +147,9 @@
                 "
               />
             </div>
-            <div v-if="media.type == 'video'">
+
+            <!--動画-->
+            <div v-if="media.type == 'video' || media.type == 'animatedGif'">
               <q-video
                 class="backgroud-video"
                 v-if="media.playUrl"
@@ -190,6 +196,21 @@
                 </div>
               </div>
             </div>
+
+            <!--YouTube-->
+            <div v-if="media.type == 'youTube'">
+              <div class="holotwitter-youtube-container">
+                <YouTube
+                  :src="media.mediaUrl"
+                  @ready="true"
+                  ref="youtube"
+                  :vars="{ autoplay: 0, rel: 0 }"
+                />
+              </div>
+            </div>
+
+            <!--gif-->
+            <div v-if="media.type == 'animatedGif'"></div>
           </div>
         </div>
         <template v-slot:avatar>
@@ -210,9 +231,11 @@ import api from 'src/api/scraper/HolotwitterApi';
 import { LocationQueryRaw, useRoute, useRouter } from 'vue-router';
 import { useQuerySupport } from 'src/utils/QuerySupport';
 import { useQuasar } from 'quasar';
+import YouTube from 'vue3-youtube';
 const { decodeQueryString } = useQuerySupport();
 export default defineComponent({
   name: 'holotwitter-page',
+  components: { YouTube },
   setup() {
     const {
       handleProps,
@@ -342,7 +365,7 @@ const useModel = function () {
           response.records.forEach((it) =>
             dataState.value.records.push({
               id: it.id,
-              text: it.text,
+              text: it.text, // 末尾のハッシュタグのリンク化のため,
               createdAt: it.createdAt,
               userScreenName: it.userScreenName,
               userName: it.userName,
@@ -523,6 +546,9 @@ interface IsLink {
 .holotwitter-user-icon:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
+/*
+  動画の再生
+ */
 .holotwitter-movie-container {
   position: relative;
   width: 100%;
@@ -539,8 +565,19 @@ interface IsLink {
   object-fit: cover;
   z-index: 1;
 }
+/*
+  リンクホバー時の色付け
+ */
 .holotwitter-text-link:hover {
   color: orange;
   transition: 0.3s;
+}
+/*
+  YouTubeはスマホの場合は非表示
+ */
+@media (max-width: 800px) {
+  .holotwitter-youtube-container {
+    display: none;
+  }
 }
 </style>
