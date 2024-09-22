@@ -12,3 +12,5 @@ api/option/ssbu_icons/char
 api/option/ssbu_icons
 token.json
 client_secret.json
+ui/.quasar/app.js
+ui/.quasar/client-entry.js
