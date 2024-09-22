@@ -1,6 +1,6 @@
 <template>
   <q-page class="">
-    <div class="holo-page-title q-pb-md">ホロメンのつぶやき</div>
+    <div class="holo-page-title q-pb-md">ホロのつぶやき</div>
     <q-form @submit="onSearchClick">
       <div class="row q-gutter-md wrap q-mb-sm">
         <div>
@@ -101,7 +101,25 @@
       >
         <div>
           <div style="white-space: pre-wrap; word-wrap: break-word">
-            {{ item.text }}
+            <span v-for="(part, index) in getLinkText(item.text)" :key="index">
+              <a
+                v-if="part.isLink"
+                :href="part.text"
+                target="_blank"
+                class="text-primary holotwitter-text-link"
+                >{{ part.text }}</a
+              >
+              <a
+                v-if="part.isHashtag"
+                :href="`https://x.com/hashtag/${part.text.slice(1)}`"
+                target="_blank"
+                class="text-primary holotwitter-text-link"
+                >{{ part.text }}</a
+              >
+              <span v-if="!part.isHashtag && !part.isLink">{{
+                part.text
+              }}</span>
+            </span>
           </div>
           <div
             class="q-py-md q-px-sm"
@@ -204,6 +222,7 @@ export default defineComponent({
       selectedUser,
       acounts,
       search,
+      getLinkText,
       onSearchClick,
       onAcountClick,
       onAcountClearClick,
@@ -227,6 +246,7 @@ export default defineComponent({
       dataState,
       acounts,
       search,
+      getLinkText,
       getAcount,
       selectedUser,
       topScroll,
@@ -357,6 +377,32 @@ const useModel = function () {
     search(condition.value, true);
   };
 
+  const getLinkText = function (text: string): IsLink[] {
+    // URLとハッシュタグを検出する正規表現
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const hashtagRegex = /(#\w+)/g;
+
+    // まずURLで分割
+    const parts = text.split(urlRegex);
+
+    return parts.flatMap((part) => {
+      if (urlRegex.test(part)) {
+        // URLの部分はそのままリンクに
+        return { isLink: true, isHashtag: false, text: part } as IsLink;
+      } else {
+        // URL以外の部分でハッシュタグをさらに検出
+        const subParts = part.split(hashtagRegex);
+        return subParts.map((subPart) => {
+          if (hashtagRegex.test(subPart)) {
+            return { isLink: false, isHashtag: true, text: subPart };
+          } else {
+            return { isLink: false, isHashtag: false, text: subPart };
+          }
+        });
+      }
+    });
+  };
+
   const onAcountClick = function (acountName: string) {
     if (condition.value.acountName == acountName) {
       console.log('検索条件が変化しないため、検索しません');
@@ -422,6 +468,7 @@ const useModel = function () {
     selectedUser,
     acounts,
     search,
+    getLinkText,
     onSearchClick,
     onAcountClick,
     onAcountClearClick,
@@ -465,6 +512,12 @@ interface Media {
   metaImageUrl: string;
   playUrl: string | null;
 }
+
+interface IsLink {
+  isLink: boolean;
+  isHashtag: boolean;
+  text: string;
+}
 </script>
 <style>
 .holotwitter-user-icon:hover {
@@ -485,5 +538,9 @@ interface Media {
   height: 100%;
   object-fit: cover;
   z-index: 1;
+}
+.holotwitter-text-link:hover {
+  color: orange;
+  transition: 0.3s;
 }
 </style>

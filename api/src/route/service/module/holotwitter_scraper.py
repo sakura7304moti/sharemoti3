@@ -77,7 +77,7 @@ def format_data(item:dict):
     # ツイート
     tweet = interface.HolotwitterTweet(
         item['id'],
-        item.get('displayTextFragments', ''),
+        item.get('displayText', ''),
         parse_date(item['createdAt']),
         item.get('rtCount', 0),
         item.get('likesCount', 0),
