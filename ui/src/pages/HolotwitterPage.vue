@@ -1,6 +1,11 @@
 <template>
   <q-page class="">
-    <div class="holo-page-title q-pb-md">ホロのつぶやき</div>
+    <div class="holo-page-title q-pb-md">
+      ホロのつぶやき
+      <q-icon class="q-pl-md" color="primary" name="info" size="sm">
+        <q-tooltip class="text-body2"> 2時間おきに更新してるよ！ </q-tooltip>
+      </q-icon>
+    </div>
     <q-form @submit="onSearchClick">
       <div class="row q-gutter-md wrap q-mb-sm">
         <div>
