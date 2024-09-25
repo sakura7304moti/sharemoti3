@@ -408,18 +408,10 @@ function usePage() {
     },
   ] as PageState[]);
 
-  const subPages = ref([
-    {
-      title: '背景透過',
-      url: '/rembg',
-    },
-  ]);
-
   function callPageList(no: number) {
     if (no == 1) return mainPages.value;
     if (no == 2) return filePages.value;
     if (no == 3) return scraperPages.value;
-    if (no == 4) return subPages.value;
     return [] as PageState[];
   }
 
@@ -435,10 +427,6 @@ function usePage() {
     {
       id: 3,
       title: 'hololive',
-    },
-    {
-      id: 4,
-      title: 'おまけ',
     },
   ] as headItem[]);
 

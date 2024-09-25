@@ -36,7 +36,7 @@ from src.route import hololewd_route
 from src.route import pixiv_route
 
 #sub
-from src.route import rembg_route
+#from src.route import rembg_route
 
 #make table
 from src.route.service import create_table_service
@@ -79,7 +79,7 @@ app.register_blueprint(holoarchive_route.app)
 app.register_blueprint(hololewd_route.app)
 app.register_blueprint(pixiv_route.app)
 #sub
-app.register_blueprint(rembg_route.app)
+#app.register_blueprint(rembg_route.app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=False)
