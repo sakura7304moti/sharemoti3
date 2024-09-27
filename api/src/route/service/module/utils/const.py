@@ -107,12 +107,24 @@ class Path:
         """
         return os.path.join(self.archive(), 'holo_album', 'album.csv')
     
+    def ssbu_caterogy(self):
+        """
+        切り抜きの種類のcsv
+        """
+        return os.path.join(self.option(), 'ssbu_category.csv')
+    
 
     def db_main_share(self):
         """
         名言集などのDB
         """
         return os.path.join(self.database(), 'main_share.db')
+    
+    def db_ssbu_clip(self):
+        """
+        スマブラの切り抜き
+        """
+        return os.path.join(self.database(), 'ssbu.db')
     
 
     def db_hololewd(self):
@@ -169,6 +181,13 @@ class Option:
             rec = SsbuNameRecord(name,url,icon)
             records.append(rec)
         return records
+    
+    def ssbu_category(self):
+        """
+        カテゴリーのリストを取得
+        """
+        df = pd.read_csv(os.path.join(self.p.ssbu_caterogy()), index_col=False)
+        return df['name'].to_list()
     
     def twitter_holo_hashtags(self) -> List[HoloName]:
         """

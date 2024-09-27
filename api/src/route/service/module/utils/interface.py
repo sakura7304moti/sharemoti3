@@ -1,5 +1,6 @@
 import datetime
 from typing import List
+import unicodedata
 
 class WordList2Record:  # 名言集2
     def __init__(self, word: str, desc: str,createAt:str,updateAt:str):
@@ -715,4 +716,59 @@ class HoloTwitterSearchCondition:
             "startDate":self.start_date,
             "pageNo":self.page_no,
             "pageSize":self.page_size
+        }
+
+class SsbuClip:
+    def __init__(
+        self,
+        id:int,
+        file_name:str,
+        char_name:str,
+        dir_name:str,
+        date:str,
+        cates:List[str]
+    ):
+        self.id = id
+        self.file_name = file_name
+        self.char_name = char_name
+        self.dir_name = dir_name
+        self.date = date
+        self.cates = cates
+
+    def to_args(self):
+        return {
+            "id":self.id,
+            "fileName":unicodedata.normalize('NFC', self.file_name),
+            "charName":unicodedata.normalize('NFC', self.char_name),
+            "dirName":unicodedata.normalize('NFC', self.dir_name),
+            "date":unicodedata.normalize('NFC', self.date)
+        }
+    
+class SsbuClipSearchCondition:
+    def __init__(
+        self,
+        text: str,
+        char_name: str,
+        ssbu_name: str,
+        date: str,
+        cate: str,
+        page_no: int
+    ):
+        self.text = text
+        self.char_name = char_name
+        self.ssbu_name = ssbu_name
+        self.date = date
+        self.cate = cate
+        self.page_size = 20
+        self.page_no = page_no
+
+    def to_args(self):
+        return {
+            "text": unicodedata.normalize('NFC', f"%{self.text}%"),
+            "charName": unicodedata.normalize('NFC', self.char_name),
+            "ssbuName": unicodedata.normalize('NFC', self.ssbu_name),
+            "date": unicodedata.normalize('NFC', self.date),
+            "cate": unicodedata.normalize('NFC', self.cate),
+            "pageSize": self.page_size,
+            "pageNo": self.page_no
         }
