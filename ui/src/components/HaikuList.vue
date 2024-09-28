@@ -1,16 +1,16 @@
 <template>
   <!--SUB 1/3 上に表示する検索、追加等詳細な操作画面-->
   <div class="q-pb-md">
-    <q-card style="width: 600px" class="q-pa-sm" v-if="tableView == false">
+    <q-card style="max-width: 600px" class="q-pa-sm" v-if="tableView == false">
       <q-card-section>
         <div class="text-h6">{{ listName }}</div>
         <div
           class="haiku-upper"
           v-if="displayCondition.upper && tableView == false"
         >
-          <div class="row q-gutter-md">
+          <div class="row q-gutter-sm">
             <!--search input-->
-            <div style="height: 60px; width: 350px">
+            <div style="height: 60px; width: 320px">
               <q-input
                 dense
                 debounce="300"
@@ -33,7 +33,7 @@
             <!--新規追加ボタン-->
             <div class="q-pt-xs">
               <q-btn
-                label="作成"
+                label="ここで一句"
                 icon-right="note_add"
                 color="grey-6"
                 outline
@@ -50,26 +50,22 @@
               />
             </div>
           </div>
-          <div class="row q-gutter-md">
+          <div class="row q-gutter-md q-pt-md">
             <div>
-              <q-btn
-                label="解説"
-                icon="description"
-                @click="detailDisplay = !detailDisplay"
-                color="green"
-                dense
-                outline
+              <q-toggle
+                v-model="detailDisplay"
+                label="解説を表示"
+                color="primary"
               />
             </div>
             <div>
-              <q-btn
-                icon="import_export"
-                @click="rangeChange"
-                label="並び"
-                color="green"
-                outline
-                dense
-              />
+              <div>
+                <q-toggle
+                  v-model="displaySort"
+                  label="新しい順"
+                  color="primary"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -77,7 +73,11 @@
     </q-card>
   </div>
 
-  <div v-for="rec in records" :key="rec.id" class="row q-gutter-md q-pa-md">
+  <div
+    v-for="rec in records"
+    :key="rec.id"
+    class="row q-gutter-md q-pa-md wrap"
+  >
     <div class="haiku-box">
       <div
         style="
@@ -85,7 +85,7 @@
           font-family: haiku;
           font-size: 32px;
           margin-left: auto;
-          height: 270px;
+          height: 280px;
         "
       >
         <div style="margin-right: 50px; height: 320px">
@@ -101,30 +101,36 @@
           {{ rec.poster }}
         </div>
       </div>
-      <div style="height: 20px" v-if="lockIconCondition == false">
+      <div
+        class="bg-light-green-1"
+        style="height: 50px"
+        v-if="lockIconCondition == false"
+      >
         <hr />
-        <div class="row" style="width: 300px">
-          <div style="width: 100px">
-            <a
-              href="#"
-              class="col text-secondary"
+        <div class="row" style="width: 270px">
+          <div class="col text-left">
+            <q-btn
+              color="primary"
+              label="編集する"
               @click.prevent="updateClick(rec)"
-              ><q-icon name="edit" size="md"
-            /></a>
+              icon="edit"
+              dense
+            />
           </div>
-          <div>
-            <a
-              href="#"
-              class="col text-negative"
+          <div class="col text-right">
+            <q-btn
+              color="negative"
+              label="削除する"
               @click.prevent="deleteClick(rec)"
-              ><q-icon name="delete" size="md"
-            /></a>
+              icon="delete"
+              dense
+            />
           </div>
         </div>
       </div>
     </div>
     <div>
-      <div class="box28" v-if="detailDisplay">
+      <div class="box28 bg-white" v-if="detailDisplay">
         <span class="box-title">解説</span>
         <p
           style="text-align: left; white-space: pre-wrap; word-wrap: break-word"
@@ -453,6 +459,7 @@ export default defineComponent({
       deleteClick,
       deleteRecord,
       rangeChange,
+      displaySort,
     } = useHaikuListModel();
     search();
 
@@ -464,6 +471,10 @@ export default defineComponent({
       } else {
         records.value.forEach((it) => (it.detailDisplay = true));
       }
+    });
+
+    watch(displaySort, () => {
+      rangeChange();
     });
 
     return {
@@ -491,6 +502,7 @@ export default defineComponent({
       insertHaikuOmake: ref(false),
       detailDisplay,
       rangeChange,
+      displaySort,
     };
   },
 });

@@ -6,8 +6,17 @@ import api, {
 import { ref } from 'vue';
 
 export function useHaikuListModel() {
+  const KEY_LOCAL_STRAGE = 'haiku-list-sort';
+  const setSortValue = function () {
+    const viewValue = localStorage.getItem(KEY_LOCAL_STRAGE);
+    if (viewValue) {
+      displaySort.value = viewValue == 'desc';
+    }
+  };
+
   const quasar = useQuasar();
   const lockIconCondition = ref(true);
+  const displaySort = ref(false);
   const displayCondition = ref({
     upper: true,
     insert: false,
@@ -116,11 +125,18 @@ export function useHaikuListModel() {
   };
 
   const rangeChange = function () {
+    if (displaySort.value == true) {
+      localStorage.setItem(KEY_LOCAL_STRAGE, 'desc');
+    } else {
+      localStorage.setItem(KEY_LOCAL_STRAGE, 'asc');
+    }
+
     records.value.reverse();
   };
 
   /*SELECT */
   const search = async function (query = '') {
+    setSortValue();
     LoadingCondition.value.search = true;
     const request = {
       id: -1,
@@ -168,6 +184,11 @@ export function useHaikuListModel() {
             });
           });
           sortRecords();
+
+          console.log();
+          if (displaySort.value) {
+            records.value.reverse();
+          }
         }
       })
       .catch((e) => {
@@ -331,6 +352,7 @@ export function useHaikuListModel() {
       });
   };
   return {
+    displaySort,
     lockIconCondition,
     displayCondition,
     condition,
