@@ -90,7 +90,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/ssbu',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: () => import('pages/SsbuListPage.vue') }],
+    children: [{ path: '', component: () => import('pages/SsbuClipPage.vue') }],
   },
   {
     path: '/ssbu_clip',
