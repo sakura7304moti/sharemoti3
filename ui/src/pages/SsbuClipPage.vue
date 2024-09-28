@@ -23,11 +23,6 @@
             outlined
           />
         </div>
-      </div>
-      <div
-        class="row q-gutter-md wrap q-mb-sm"
-        style="max-width: 1100px; width: 100%"
-      >
         <div>
           <q-select
             label="日付"
@@ -149,6 +144,19 @@
         </q-card-section>
       </q-card>
     </div>
+    <!-- ページトップに戻るボタン -->
+    <button
+      v-if="isShowTopButton"
+      class="scroll-to-top"
+      @click="onTopScrollClick"
+    >
+      <img
+        style="height: 70px"
+        class="holotwitter-top-scroll-img"
+        src="https://ugokuweb.coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/img/rocket_base.png"
+      />
+      <div>トップに戻る</div>
+    </button>
   </q-page>
 </template>
 <script lang="ts">
@@ -184,6 +192,8 @@ export default defineComponent({
       getCategory,
       onPlayClick,
       downloadVideo,
+      onTopScrollClick,
+      checkTopButton,
     } = useModel();
 
     const onMount = function () {
@@ -191,6 +201,7 @@ export default defineComponent({
       getDate();
       getCategory();
       window.addEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', checkTopButton);
     };
 
     onMount();
@@ -215,6 +226,7 @@ export default defineComponent({
       getCategory,
       onPlayClick,
       downloadVideo,
+      onTopScrollClick,
     };
   },
 });
@@ -477,6 +489,18 @@ const useModel = function () {
     downloadState.value.loading = false;
   };
 
+  const onTopScrollClick = function () {
+    // スムーズにページのトップに戻る
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
+  const checkTopButton = function () {
+    isShowTopButton.value = window.scrollY > 100;
+  };
+
   return {
     quasar,
     isLoading,
@@ -498,6 +522,8 @@ const useModel = function () {
     getCategory,
     onPlayClick,
     downloadVideo,
+    onTopScrollClick,
+    checkTopButton,
   };
 };
 interface DownloadState {
@@ -582,5 +608,28 @@ interface SsbuClip {
     font-weight: 700;
     transition: 0.6s;
   }
+}
+/*
+  トップスクロール
+*/
+.scroll-to-top {
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+@media (max-width: 800px) {
+  .scroll-to-top {
+    display: none;
+  }
+}
+
+.scroll-to-top:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 </style>
