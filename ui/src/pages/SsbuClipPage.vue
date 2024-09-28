@@ -1,7 +1,7 @@
 <template>
   <q-page class="">
     <div class="text-h6 q-pb-md">スマブラの切り抜き</div>
-    <q-form @submit.prevent="onSearchClick" class="q-mb-lg q-ml-md">
+    <q-form @submit.prevent="onSearchClick" class="q-mb-lg q-ml-sm">
       <div
         class="row q-gutter-md wrap q-mb-sm"
         style="max-width: 1100px; width: 100%"
@@ -20,16 +20,6 @@
           <ssbu-name-select
             class="bg-white"
             v-model="condition.ssbuName"
-            outlined
-          />
-        </div>
-        <div>
-          <q-input
-            label="あだ名"
-            class="bg-white"
-            v-model="condition.charName"
-            dense
-            stack-label
             outlined
           />
         </div>
@@ -77,7 +67,7 @@
     </q-form>
 
     <div
-      class="q-ml-md"
+      class="q-ml-sm"
       v-for="item in dataState.records"
       :key="item.id"
       style="padding-bottom: 48px; max-width: 600px"
@@ -99,14 +89,8 @@
                 :ratio="16 / 9"
               />
             </div>
-            <div v-else>
-              <div class="ssbu-clip-video-play" @click="onPlayClick(item.id)">
-                <q-icon name="play_circle" size="md" color="light-green-3" />
-                <span class="q-pl-sm">再生する</span>
-              </div>
-            </div>
           </div>
-          <div>
+          <div class="q-mb-sm">
             <div class="row justify-between">
               <div class="row q-pt-sm">
                 <q-avatar>
@@ -133,6 +117,35 @@
               </div>
             </div>
           </div>
+          <div class="row">
+            <div class="col text-left">
+              <div>
+                <div class="ssbu-clip-video-play" @click="onPlayClick(item.id)">
+                  <q-icon name="play_circle" size="md" color="light-green-3" />
+                  <span class="q-pl-sm">再生する</span>
+                </div>
+              </div>
+            </div>
+            <div class="col text-right">
+              <div
+                class="ssbu-clip-download"
+                @click.prevent="
+                  downloadVideo(item.movieUrl, item.fileName, item.id)
+                "
+              >
+                <span>
+                  <q-spinner
+                    v-if="downloadState.id == item.id && downloadState.loading"
+                    color="blue-3"
+                    size="sm"
+                  />
+                  <q-icon v-else name="download" size="md" color="blue-3" />
+                </span>
+
+                <a class="q-pl-sm" :href="item.movieUrl">ダウンロードする</a>
+              </div>
+            </div>
+          </div>
         </q-card-section>
       </q-card>
     </div>
@@ -153,6 +166,7 @@ export default defineComponent({
     const {
       quasar,
       isLoading,
+      downloadState,
       isShowTopButton,
       condition,
       dateItems,
@@ -169,6 +183,7 @@ export default defineComponent({
       getDate,
       getCategory,
       onPlayClick,
+      downloadVideo,
     } = useModel();
 
     const onMount = function () {
@@ -183,6 +198,7 @@ export default defineComponent({
     return {
       quasar,
       isLoading,
+      downloadState,
       isShowTopButton,
       condition,
       dateItems,
@@ -198,6 +214,7 @@ export default defineComponent({
       getDate,
       getCategory,
       onPlayClick,
+      downloadVideo,
     };
   },
 });
@@ -205,6 +222,10 @@ const useModel = function () {
   const quasar = useQuasar();
   const isLoading = ref(false);
   const isShowTopButton = ref(false);
+  const downloadState = ref({
+    id: 0,
+    loading: false,
+  } as DownloadState);
   const condition = ref({
     text: '',
     charName: '',
@@ -280,6 +301,7 @@ const useModel = function () {
               smallIcon: it.smallIcon,
               isPlay: false,
               movieUrl: SsbuClipApi.MovieUrl(it.dirName, it.fileName),
+              videoIsLoading: false,
             })
           );
           dataState.value.totalCount = response.totalCount;
@@ -426,10 +448,39 @@ const useModel = function () {
         });
       });
   };
+  const downloadVideo = async function (
+    url: string,
+    fileName: string,
+    id: number
+  ) {
+    downloadState.value.id = id;
+    downloadState.value.loading = true;
+
+    let res = await fetch(url, {
+      method: 'GET',
+    }).catch((err) => err.data);
+
+    if (res.status == 200) {
+      // blobとして内容を読み出す
+      const content = await res.blob();
+      // オブジェクトURLを生成
+      const objectUrl = (window.URL || window.webkitURL).createObjectURL(
+        content
+      );
+      // オブジェクトURLをhref属性に設定したaタグを作成
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = fileName;
+      // aタグをクリック
+      a.click();
+    }
+    downloadState.value.loading = false;
+  };
 
   return {
     quasar,
     isLoading,
+    downloadState,
     isShowTopButton,
     condition,
     dateItems,
@@ -446,8 +497,13 @@ const useModel = function () {
     getDate,
     getCategory,
     onPlayClick,
+    downloadVideo,
   };
 };
+interface DownloadState {
+  id: number;
+  loading: boolean;
+}
 interface ConditionState {
   text: string;
   charName: string;
@@ -472,6 +528,7 @@ interface SsbuClip {
   smallIcon: string;
   isPlay: boolean;
   movieUrl: string;
+  videoIsLoading: boolean;
 }
 </script>
 <style>
@@ -496,6 +553,32 @@ interface SsbuClip {
   transition: 0.4s;
   span {
     color: rgb(182, 196, 176);
+    font-weight: 700;
+    transition: 0.6s;
+  }
+}
+.ssbu-clip-download {
+  /*ボタンの形状*/
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  background: transparent;
+  border-radius: 20px;
+  border: solid 1px rgba(196, 194, 194, 0.5);
+  outline: none;
+  cursor: pointer;
+  padding: 8px;
+  a {
+    text-decoration: none;
+    margin-top: 8px;
+    color: rgb(196, 194, 194);
+  }
+}
+.ssbu-clip-download:hover {
+  background-color: rgba(164, 222, 240, 0.2);
+  transition: 0.4s;
+  a {
+    color: rgb(124, 182, 229);
     font-weight: 700;
     transition: 0.6s;
   }
