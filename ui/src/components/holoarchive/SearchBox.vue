@@ -143,7 +143,8 @@
           v-if="page.pageCount > 0"
           v-model="page.pageNo"
           :max="page.pageCount"
-          max-pages="5"
+          max-pages="3"
+          input
           direction-links
           @click="search"
         />

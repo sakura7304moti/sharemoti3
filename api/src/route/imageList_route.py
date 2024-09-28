@@ -22,7 +22,7 @@ imagelist_service.create_db()
 # 保存先のフォルダーを取得・作成
 p = const.Path()
 UPLOAD_FOLDER = p.image_uploads()
-print(f'uploads -> {UPLOAD_FOLDER}')
+#print(f'uploads -> {UPLOAD_FOLDER}')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
