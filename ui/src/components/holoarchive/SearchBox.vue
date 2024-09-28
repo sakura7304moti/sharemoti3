@@ -3,11 +3,11 @@
     <q-card-section>
       <div class="row q-gutter-md">
         <!--タイトル-->
-        <div>
+        <div class="q-mb-sm">
           <q-input
             v-model="filter.title"
             dense
-            label="title"
+            label="テキスト"
             stack-label
             style="width: 200px"
             :disable="isLoading"
@@ -16,7 +16,7 @@
 
         <!--チャンネル-->
         <div>
-          <holo-channel-select v-model="filter.channelId" />
+          <holo-channel-select v-model="filter.channelId" label="チャンネル" />
         </div>
 
         <!--動画のタイプ-->
@@ -30,14 +30,14 @@
             map-options
             dense
             style="width: 120px"
-            label="type"
+            label="種類"
             stack-label
             clearable
             :disable="isLoading"
           />
         </div>
       </div>
-      <div class="q-pt-sm row q-gutter-md">
+      <div class="q-pt-md row q-gutter-md">
         <!--fromDate-->
         <div class="holo-archive-date-select">
           <div
@@ -47,7 +47,7 @@
               'text-grey': !view.fromDate,
             }"
           >
-            fromDate
+            開始日
           </div>
           <div class="row q-gutter-sm">
             <div>
@@ -90,7 +90,7 @@
             class="text-caption"
             :class="{ 'text-primary': view.toDate, 'text-grey': !view.toDate }"
           >
-            toDate
+            終了日
           </div>
           <div class="row q-gutter-sm">
             <div>
@@ -127,12 +127,12 @@
           </div>
         </div>
 
-        <div>
+        <div class="q-pt-md">
           <q-btn
             icon="search"
             @click.prevent="search"
             :loading="isLoading"
-            text-color="primary"
+            color="primary"
           />
         </div>
       </div>
@@ -252,8 +252,8 @@ interface viewState {
 </script>
 <style>
 #holo-archive-search-box {
-  height: 260px;
-  width: 400px;
+  height: 330px;
+  width: 380px;
 }
 .holo-archive-date-select {
   width: 100px;

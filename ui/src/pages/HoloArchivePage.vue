@@ -1,9 +1,7 @@
 <template>
   <q-page class="">
-    <div class="holo-page-title q-pb-md" style="display: none">
-      アーカイブまとめ
-    </div>
-    <div style="display: flex">
+    <div class="holo-page-title q-pb-md">アーカイブまとめ</div>
+    <div style="display: flex; flex-wrap: wrap">
       <div style="width: 640px">
         <YouTube
           v-if="playUrl != ''"
@@ -11,21 +9,14 @@
           @ready="true"
           ref="youtube"
           :vars="{ autoplay: 1, rel: 0 }"
+          :width="pageWidth"
         />
         <div class="q-pt-md"></div>
         <search-box />
       </div>
       <div style="flex-grow: 1">
         <div style="display: flex; flex-wrap: wrap">
-          <div
-            style="
-              display: flex;
-              flex-wrap: wrap;
-              overflow-y: auto;
-              height: 80vh;
-            "
-            id="holo-archive-cards"
-          >
+          <div style="display: flex; flex-wrap: wrap" id="holo-archive-cards">
             <div v-for="state in records" :key="state.id" class="q-pa-md">
               <archive-card
                 :data-state="state"
@@ -36,6 +27,15 @@
           </div>
         </div>
       </div>
+      <q-pagination
+        v-if="page.pageCount > 0 && !isLoading && records.length > 0"
+        v-model="page.pageNo"
+        :max="page.pageCount"
+        max-pages="3"
+        input
+        direction-links
+        @click="search"
+      />
     </div>
   </q-page>
 </template>
@@ -53,6 +53,9 @@ export default defineComponent({
     YouTube,
   },
   setup() {
+    const pageWidth = computed(() =>
+      window.innerWidth > 640 ? 640 : window.innerWidth - 32
+    );
     const store = useHoloArchiveStore();
     const records = computed(() => store.records);
     const playUrl = computed(() => store.playMovie);
@@ -66,7 +69,25 @@ export default defineComponent({
       isLoading.value = false;
     };
 
-    return { records, playUrl, isLoading, searchStart, searchEnd };
+    const page = ref(store.page);
+
+    const search = function () {
+      store.getMovies();
+
+      const element = document.getElementById('holo-archive-cards');
+      element?.scroll({ top: 0 });
+    };
+
+    return {
+      pageWidth,
+      records,
+      playUrl,
+      isLoading,
+      page,
+      searchStart,
+      searchEnd,
+      search,
+    };
   },
 });
 </script>
