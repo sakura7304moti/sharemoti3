@@ -357,7 +357,7 @@ function usePage() {
     },
     {
       title: 'スマブラ',
-      url: '/ssbu',
+      url: '/ssbu_clip',
     },
     {
       title: 'オム子レイディオ',

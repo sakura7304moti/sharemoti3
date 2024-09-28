@@ -722,6 +722,7 @@ class SsbuClip:
     def __init__(
         self,
         id:int,
+        title:str,
         file_name:str,
         char_name:str,
         dir_name:str,
@@ -729,6 +730,7 @@ class SsbuClip:
         cates:List[str]
     ):
         self.id = id
+        self.title = title
         self.file_name = file_name
         self.char_name = char_name
         self.dir_name = dir_name
@@ -738,6 +740,7 @@ class SsbuClip:
     def to_args(self):
         return {
             "id":self.id,
+            "title":self.title,
             "fileName":unicodedata.normalize('NFC', self.file_name),
             "charName":unicodedata.normalize('NFC', self.char_name),
             "dirName":unicodedata.normalize('NFC', self.dir_name),

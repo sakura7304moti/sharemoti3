@@ -2,6 +2,7 @@ import os
 import glob
 from typing import List
 import pandas as pd
+import math
 
 from tqdm import tqdm
 
@@ -13,11 +14,8 @@ p = const.Path()
 dbname = p.db_main_share()
 query_base = const.DbBase(dbname)
 
-# ファイルのパス
-DATA_PATH = p.share_folder()
-
 # 切り抜きのベースのパス
-SSBU_CLIP_PATH = os.path.join(DATA_PATH, 'スマブラ', '切り抜き')
+SSBU_CLIP_DIR = os.path.join(p.share_folder(), 'スマブラ', '切り抜き')
 
 
 # ---------------
@@ -46,6 +44,7 @@ def make_table():
     ssbu_clip_query = """
     CREATE TABLE IF NOT EXISTS ssbu_clip (
         id INTEGER PRIMARY KEY,
+        title TEXT,
         file_name TEXT,
         dir_name TEXT,
         char_name TEXT,
@@ -66,8 +65,8 @@ def get_files():
     """
     切り抜きのパスの一覧
     """
-    path_list = glob.glob(os.path.join(SSBU_CLIP_PATH,'*','*','*.mp4'))
-    path_list.sort(reverse=True)
+    path_list = glob.glob(os.path.join(SSBU_CLIP_DIR,'*','*','*.mp4'))
+    path_list.sort()
     return path_list
 
 def get_clip(path:str, index:int, category_list:List[str]) -> interface.SsbuClip:
@@ -78,14 +77,17 @@ def get_clip(path:str, index:int, category_list:List[str]) -> interface.SsbuClip
     result = file_name.split('_')
     if len(result) > 1:
         char_name = result[0]
+        title = file_name.replace('.mp4', '').replace(char_name + '_', '')
     else:
         char_name = ''
-    dir_name = os.path.dirname(path.replace(SSBU_CLIP_PATH, ''))
+        title = ''
+    dir_name = os.path.dirname(path.replace(SSBU_CLIP_DIR, ''))
     date = os.path.basename(dir_name)
     cates = [c for c in category_list if c in file_name]
 
     clip = interface.SsbuClip(
         index,
+        title,
         file_name,
         char_name,
         dir_name,
@@ -126,6 +128,7 @@ def insert_clip(condition:interface.SsbuClip):
     clip_query = """
     INSERT INTO ssbu_clip(
         id,
+        title,
         file_name,
         dir_name,
         char_name,
@@ -133,9 +136,10 @@ def insert_clip(condition:interface.SsbuClip):
     )
     VALUES(
         :id,
+        :title,
         :fileName,
-        :charName,
         :dirName,
+        :charName,
         :date
     )
     """
@@ -184,11 +188,13 @@ def get_dates() -> pd.DataFrame:
         distinct date
     from ssbu_clip
     """
-    return query_base.execute_df(query)
+    ls = query_base.execute_df(query)["date"].to_list()
+    ls.sort(reverse=True)
+    return ls
 
 def search(condition:interface.SsbuClipSearchCondition):
     """
-    検索
+    切り抜き検索
     ・部分一致テキスト
     ・あだ名
     ・キャラ名
@@ -201,6 +207,7 @@ def search(condition:interface.SsbuClipSearchCondition):
             WITH clip AS(
             SELECT
                 sc.id as id,
+                sc.title as title,
                 sc.file_name as fileName,
                 sc.dir_name as dirName,
                 sc.char_name as charName,
@@ -258,6 +265,18 @@ def search(condition:interface.SsbuClipSearchCondition):
         args = cd.to_args()
         args["offset"] = (max(cd.page_no - 1,0))*cd.page_size
         df = query_base.execute_df(query, args)
+
+        # 画像のURLをはっつける
+        names = ssbu_names()
+        urls = []
+        icons = []
+        for item in df['ssbuName'].to_list():
+            recs = [n for n in names if n.name == item]
+            if len(recs) == 1:
+                urls.append(recs[0].url)
+                icons.append(recs[0].icon)
+        df["fullIcon"] = urls
+        df["smallIcon"] = icons
         return df
     
     def get_total_count(cd:interface.SsbuClipSearchCondition):
@@ -276,3 +295,9 @@ def search(condition:interface.SsbuClipSearchCondition):
     df = get_records(condition)
     total_count = get_total_count(condition)
     return df, total_count
+
+def get_movie(dir_name:str, file_name:str):
+    """
+    動画のフルパスを取得
+    """
+    return f"{SSBU_CLIP_DIR}{dir_name}/{file_name}"
