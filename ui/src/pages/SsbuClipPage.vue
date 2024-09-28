@@ -1,8 +1,7 @@
 <template>
   <q-page class="">
-    <div class="text-h6">スマブラの切り抜き</div>
-    <!--PC用・タブレット用の表示-->
-    <q-form @submit.prevent="onSearchClick" class="q-mb-lg">
+    <div class="text-h6 q-pb-md">スマブラの切り抜き</div>
+    <q-form @submit.prevent="onSearchClick" class="q-mb-lg q-ml-md">
       <div
         class="row q-gutter-md wrap q-mb-sm"
         style="max-width: 1100px; width: 100%"
@@ -78,16 +77,20 @@
     </q-form>
 
     <div
+      class="q-ml-md"
       v-for="item in dataState.records"
       :key="item.id"
-      style="padding-bottom: 32px; max-width: 600px"
+      style="padding-bottom: 48px; max-width: 600px"
     >
       <q-card>
         <q-card-section>
-          <div class="text-subtitle1 q-mb-md" style="font-size: 1.3rem">
+          <div
+            class="text-subtitle1 q-mb-md ssbu-clip-title"
+            style="font-size: 1.3rem"
+          >
             {{ item.title }}
           </div>
-          <div class="q-mb-md">
+          <div class="q-mb-sm">
             <div v-if="item.isPlay">
               <q-video
                 class="backgroud-video"
@@ -104,39 +107,29 @@
             </div>
           </div>
           <div>
-            <div
-              style="
-                position: relative;
-                height: 100px;
-                background-color: rgb(51, 51, 51);
-              "
-            >
-              <img
-                :src="item.fullIcon"
-                style="
-                  margin-left: 20%;
-                  max-width: 100%;
-                  width: 80%;
-                  max-height: 100%;
-                  height: 100%;
-                  object-fit: cover;
-                "
-              />
-              <div
-                style="
-                  position: absolute;
-                  left: 0;
-                  top: 50%;
-                  transform: translateY(-50%);
-                  width: 100%;
-                  text-align: left;
-                  padding-left: 20px;
-                  font-size: 22px;
-                  font-weight: bold;
-                  color: white;
-                "
-              >
-                {{ item.charName }}
+            <div class="row justify-between">
+              <div class="row q-pt-sm">
+                <q-avatar>
+                  <img :src="item.smallIcon" />
+                </q-avatar>
+                <q-item-label class="q-pt-sm q-pl-sm text-subtitle1">
+                  {{ item.charName }}
+                </q-item-label>
+              </div>
+
+              <div>
+                <q-field label=" " stack-label class="q-pr-md">
+                  <template v-slot:control>
+                    <div class="self-center full-width no-outline" tabindex="0">
+                      <span v-if="item.date.length == 8">
+                        {{ item.date.substring(0, 4) }}年
+                        {{ item.date.substring(4, 6) }}月
+                        {{ item.date.substring(6, 8) }}日
+                      </span>
+                      <span v-else>{{ item.date }}</span>
+                    </div>
+                  </template>
+                </q-field>
               </div>
             </div>
           </div>
@@ -165,6 +158,7 @@ export default defineComponent({
       dateItems,
       categoryItems,
       dataState,
+      handleScroll,
       topScroll,
       search,
       onSearchClick,
@@ -177,9 +171,15 @@ export default defineComponent({
       onPlayClick,
     } = useModel();
 
-    onSearchClick();
-    getDate();
-    getCategory();
+    const onMount = function () {
+      onSearchClick();
+      getDate();
+      getCategory();
+      window.addEventListener('scroll', handleScroll);
+    };
+
+    onMount();
+
     return {
       quasar,
       isLoading,
@@ -220,6 +220,16 @@ const useModel = function () {
   const dateItems = ref([] as string[]);
   const categoryItems = ref([] as string[]);
 
+  const handleScroll = () => {
+    const bottomOfWindow =
+      window.innerHeight + window.scrollY >=
+      document.documentElement.offsetHeight - 200;
+
+    if (bottomOfWindow && !isLoading.value) {
+      onScrollSearch();
+    }
+  };
+
   const topScroll = function () {
     window.scroll({
       top: 0,
@@ -256,23 +266,23 @@ const useModel = function () {
           console.log('search response', response);
           if (clear) {
             dataState.value.records.splice(0);
-            response.records.forEach((it) =>
-              dataState.value.records.push({
-                id: it.id,
-                title: it.title,
-                fileName: it.fileName,
-                dirName: it.dirName,
-                charName: it.charName,
-                ssbuName: it.ssbuName,
-                date: it.date,
-                fullIcon: it.fullIcon,
-                smallIcon: it.smallIcon,
-                isPlay: false,
-                movieUrl: SsbuClipApi.MovieUrl(it.dirName, it.fileName),
-              })
-            );
-            dataState.value.totalCount = response.totalCount;
           }
+          response.records.forEach((it) =>
+            dataState.value.records.push({
+              id: it.id,
+              title: it.title,
+              fileName: it.fileName,
+              dirName: it.dirName,
+              charName: it.charName,
+              ssbuName: it.ssbuName,
+              date: it.date,
+              fullIcon: it.fullIcon,
+              smallIcon: it.smallIcon,
+              isPlay: false,
+              movieUrl: SsbuClipApi.MovieUrl(it.dirName, it.fileName),
+            })
+          );
+          dataState.value.totalCount = response.totalCount;
           console.log('search dataState', dataState.value);
         }
       })
@@ -289,6 +299,18 @@ const useModel = function () {
 
   const onSearchClick = function () {
     search(condition.value, true);
+  };
+
+  const onScrollSearch = async function () {
+    console.log('scroll called');
+    if (
+      !isLoading.value &&
+      condition.value.pageNo < dataState.value.totalCount
+    ) {
+      console.log('scroll search...');
+      condition.value.pageNo = condition.value.pageNo + 1;
+      await search(condition.value, false);
+    }
   };
 
   const onResetCondition = function () {
@@ -308,6 +330,12 @@ const useModel = function () {
     onResetCondition();
     condition.value.charName = charName;
     onSearchClick();
+
+    quasar.notify({
+      color: 'secondary',
+      position: 'top',
+      message: condition.value.charName + 'で検索！',
+    });
   };
 
   const onSsbuNameClick = function (ssbuName: string) {
@@ -319,6 +347,12 @@ const useModel = function () {
     onResetCondition();
     condition.value.ssbuName = ssbuName;
     onSearchClick();
+
+    quasar.notify({
+      color: 'secondary',
+      position: 'top',
+      message: condition.value.ssbuName + 'で検索！',
+    });
   };
 
   const onDateClick = function (date: string) {
@@ -330,6 +364,12 @@ const useModel = function () {
     onResetCondition();
     condition.value.date = date;
     onSearchClick();
+
+    quasar.notify({
+      color: 'secondary',
+      position: 'top',
+      message: condition.value.date + 'で検索！',
+    });
   };
 
   const onCateClick = function (cate: string) {
@@ -341,6 +381,12 @@ const useModel = function () {
     onResetCondition();
     condition.value.cate = cate;
     onSearchClick();
+
+    quasar.notify({
+      color: 'secondary',
+      position: 'top',
+      message: condition.value.cate + 'で検索！',
+    });
   };
 
   const getDate = async function () {
@@ -389,6 +435,7 @@ const useModel = function () {
     dateItems,
     categoryItems,
     dataState,
+    handleScroll,
     topScroll,
     search,
     onSearchClick,
