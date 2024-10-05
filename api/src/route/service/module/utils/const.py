@@ -6,6 +6,11 @@ import yaml
 import requests
 import sqlite3
 import datetime
+import psycopg2
+
+
+from sqlalchemy import create_engine
+
 
 from .interface import HoloName, SsbuNameRecord
 
@@ -306,6 +311,53 @@ class DbBase:
                 return pd.read_sql(sql = query, con = conn)
             else:
                 return pd.read_sql(sql = query, con = conn, params = param)
+
+    def current_time(self):
+        """
+        現在の日時を取得。
+        create_atやupdate_atの日時セットに。
+        """
+        return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+class PsqlBase:
+    def db_url(self):
+        """
+        接続URL
+        """
+        try:
+            url = os.environ['SHAREMOTI_DB']
+            return url
+        except Exception as e:
+            print(f"\033[31m DBのURL取得エラー {e.with_traceback} \033[0m")
+
+    def db_connection(self):
+        """
+        メインのdbの接続情報
+        """
+        return create_engine("postgresql+psycopg2://sakura0moti:music0@192.168.0.31/sharemoti")
+
+    def execute_commit(self, query:str, param: dict | None = None):
+        """
+        クエリを実行するだけ。commitが必要な場合はこっち。
+        """
+        with self.db_connection() as con:
+            cur = con.cursor()
+            if param is None:
+                cur.execute(query)
+            else:
+                cur.execute(query, param)
+            
+            con.commit()
+            con.close()
+
+    def execute_df(self, query:str, param: dict | None = None):
+        """
+        クエリを実行してデータフレームを取得
+        """
+        if param is None:
+            return pd.read_sql(sql = query, con = self.db_connection())
+        else:
+            return pd.read_sql(sql = query, con = self.db_connection(), params = param)
 
     def current_time(self):
         """
