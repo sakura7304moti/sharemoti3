@@ -47,13 +47,19 @@ def search_illusts(query:str):
     json_result = api.search_illust(word=keyword)
     time.sleep(1)
     illusts.extend(json_result.illusts)
+
+    if json_result is None:
+        return illusts
+    
+    if json_result.illusts is None:
+        return illusts
     
     # 検索結果が無くなるまで検索
     while json_result:
         illusts.extend([i for i in json_result.illusts if i.total_bookmarks > 1000])# bookmarks
         
         # 次のページが存在する場合は次のページを取得
-        if json_result is None:
+        if json_result is None or json_result.illusts is None:
             return illusts
         else:
             if 'next_url' in json_result:
@@ -374,7 +380,7 @@ def holo_pixiv_update():
     make_tables()
     for member in tqdm(members):
         tqdm.write(f"\rName: \033[92m{member}\033[0m", end='')
-        query = f"{member} 000user"
+        query = f"{member}"
         illusts = search_illusts(query)
         if illusts is not None:
             for illust in illusts:
