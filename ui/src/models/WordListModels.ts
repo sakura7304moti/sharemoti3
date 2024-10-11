@@ -15,9 +15,9 @@ export function useWordListModel() {
       sortable: true,
     },
     {
-      name: 'desc',
+      name: 'detail',
       label: '詳細',
-      field: 'desc',
+      field: 'detail',
       sortable: true,
     },
     {
@@ -34,16 +34,17 @@ export function useWordListModel() {
     },
   ] as QTableColumn[];
 
-  const condition = ref('');
+  const searchCondition = ref('');
   const insertCondition = ref({
     word: '',
-    desc: '',
-  } as ConditionState);
+    detail: '',
+  } as InsertCondition);
 
   const updateCondition = ref({
+    id: -1,
     word: '',
-    desc: '',
-  } as ConditionState);
+    detail: '',
+  } as UpdateCondition);
   const isLoading = ref(false);
   const isSaveLoading = ref(false);
   const isDeleteLoading = ref(false);
@@ -110,41 +111,24 @@ export function useWordListModel() {
   };
 
   /*SELECT */
-
-  function formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  function displayDate(date: string): string {
-    const inputDate = new Date(date);
-
-    // 7時間後の日時
-    //const resultDate = addHours(inputDate, 7);
-
-    // yyyy-mm-ddの形式に変換
-    const resultString = formatDate(inputDate);
-    return resultString;
-  }
   const search = async function () {
     isLoading.value = true;
     await api
       .search({
-        text: condition.value,
+        text: searchCondition.value,
       })
       .then((response) => {
         if (response) {
           console.log('response', response);
 
           records.value.splice(0);
-          response.records?.forEach((rec) =>
+          response.forEach((rec) =>
             records.value.push({
+              id: rec.id,
               word: rec.word ?? '',
-              desc: rec.desc ?? '',
-              createAt: displayDate(rec.createAt ?? ''),
-              updateAt: displayDate(rec.updateAt ?? ''),
+              detail: rec.detail ?? '',
+              createAt: rec.createAt,
+              updateAt: rec.updateAt,
             })
           );
           sortRecords();
@@ -164,7 +148,7 @@ export function useWordListModel() {
   };
 
   /*INSERT , UPDATE*/
-  const sortfn = function (a: ConditionState, b: ConditionState) {
+  const sortfn = function (a: DataState, b: DataState) {
     if (a.word > b.word) {
       return 1;
     } else {
@@ -174,47 +158,38 @@ export function useWordListModel() {
   const sortRecords = function () {
     records.value.sort(sortfn);
   };
-  const onEditClick = function (rec: ConditionState) {
+  const onEditClick = function (rec: DataState) {
     updateCondition.value = JSON.parse(JSON.stringify(rec));
     editModalShow.value = true;
   };
 
   const insertErr = ref('');
-  const insertRecord = async function (word: string, desc: string) {
+  const insertRecord = async function (condition: InsertCondition) {
     //バリテーション
     insertErr.value = '';
-    if (word == '') {
+    if (condition.word == '') {
       insertErr.value = '名言を空にはできないよ!';
     }
-    if (records.value.find((it) => it.word == word)) {
+    if (records.value.find((it) => it.word == condition.word)) {
       insertErr.value = '既に同じ名言が存在してるよ!';
     }
     if (insertErr.value == '') {
       isSaveLoading.value = true;
-      const request = {
-        word: word, //.replace(/\n/g, ''),
-        desc: desc, //.replace(/\n/g, ''),
-      } as ConditionState;
       await api
-        .save(request)
+        .insert(condition)
         .then((response) => {
           if (response) {
             console.log('response', response);
-
-            //追加した場合
-            if (response.insert) {
-              search();
-              insertCondition.value.word = '';
-              insertCondition.value.desc = '';
-              quasar.notify({
-                color: 'blue',
-                position: 'top',
-                message: '追加したわよっ！',
-              });
-              sortRecords();
-              //saveModalShow.value = false;
-              insertErr.value = '';
-            }
+            search();
+            insertCondition.value.word = '';
+            insertCondition.value.detail = '';
+            quasar.notify({
+              color: 'blue',
+              position: 'top',
+              message: '追加したわよっ！',
+            });
+            sortRecords();
+            insertErr.value = '';
           }
         })
         .catch((e) => {
@@ -223,7 +198,7 @@ export function useWordListModel() {
           quasar.notify({
             color: 'red',
             position: 'top',
-            message: 'データの取得に失敗...',
+            message: 'データの追加に失敗した...',
           });
         });
       isSaveLoading.value = false;
@@ -231,41 +206,29 @@ export function useWordListModel() {
   };
 
   const updateErr = ref('');
-  const updateRecord = async function (word: string, desc: string) {
+  const updateRecord = async function (condition: UpdateCondition) {
     //バリエーション
     updateErr.value = '';
-    const rec = records.value.find((it) => it.word == word);
-    if (!rec) {
-      updateErr.value = '更新する名言が見つからなかった...';
+    if (condition.word == '') {
+      updateErr.value = '名言を空にはできないよ!';
     }
-    if (rec?.desc == desc) {
-      updateErr.value = '詳細が変わってないから更新しないよ!';
-    }
-
     if (updateErr.value == '') {
       isSaveLoading.value = true;
-      const request = {
-        word: word, //.replace(/\n/g, ''),
-        desc: desc, //.replace(/\n/g, ''),
-      } as ConditionState;
       await api
-        .save(request)
+        .update(condition)
         .then((response) => {
           if (response) {
             console.log('response', response);
-
-            //更新した場合
-            if (response.update) {
-              search();
-              insertCondition.value.word = '';
-              insertCondition.value.desc = '';
-              quasar.notify({
-                color: 'blue',
-                position: 'top',
-                message: '更新した！',
-              });
-              editModalShow.value = false;
-            }
+            search();
+            updateCondition.value.id = -1;
+            updateCondition.value.word = '';
+            updateCondition.value.detail = '';
+            quasar.notify({
+              color: 'blue',
+              position: 'top',
+              message: '更新した！',
+            });
+            editModalShow.value = false;
           }
         })
         .catch((e) => {
@@ -283,15 +246,11 @@ export function useWordListModel() {
 
   /*DELETE */
   const deleteCheckModalShow = ref(false);
-  const deleteRecord = async function (word: string, desc: string) {
+  const deleteRecord = async function (id: number) {
     isDeleteLoading.value = true;
-    const request = {
-      word: word, //.replace(/\n/g, ''),
-      desc: desc, //.replace(/\n/g, ''),
-    } as ConditionState;
 
     await api
-      .delete(request)
+      .delete({ id: id })
       .then((response) => {
         if (response) {
           console.log('response', response);
@@ -303,11 +262,10 @@ export function useWordListModel() {
               position: 'top',
               message: '消したでぇ',
             });
-            const index = records.value.findIndex((it) => it.word == word);
+            const index = records.value.findIndex((it) => it.id == id);
             records.value.splice(index, 1);
-            updateCondition.value = {
-              word: '',
-            } as ConditionState;
+            updateCondition.value.word = '';
+            updateCondition.value.detail = '';
             editModalShow.value = false;
             deleteCheckModalShow.value = false;
           } else {
@@ -332,7 +290,7 @@ export function useWordListModel() {
   };
 
   return {
-    condition,
+    searchCondition,
     saveModalShow,
     editModalShow,
     records,
@@ -359,14 +317,21 @@ export function useWordListModel() {
   };
 }
 
-interface ConditionState {
+interface InsertCondition {
   word: string;
-  desc: string;
+  detail: string | null;
+}
+
+interface UpdateCondition {
+  id: number;
+  word: string;
+  detail: string | null;
 }
 
 interface DataState {
+  id: number;
   word: string;
-  desc: string;
+  detail: string | null;
   createAt: string;
   updateAt: string;
 }

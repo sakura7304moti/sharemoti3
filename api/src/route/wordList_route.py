@@ -1,9 +1,8 @@
 """
 名言集のルーティング
 """
-import json
 from flask import Blueprint, request, jsonify
-from src.route.service.module.utils import const,interface
+from src.route.service.module.utils import interface
 from src.route.service import wordlist_service
 
 def to_condition():
@@ -26,7 +25,7 @@ app = Blueprint('wordList',__name__)
 
 @app.route("/wordList/search", methods=["POST"])
 def wordlist_search():
-    json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
+    json_data = request.json
     text = json_data.get("text", "")
 
     df = wordlist_service.search(text)
@@ -49,7 +48,7 @@ def wordlist_update():
 
 @app.route("/wordList/delete", methods=["POST"])
 def wordlist_delete():
-    json_data = request.json  # POSTメソッドで受け取ったJSONデータを取得
+    json_data = request.json
     id = int(json_data.get("id", 0))
     wordlist_service.delete(id)
     return success_status()
