@@ -9,19 +9,19 @@ export class SsbuClipApi extends FileAPIClient {
   }
 
   public date(): Promise<Array<string> | null> {
-    const url = 'ssbu_clip/date';
+    const url = '/ssbu_clip/date';
     const path = this.combineUrl(url);
     return this.httpGet<Array<string>>(path);
   }
 
   public category(): Promise<Array<string> | null> {
-    const url = 'ssbu_clip/category';
+    const url = '/ssbu_clip/category';
     const path = this.combineUrl(url);
     return this.httpGet<Array<string>>(path);
   }
 
   public async movie(dir_name: string, file_name: string) {
-    const url = `ssbu_clip/movie?dir_name=${dir_name}&file_name=${file_name}`;
+    const url = `/ssbu_clip/movie?dir_name=${dir_name}&file_name=${file_name}`;
     const path = this.combineUrl(url);
 
     await axios({
@@ -37,14 +37,14 @@ export class SsbuClipApi extends FileAPIClient {
   }
 
   public updateTable() {
-    const url = 'ssbu_clip/update';
+    const url = '/ssbu_clip/update';
     const path = this.combineUrl(url);
 
     return this.httpGet<StatusResponse>(path);
   }
 
   public static MovieUrl(dir_name: string, file_name: string) {
-    const url = `ssbu_clip/movie?dir_name=${dir_name}&file_name=${file_name}`;
+    const url = `/ssbu_clip/movie?dir_name=${dir_name}&file_name=${file_name}`;
 
     const baseApi = new FileAPIClient();
     const path = baseApi.combineUrl(url);
