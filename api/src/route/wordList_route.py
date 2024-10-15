@@ -25,12 +25,16 @@ app = Blueprint('wordList',__name__)
 
 @app.route("/wordList/search", methods=["POST"])
 def wordlist_search():
-    json_data = request.json
-    text = json_data.get("text", "")
+    try:
+        json_data = request.json
+        text = json_data.get("text", "")
 
-    df = wordlist_service.search(text)
-    records = df.to_json(orient='records',force_ascii=False)
-    return jsonify(records)
+        df = wordlist_service.search(text)
+        records = df.to_json(orient='records',force_ascii=False)
+        return jsonify(records)
+    except Exception as e:
+        # その他のエラーを捕捉
+        return jsonify({"status": "error", "message": "An unexpected error occurred", "details": str(e)}), 500
     
 
 @app.route("/wordList/insert", methods=["POST"])
