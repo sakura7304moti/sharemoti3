@@ -775,3 +775,21 @@ class SsbuClipSearchCondition:
             "pageSize": self.page_size,
             "pageNo": self.page_no
         }
+    
+class Word:
+    def __init__(
+        self,
+        id:int,
+        word:str,
+        detail:str
+    ):
+        self.id = id
+        self.word = word
+        self.detail = detail
+
+    def to_args(self):
+        return {
+            "id":self.id,
+            "word":self.word,
+            "detail":self.detail
+        }

@@ -1,43 +1,37 @@
+import { PutResponse } from '../BaseApi';
 import { MainAPIClient } from './MainBaseApi';
 
 export class WordList2Api extends MainAPIClient {
-  //検索
-  public search(
-    request: WordList2SearchRequest
-  ): Promise<WordList2Response | null> {
+  // 検索
+  public search(request: SearchRequest): Promise<Array<DataState> | null> {
     const url = '/wordList/search';
     const path = this.combineUrl(url);
 
-    return this.httpPost<WordList2SearchRequest, WordList2Response>(
-      path,
-      request
-    );
+    return this.httpPost<SearchRequest, Array<DataState>>(path, request);
   }
 
-  //追加・更新
-  public save(
-    request: WordList2Request
-  ): Promise<WordList2SaveResponse | null> {
-    const url = '/wordList/save';
+  // 追加
+  public insert(request: InsertRequest): Promise<PutResponse | null> {
+    const url = '/wordList/insert';
     const path = this.combineUrl(url);
 
-    return this.httpPost<WordList2Request, WordList2SaveResponse>(
-      path,
-      request
-    );
+    return this.httpPost<InsertRequest, PutResponse>(path, request);
   }
 
-  //削除
-  public delete(
-    request: WordList2Request
-  ): Promise<WordList2DeleteResponse | null> {
+  // 更新
+  public update(request: UpdateRequest): Promise<PutResponse | null> {
+    const url = '/wordList/update';
+    const path = this.combineUrl(url);
+
+    return this.httpPost<UpdateRequest, PutResponse>(path, request);
+  }
+
+  // 削除
+  public delete(request: DeleteRequest): Promise<PutResponse | null> {
     const url = '/wordList/delete';
     const path = this.combineUrl(url);
 
-    return this.httpPost<WordList2Request, WordList2DeleteResponse>(
-      path,
-      request
-    );
+    return this.httpPost<DeleteRequest, PutResponse>(path, request);
   }
 }
 
@@ -47,31 +41,29 @@ export default api;
 /*
  *interfaces
  */
-export interface WordList2SearchRequest {
-  text: string | null;
+interface SearchRequest {
+  text: string;
 }
 
-export interface WordList2Request {
-  word: string | null;
-  desc: string | null;
+interface InsertRequest {
+  word: string;
+  detail: string | null;
 }
 
-export interface WordList2Response {
-  records: Array<WordList2Rec>;
+interface UpdateRequest {
+  id: number;
+  word: string;
+  detail: string | null;
 }
 
-interface WordList2Rec {
-  word: string | null;
-  desc: string | null;
-  createAt: string | null;
-  updateAt: string | null;
+interface DeleteRequest {
+  id: number;
 }
 
-export interface WordList2SaveResponse {
-  insert: boolean;
-  update: boolean;
-}
-
-export interface WordList2DeleteResponse {
-  status: boolean;
+interface DataState {
+  id: number;
+  word: string;
+  detail: string | null;
+  createAt: string;
+  updateAt: string;
 }

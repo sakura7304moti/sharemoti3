@@ -1,25 +1,26 @@
 from src.route.service.module import wordlist
+from src.route.service.module.utils import interface
 """
 名言集
 """
-def create_db():
-    """
-    DB作成
-    """
-    wordlist.init()
 
-def save(word: str = "", desc: str = ""):
+def insert(condition:interface.Word):
     """
-    存在しなければ追加
-    存在するなら更新
+    レコード追加
     """
-    return wordlist.save(word, desc)
+    wordlist.insert(condition)
 
-def delete(word: str = "", desc:str = ""):
+def update(condition:interface.Word):
+    """
+    レコード更新
+    """
+    wordlist.update(condition) 
+
+def delete(id:int):
     """
     レコード削除
     """
-    return wordlist.delete(word, desc)
+    wordlist.delete(id)
 
 def search(text:str = ""):
     """

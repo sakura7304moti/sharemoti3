@@ -189,7 +189,7 @@
             <q-input
               label="詳細(省略可)"
               type="textarea"
-              v-model="insertCondition.desc"
+              v-model="insertCondition.detail"
               class="table-base-form-model"
               dense
               outlined
@@ -200,9 +200,7 @@
           </div>
           <div class="row q-gutter-md">
             <q-btn
-              @click.prevent="
-                insertRecord(insertCondition.word, insertCondition.desc)
-              "
+              @click.prevent="insertRecord(insertCondition)"
               label="追加"
               color="primary"
               outline
@@ -246,12 +244,11 @@
               outlined
               stack-label
               style="width: 250px; height: 150px"
-              readonly
             />
             <q-input
               label="詳細(省略可)"
               type="textarea"
-              v-model="updateCondition.desc"
+              v-model="updateCondition.detail"
               class="table-base-form-model"
               dense
               outlined
@@ -263,9 +260,7 @@
           <!--buttons-->
           <div class="row q-gutter-md">
             <q-btn
-              @click.prevent="
-                updateRecord(updateCondition.word, updateCondition.desc)
-              "
+              @click.prevent="updateRecord(updateCondition)"
               label="更新"
               color="primary"
               outline
@@ -308,9 +303,7 @@
           <q-field label="名言" stack-label>{{ updateCondition.word }}</q-field>
           <div class="row q-gutter-md q-pt-sm">
             <q-btn
-              @click.prevent="
-                deleteRecord(updateCondition.word, updateCondition.desc)
-              "
+              @click.prevent="deleteRecord(updateCondition.id)"
               label="削除する"
               color="negative"
               outline
@@ -380,7 +373,7 @@ export default defineComponent({
     watch(editModalShow, () => {
       if (editModalShow.value == false) {
         updateCondition.value.word = '';
-        updateCondition.value.desc = '';
+        updateCondition.value.detail = '';
       }
     });
 

@@ -36,8 +36,12 @@ export class APIClient {
         T,
         AxiosResponse<string>
       >(url, request, this.config);
-      const r = JSON.parse(res.data);
-      return r;
+      if (typeof res.data == 'string') {
+        const r = JSON.parse(res.data);
+        return r;
+      } else {
+        return res.data;
+      }
     } catch (e) {
       console.log('parse err', e);
       return null;
@@ -51,8 +55,12 @@ export class APIClient {
         T,
         AxiosResponse<string>
       >(url);
-      const r = JSON.parse(res.data);
-      return r;
+      if (typeof res.data == 'string') {
+        const r = JSON.parse(res.data);
+        return r;
+      } else {
+        return res.data;
+      }
     } catch {
       return null;
     }
@@ -65,8 +73,12 @@ export class APIClient {
         T,
         AxiosResponse<string>
       >(url);
-      const r = JSON.parse(res.data);
-      return r;
+      if (typeof res.data == 'string') {
+        const r = JSON.parse(res.data);
+        return r;
+      } else {
+        return res.data;
+      }
     } catch {
       return null;
     }
@@ -94,4 +106,8 @@ export class APIClient {
 export interface PageResult<T> {
   records: Array<T>;
   totalPages: number;
+}
+
+export interface PutResponse {
+  status: string;
 }
