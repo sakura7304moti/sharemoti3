@@ -1,5 +1,6 @@
 import glob
 import os
+import traceback
 from typing import List
 import pandas as pd
 import yaml
@@ -44,7 +45,15 @@ def line_handler(func):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                line_notify(f"""{func.__name__}
+                # スタックトレースを取得
+                tb = traceback.extract_tb(e.__traceback__)
+                
+                # 最後にエラーが発生したファイル、行、関数、コードを取得
+                for frame in tb:
+                    line_notify(f"""ファイル名: {frame.filename}
+行数: {frame.lineno}
+関数名: {frame.name}
+コード: {frame.line}
 {e}""")
     return wrapper
 

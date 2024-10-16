@@ -5,6 +5,7 @@ import os
 import sys
 import time
 import sqlite3
+import traceback
 
 
 from tqdm import tqdm
@@ -70,9 +71,10 @@ def search_illusts(query:str):
                 time.sleep(1)
                 if json_result is None:
                     return illusts
+                if json_result.illusts is None:
+                    return illusts
             else:
                 return illusts
-        
 
 #-----------------------------------------
 # テーブル追加
