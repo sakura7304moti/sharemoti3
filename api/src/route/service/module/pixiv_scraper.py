@@ -68,6 +68,8 @@ def search_illusts(query:str):
                     return illusts
                 json_result = api.search_illust(**next_qs)
                 time.sleep(1)
+                if json_result is None:
+                    return illusts
             else:
                 return illusts
         
