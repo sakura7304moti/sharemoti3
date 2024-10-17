@@ -47,14 +47,14 @@ def search_illusts(query:str):
     # 初回検索（最初のページを取得）
     json_result = api.search_illust(word=keyword)
     time.sleep(1)
-    illusts.extend(json_result.illusts)
-
+    
     if json_result is None:
         return illusts
     
     if json_result.illusts is None:
         return illusts
     
+    illusts.extend(json_result.illusts)
     # 検索結果が無くなるまで検索
     while json_result:
         illusts.extend([i for i in json_result.illusts if i.total_bookmarks > 1000])# bookmarks
