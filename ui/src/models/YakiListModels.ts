@@ -63,7 +63,7 @@ export function useYakiListModel() {
           console.log('response', response);
 
           records.value.splice(0);
-          response.records?.forEach((rec) =>
+          response.forEach((rec) =>
             records.value.push({
               id: rec.id,
               word: rec.word,
@@ -129,17 +129,15 @@ export function useYakiListModel() {
             console.log('response', response);
 
             //追加した場合
-            if (response.success) {
-              search();
-              insertCondition.value.word = '';
-              quasar.notify({
-                color: 'blue',
-                position: 'top',
-                message: '追加完了!',
-              });
-              sortRecords();
-              insertErr.value = '';
-            }
+            search();
+            insertCondition.value.word = '';
+            quasar.notify({
+              color: 'blue',
+              position: 'top',
+              message: '追加完了!',
+            });
+            sortRecords();
+            insertErr.value = '';
           }
         })
         .catch((e) => {
@@ -173,17 +171,15 @@ export function useYakiListModel() {
             console.log('response', response);
 
             //更新した場合
-            if (response.success) {
-              search();
-              insertCondition.value.word = '';
-              insertCondition.value.yaki = '';
-              quasar.notify({
-                color: 'blue',
-                position: 'top',
-                message: '更新完了!',
-              });
-              editModalShow.value = false;
-            }
+            search();
+            insertCondition.value.word = '';
+            insertCondition.value.yaki = '';
+            quasar.notify({
+              color: 'blue',
+              position: 'top',
+              message: '更新完了!',
+            });
+            editModalShow.value = false;
           }
         })
         .catch((e) => {
@@ -209,24 +205,14 @@ export function useYakiListModel() {
       .then((response) => {
         if (response) {
           console.log('response', response);
-
-          //削除成功した場合
-          if (response.success) {
-            quasar.notify({
-              color: 'blue',
-              position: 'top',
-              message: '削除完了しました',
-            });
-            search();
-            editModalShow.value = false;
-            deleteCheckModalShow.value = false;
-          } else {
-            quasar.notify({
-              color: 'red',
-              position: 'top',
-              message: 'データの削除に失敗しました',
-            });
-          }
+          quasar.notify({
+            color: 'blue',
+            position: 'top',
+            message: '削除完了しました',
+          });
+          search();
+          editModalShow.value = false;
+          deleteCheckModalShow.value = false;
         }
       })
       .catch((e) => {

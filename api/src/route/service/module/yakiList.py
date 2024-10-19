@@ -1,166 +1,110 @@
 """
 焼き直し条約 API
 """
-import sqlite3
-import datetime
-
-from src.route.service.module.utils import const,interface
-const_path = const.Path()
-dbname = const_path.db_main_share()
-
-def init():
-    conn = sqlite3.connect(dbname)
-
-    # データベースへのコネクションを閉じる。(必須)
-    conn.close()
-    
-    """
-    CREATE TABLE
-    """
-    conn = sqlite3.connect(dbname)
-    # sqliteを操作するカーソルオブジェクトを作成
-    cur = conn.cursor()
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS yakiList2(
-                id INTEGER PRIMARY KEY,
-                word STRING,
-                yaki STRING,
-                create_at STRING,
-                update_at STRING
-                )
-                """
-    )
-    
-    # データベースへコミット。これで変更が反映される。
-    conn.commit()
-    conn.close()
+from src.route.service.module.utils import const
+query_model = const.PsqlBase()
 
 def exists(
     word:str,
     yaki:str
 ):
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
     query = "SELECT * FROM yakiList2 where word = :word and yaki = :yaki"
     args = {
         "word":word,
         "yaki":yaki
     }
+    df = query_model.execute_df(query, args)
 
-    #検索
-    cursor.execute(query,args)
-    results = cursor.fetchall()
-
-    #閉じる
-    conn.close()
-
-    return len(results) > 0
+    return len(df) > 0
     
 
 def insert(
     word:str,
     yaki:str
 ):
-    try:
-        if not exists(word,yaki):
-            # データベースに接続する
-            conn = sqlite3.connect(dbname)
-            cursor = conn.cursor()
-        
-            # 現在の日時を取得
-            current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
-            query = "INSERT INTO yakiList2 (word, yaki, create_at, update_at) VALUES (:word, :yaki, :create_at, :update_at)"
-            args = {"word": word, "yaki" : yaki, "create_at" : current_time, "update_at" : current_time}
-    
-            cursor.execute(query, args)
-    
-            # 変更をコミットし、接続を閉じる
-            conn.commit()
-            conn.close()
-            return interface.DbResult(True,"")
+    query = """
+        INSERT INTO 
+        sharemoti.yaki (
+            word, 
+            yaki, 
+            create_at, 
+            update_at
+        ) VALUES (
+            %(word)s, 
+            %(yaki)s, 
+            %(current_time)s,
+            %(current_time)s
+        )"""
+    current_time = query_model.current_time()
+    args = {
+        "word": word, 
+        "yaki" : yaki, 
+        "current_time" : current_time,
+    }
+    query_model.execute_commit(query, args)
 
-    except Exception as e:
-        err_text = str(e)
-        return interface.DbResult(False,err_text)
+def insert_custom(
+    word:str,
+    yaki:str,
+    create_at,
+    update_at
+):
+    query = """
+        INSERT INTO 
+        sharemoti.yaki (
+            word, 
+            yaki, 
+            create_at, 
+            update_at
+        ) VALUES (
+            %(word)s, 
+            %(yaki)s, 
+            %(create_at)s,
+            %(update_at)s
+        )"""
+    args = {
+        "word": word, 
+        "yaki" : yaki, 
+        "create_at" : create_at,
+        "update_at" : update_at
+    }
+    query_model.execute_commit(query, args)
         
 def update(
     id:int,
     word:str,
     yaki:str
 ):
-    try:
-        # データベースに接続する
-        conn = sqlite3.connect(dbname)
-        cursor = conn.cursor()
-    
-        # 現在の日時を取得
-        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        query = """
-            UPDATE yakiList2 Set 
-                word = :word, 
-                yaki = :yaki, 
-                update_at = :current_time
-            WHERE id = :id
-        """
-        args = {
-            "id" : id,
-            "word" : word,
-            "yaki" : yaki,
-            "current_time" : current_time
-        }
-
-        cursor.execute(query, args)
-        # 変更をコミットし、接続を閉じる
-        conn.commit()
-        conn.close()
-        return interface.DbResult(True,"")
-
-    except Exception as e:
-        err_text = str(e)
-        return interface.DbResult(False,err_text)
+    query = """
+        UPDATE sharemoti.yaki Set 
+            word = %(word)s, 
+            yaki = %(yaki)s, 
+            update_at = %(current_time)s
+        WHERE id = %(id)s
+    """
+    current_time = query_model.current_time()
+    args = {
+        "id" : id,
+        "word" : word,
+        "yaki" : yaki,
+        "current_time" : current_time
+    }
+    query_model.execute_commit(query, args)
 
 def delete(id:int):
-    try:
-        # データベースに接続する
-        conn = sqlite3.connect(dbname)
-        cursor = conn.cursor()
-    
-        query = "DELETE FROM yakiList2 WHERE id = :id"
-        args = {"id" : id}
-    
-        # レコードを削除する
-        cursor.execute(query, args)
-    
-        # 変更をコミットし、接続を閉じる
-        conn.commit()
-        conn.close()
-        return interface.DbResult(True,"")
-
-    except Exception as e:
-        err_text = str(e)
-        return interface.DbResult(False,err_text)
+    query = "DELETE FROM sharemoti.yaki WHERE id = %(id)s"
+    args = {"id" : id}
+    query_model.execute_commit(query, args)
 
 def search():
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
-    query = "SELECT * FROM yakiList2"
-    
-    # SELECTクエリを実行
-    cursor.execute(query)
-    results = cursor.fetchall()
-
-    # 結果を表示
-    records = []
-    for row in results:
-        rec = interface.YakiList2Record(*row)
-        records.append(rec)
-
-    # 接続を閉じる
-    conn.close()
-    return records
+    query = """
+        SELECT
+            id,
+            word,
+            yaki,
+            TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
+            TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
+        from sharemoti.yaki
+        order by create_at
+    """
+    return query_model.execute_df(query)

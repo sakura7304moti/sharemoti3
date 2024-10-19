@@ -1,31 +1,32 @@
+import { PutResponse } from '../BaseApi';
 import { MainAPIClient } from './MainBaseApi';
 export class YakiList2Api extends MainAPIClient {
   //検索
-  public search(): Promise<SearchResponse | null> {
+  public search(): Promise<DataState[] | null> {
     const url = '/yakiList/search';
     const path = this.combineUrl(url);
-    return this.httpGet<SearchResponse>(path);
+    return this.httpGet<DataState[]>(path);
   }
 
   //追加
-  public insert(request: InsertRequest): Promise<DbResult | null> {
+  public insert(request: InsertRequest): Promise<PutResponse | null> {
     const url = '/yakiList/insert';
     const path = this.combineUrl(url);
-    return this.httpPost<InsertRequest, DbResult>(path, request);
+    return this.httpPost<InsertRequest, PutResponse>(path, request);
   }
 
   //更新
-  public update(request: UpdateRequest): Promise<DbResult | null> {
+  public update(request: UpdateRequest): Promise<PutResponse | null> {
     const url = '/yakiList/update';
     const path = this.combineUrl(url);
-    return this.httpPost<UpdateRequest, DbResult>(path, request);
+    return this.httpPost<UpdateRequest, PutResponse>(path, request);
   }
 
   //削除
-  public dell(request: DeleteRequest): Promise<DbResult | null> {
+  public dell(request: DeleteRequest): Promise<PutResponse | null> {
     const url = '/yakiList/delete';
     const path = this.combineUrl(url);
-    return this.httpPost<DeleteRequest, DbResult>(path, request);
+    return this.httpPost<DeleteRequest, PutResponse>(path, request);
   }
 }
 

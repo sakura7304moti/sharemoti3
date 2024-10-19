@@ -1,11 +1,5 @@
 from src.route.service.module import yakilist
 
-def create_db():
-    """
-    テーブル作成
-    """
-    yakilist.init()
-
 def insert(word:str, yaki:str):
     """
     レコード追加
