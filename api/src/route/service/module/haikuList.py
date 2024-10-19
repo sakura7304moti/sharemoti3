@@ -27,6 +27,30 @@ def insert(condition:interface.Haiku):
     args['current_time'] = query_model.current_time()
     query_model.execute_commit(query, args)
 
+def insert_custom(condition:interface.Haiku, create_at, update_at):
+    query = """
+        INSERT INTO sharemoti.haiku (
+            first, 
+            second,
+            third,
+            poster,
+            detail,
+            create_at,
+            update_at
+        ) VALUES (
+            %(first)s, 
+            %(second)s, 
+            %(third)s, 
+            %(poster)s, 
+            %(detail)s, 
+            %(create_at)s, 
+            %(update_at)s
+        )"""
+    args = condition.to_args()
+    args['create_at'] = create_at
+    args['update_at'] = update_at
+    query_model.execute_commit(query, args)
+
 def update(condition:interface.Haiku):
     query = """
     UPDATE sharemoti.haiku 
