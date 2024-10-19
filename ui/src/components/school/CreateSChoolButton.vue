@@ -9,14 +9,24 @@
   <q-dialog v-model="dialog">
     <q-card style="min-width: 300px">
       <q-card-section style="max-width: 100%; width: 100%">
-        <div class="text-h6 row">
-          <div class="col text-left">学校登録画面！</div>
+        <div class="text-h6 row">学校登録画面！</div>
+        <div class="row justify-between q-pt-sm">
+          <div>
+            <q-btn
+              label="閉じる"
+              @click="dialog = false"
+              color="grey-4"
+              dense
+              icon="close"
+            />
+          </div>
           <div>
             <q-btn
               label="作成する"
               class="col"
               color="primary"
               dense
+              icon="create"
               @click="createSchol(condition)"
               :disable="condition.schoolName == ''"
             />
@@ -70,6 +80,7 @@
           label="作成する"
           color="primary"
           dense
+          icon="create"
           @click="createSchol(condition)"
           :disable="condition.schoolName == ''"
         />

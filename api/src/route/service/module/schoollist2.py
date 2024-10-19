@@ -4,45 +4,7 @@
 
 from src.route.service.module.utils import const, interface
 
-
-p = const.Path()
-dbname = p.db_main_share()
-query_base = const.DbBase(dbname)
-
-
-def make_table():
-    """
-    テーブルの作成
-    ・学校
-    ・コメント
-    """
-    school_query = """
-    CREATE TABLE IF NOT EXISTS school(
-        id INTEGER PRIMARY KEY,
-        school_name STRING,
-        principal STRING,
-        detail STRING,
-        slogan STRING,
-        create_at STRING,
-        update_at STRING
-    )
-    """
-
-    comment_query = """
-    CREATE TABLE IF NOT EXISTS school_comment(
-        id INTEGER PRIMARY KEY,
-        school_id INTEGER,
-        star INTEGER,
-        title STRING,
-        comment STRING,
-        post_person STRING,
-        create_at STRING,
-        update_at STRING
-    )
-    """
-
-    query_base.execute_commit(school_query)
-    query_base.execute_commit(comment_query)
+query_model = const.PsqlBase()
 
 def get_school():
     """
@@ -51,22 +13,22 @@ def get_school():
     query = """
     SELECT
         sc.id as id,
-        sc.school_name as schoolName,
+        sc.school_name as "schoolName",
         sc.principal as principal,
         sc.detail as detail,
         sc.slogan as slogan,
         (
             SELECT 
                 round(avg(cm.star),1) 
-            FROM school_comment as cm 
+            FROM sharemoti.school_comment as cm 
             WHERE cm.school_id = sc.id and cm.star > 0
         ) as avgStar,
-        create_at as createAt,
-        update_at as updateAt
-    from school as sc
+        TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
+        TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
+    from sharemoti.school as sc
     order by sc.school_name
     """
-    return query_base.execute_df(query)
+    return query_model.execute_df(query)
     
 def get_comment(id:int):
     """
@@ -80,21 +42,21 @@ def get_comment(id:int):
         title as title,
         comment as comment,
         post_person as postPerson,
-        create_at as createAt,
-        update_at as updateAt
-    from school_comment
-    where school_id = :schoolId
+        TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
+        TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
+    from sharemoti.school_comment
+    where school_id = %(schoolId)s
     order by id desc
     """
     args = {"schoolId":id}
-    return query_base.execute_df(query, args)
+    return query_model.execute_df(query, args)
     
 def create_school(condition:interface.SchoolQueryRecord):
     """
     学校の作成
     """
     query = """
-    INSERT INTO school(
+    INSERT INTO sharemoti.school(
         school_name, 
         principal, 
         detail, 
@@ -103,24 +65,49 @@ def create_school(condition:interface.SchoolQueryRecord):
         update_at
     )
     VALUES(
-        :schoolName,
-        :principal,
-        :detail,
-        :slogan,
-        :currentTime,
-        :currentTime
+        %(schoolName)s,
+        %(principal)s,
+        %(detail)s,
+        %(slogan)s,
+        %(currentTime)s,
+        %(currentTime)s
     )
     """
     args = condition.to_args()
-    args["currentTime"] = query_base.current_time()
-    query_base.execute_commit(query, args)
+    args["currentTime"] = query_model.current_time()
+    query_model.execute_commit(query, args)
+
+def create_scrool_custom(condition:interface.SchoolQueryRecord, create_at, update_at):
+    query_model = const.PsqlBase()
+    query = """
+    INSERT INTO sharemoti.school(
+        school_name, 
+        principal, 
+        detail, 
+        slogan, 
+        create_at, 
+        update_at
+    )
+    VALUES(
+        %(schoolName)s,
+        %(principal)s,
+        %(detail)s,
+        %(slogan)s,
+        %(create_at)s,
+        %(update_at)s
+    )
+    """
+    args = condition.to_args()
+    args["create_at"] = create_at
+    args["update_at"] = update_at
+    query_model.execute_commit(query, args)
 
 def create_comment(condition:interface.SchoolCommentQueryRecord):
     """
     コメントの作成
     """
     query = """
-    INSERT INTO school_comment(
+    INSERT INTO sharemoti.school_comment(
         school_id,
         star,
         title,
@@ -130,57 +117,87 @@ def create_comment(condition:interface.SchoolCommentQueryRecord):
         update_at
     )
     VALUES(
-        :schoolId,
-        :star,
-        :title,
-        :comment,
-        :postPerson,
-        :currentTime,
-        :currentTime
+        %(schoolId)s,
+        %(star)s,
+        %(title)s,
+        %(comment)s,
+        %(postPerson)s,
+        %(currentTime)s,
+        %(currentTime)s
     )
     """
     args = condition.to_args()
-    args["currentTime"] = query_base.current_time()
-    query_base.execute_commit(query, args)
+    args["currentTime"] = query_model.current_time()
+    query_model.execute_commit(query, args)
+
+def create_comment_custom(condition:interface.SchoolCommentQueryRecord, create_at, update_at):
+    """
+    コメントの作成
+    """
+    query_model = const.PsqlBase()
+    query = """
+    INSERT INTO sharemoti.school_comment(
+        school_id,
+        star,
+        title,
+        comment,
+        post_person,
+        create_at,
+        update_at
+    )
+    VALUES(
+        %(schoolId)s,
+        %(star)s,
+        %(title)s,
+        %(comment)s,
+        %(postPerson)s,
+        %(create_at)s,
+        %(update_at)s
+    )
+    """
+    args = condition.to_args()
+    args["create_at"] = create_at
+    args["update_at"] = update_at
+    query_model.execute_commit(query, args)
 
 def update_school(condition:interface.SchoolQueryRecord):
     """
     学校の編集
     """
     query = """
-    UPDATE school
+    UPDATE sharemoti.school
     SET
-        school_name = :schoolName,
-        principal = :principal,
-        detail = :detail,
-        slogan = :slogan,
-        update_at = :currentTime
+        school_name = %(schoolName)s,
+        principal = %(principal)s,
+        detail = %(detail)s,
+        slogan = %(slogan)s,
+        update_at = %(currentTime)s
     where
-        id = :id
+        id = %(id)s
     """
     args = condition.to_args()
-    args["currentTime"] = query_base.current_time()
-    query_base.execute_commit(query, args)
+    args["currentTime"] = query_model.current_time()
+    query_model.execute_commit(query, args)
 
 def update_comment(condition:interface.SchoolCommentQueryRecord):
     """
     コメントの編集
     """
     query = """
-    UPDATE school_comment
+    UPDATE sharemoti.school_comment
     SET
-        school_id = :schoolId,
-        star = :star,
-        title = :title,
-        comment = :comment,
-        post_person = :postPerson,
-        update_at = :currentTime
+        school_id = %(schoolId)s,
+        star = %(star)s,
+        title = %(title)s,
+        comment = %(comment)s,
+        post_person = %(postPerson)s,
+        update_at = %(currentTime)s
     where 
-        id = :id
+        id = %(id)s
     """
     args = condition.to_args()
-    args["currentTime"] = query_base.current_time()
-    query_base.execute_commit(query, args)
+    args["currentTime"] = query_model.current_time()
+    query_model.execute_commit(query, args)
 
 def delete_school(id:int):
     """
@@ -189,17 +206,17 @@ def delete_school(id:int):
     args = {"id" : id}
 
     # 学校
-    query = "DELETE FROM school where id = :id"
-    query_base.execute_commit(query, args)
+    query = "DELETE FROM sharemoti.school where id = %(id)s"
+    query_model.execute_commit(query, args)
 
     # コメント
-    query = "DELETE FROM school_comment where school_id = :id"
-    query_base.execute_commit(query, args)
+    query = "DELETE FROM sharemoti.school_comment where school_id = %(id)s"
+    query_model.execute_commit(query, args)
 
 def delete_comment(id:int):
     """
     コメントの削除
     """
-    query = "DELETE FROM school_comment where id = :id"
+    query = "DELETE FROM sharemoti.school_comment where id = %(id)s"
     args = {"id" : id}
-    query_base.execute_commit(query, args)
+    query_model.execute_commit(query, args)

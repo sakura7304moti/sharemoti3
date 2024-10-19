@@ -534,6 +534,7 @@ export default defineComponent({
       router.push({
         path: '/school/' + props.dataState.id,
       });
+      getComments(props.dataState.id);
     };
 
     const editSchool = async function (state: School) {
@@ -702,10 +703,12 @@ export default defineComponent({
       commentDeleteDialog.value = true;
     };
     /**初期化処理 */
-    getComments(props.dataState.id);
+    //getComments(props.dataState.id);
 
     watch(props, () => {
-      getComments(props.dataState.id);
+      if (props.detail) {
+        getComments(props.dataState.id);
+      }
     });
     return {
       state,

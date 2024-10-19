@@ -1,12 +1,6 @@
 from src.route.service.module import schoollist2 as queryServce
 from src.route.service.module.utils import interface
 
-def make_table():
-    """
-    テーブルの作成
-    """
-    queryServce.make_table()
-
 def get_school():
     """
     学校の一覧を取得

@@ -36,15 +36,6 @@ from src.route import holoarchive_route
 from src.route import hololewd_route
 from src.route import pixiv_route
 
-#sub
-#from src.route import rembg_route
-
-#make table
-from src.route.service import create_table_service
-"""
-Initialize server
-"""
-create_table_service.make_table()
 
 """
 Flask run

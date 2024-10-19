@@ -5,6 +5,7 @@
       style="display: flex; max-width: 600px; width: 100%"
     >
       <div style="width: 40%">学校掲示板</div>
+
       <div
         class="row wrap"
         style="width: 60%; display: flex; justify-content: flex-end"
@@ -23,6 +24,34 @@
         />
       </div>
     </div>
+
+    <div
+      class="q-ml-md row q-gutter-sm"
+      style="
+        max-width: 300px;
+        background-color: rgb(226, 220, 202);
+        margin-bottom: 16px;
+        border-radius: 20px;
+      "
+    >
+      <div class="q-pl-sm text-subtitle1">並び順</div>
+      <div>
+        <q-radio
+          v-model="sortType"
+          val="name"
+          label="名前順"
+          @update:model-value="sortSchools"
+        />
+      </div>
+      <div>
+        <q-radio
+          v-model="sortType"
+          val="date"
+          label="開講日順"
+          @update:model-value="sortSchools"
+        />
+      </div>
+    </div>
     <school-card
       :editting="editting"
       :data-state="sc"
@@ -36,7 +65,7 @@
   </q-page>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import SchoolCard from 'src/components/school/SchoolCard.vue';
 import CreateSchoolButton from 'src/components/school/CreateSchoolButton.vue';
 import api from 'src/api/main/SchoolApi';
@@ -50,7 +79,8 @@ export default defineComponent({
     CreateSchoolButton,
   },
   setup() {
-    const { isLoading, schools, getSchools } = useSearchModel();
+    const { isLoading, schools, getSchools, sortType, sortSchools } =
+      useSearchModel();
     const editting = ref(false);
     const route = useRoute();
 
@@ -76,6 +106,8 @@ export default defineComponent({
       schools,
       editting,
       getSchools,
+      sortType,
+      sortSchools,
     };
   },
 });
@@ -84,6 +116,15 @@ export default defineComponent({
  */
 function useSearchModel() {
   const isLoading = ref(false);
+  const sortType = ref('name');
+  const sortSchools = function () {
+    if (sortType.value == 'name') {
+      schools.value.sort((a, b) => (a.schoolName > b.schoolName ? 1 : -1));
+    }
+    if (sortType.value == 'date') {
+      schools.value.sort((a, b) => (a.createAt < b.createAt ? 1 : -1));
+    }
+  };
   const schools = ref([] as SchoolState[]);
   const getSchools = async function () {
     isLoading.value = true;
@@ -105,6 +146,7 @@ function useSearchModel() {
               updateAt: it.updateAt,
             });
           });
+          sortSchools();
         }
       })
       .catch((err) => {
@@ -126,6 +168,8 @@ function useSearchModel() {
     isLoading,
     schools,
     getSchools,
+    sortType,
+    sortSchools,
   };
 }
 /**
