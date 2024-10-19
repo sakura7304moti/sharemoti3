@@ -73,15 +73,10 @@ export default defineComponent({
     } as Haiku);
     const haikus = ref([] as Haiku[]);
     const getHaikus = async function () {
-      await HaikuListApi.search({
-        id: -1,
-        haikuText: '',
-        poster: '',
-        detail: '',
-      }).then((response) => {
+      await HaikuListApi.search().then((response) => {
         if (response) {
           haikus.value.splice(0);
-          response.records.forEach((it) => haikus.value.push(it));
+          response.forEach((it) => haikus.value.push(it));
           selectHaiku();
         }
       });

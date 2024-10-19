@@ -93,11 +93,8 @@ export default defineComponent({
       await WordList2Api.search({ text: '' }).then((response) => {
         if (response) {
           words.value.splice(0);
-          words.value = response.records.map((it) => it.word ?? '');
-          const pick =
-            response.records[
-              Math.floor(Math.random() * response.records.length)
-            ];
+          words.value = response.map((it) => it.word ?? '');
+          const pick = response[Math.floor(Math.random() * response.length)];
           word.value = pick.word ?? '';
           selectWord();
         }
