@@ -114,14 +114,6 @@
           </div>
           <div class="row">
             <div class="col text-left">
-              <div>
-                <div class="ssbu-clip-video-play" @click="onPlayClick(item.id)">
-                  <q-icon name="play_circle" size="md" color="light-green-3" />
-                  <span class="q-pl-sm">再生する</span>
-                </div>
-              </div>
-            </div>
-            <div class="col text-right">
               <div
                 class="ssbu-clip-download"
                 @click.prevent="
@@ -140,6 +132,14 @@
                 <a class="q-pl-sm" :href="item.movieUrl">ダウンロードする</a>
               </div>
             </div>
+            <div class="col text-right">
+              <div>
+                <div class="ssbu-clip-video-play" @click="onPlayClick(item.id)">
+                  <q-icon name="play_circle" size="md" color="light-green-3" />
+                  <span class="q-pl-sm">再生する</span>
+                </div>
+              </div>
+            </div>
           </div>
         </q-card-section>
       </q-card>
@@ -153,7 +153,7 @@
       <img
         style="height: 70px"
         class="holotwitter-top-scroll-img"
-        src="https://ugokuweb.coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/img/rocket_base.png"
+        src="../assets/Rocket Base 512x512.png"
       />
       <div>トップに戻る</div>
     </button>
