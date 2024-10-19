@@ -8,7 +8,31 @@
           class="haiku-upper"
           v-if="displayCondition.upper && tableView == false"
         >
-          <div class="row justify-between">
+          <div>
+            <q-select
+              label="俳人"
+              :options="posterItems"
+              v-model="selectPoster"
+              clearable
+            />
+          </div>
+          <div class="row q-pt-md">
+            <div class="col">
+              <q-toggle
+                v-model="detailDisplay"
+                label="解説を表示"
+                color="primary"
+              />
+            </div>
+            <div class="col">
+              <q-toggle
+                v-model="displaySort"
+                label="新しい順"
+                color="primary"
+              />
+            </div>
+          </div>
+          <div class="q-pt-md row justify-between">
             <!--新規追加ボタン-->
             <div class="q-pt-sm">
               <q-btn
@@ -28,28 +52,12 @@
               />
             </div>
           </div>
-          <div class="row q-pt-md">
-            <div class="col">
-              <q-toggle
-                v-model="detailDisplay"
-                label="解説を表示"
-                color="primary"
-              />
-            </div>
-            <div class="col">
-              <q-toggle
-                v-model="displaySort"
-                label="新しい順"
-                color="primary"
-              />
-            </div>
-          </div>
         </div>
       </q-card-section>
     </q-card>
   </div>
   <div
-    v-for="rec in records"
+    v-for="rec in viewRecords"
     :key="rec.id"
     class="row q-gutter-md q-pa-md wrap"
   >
@@ -419,7 +427,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { useHaikuListModel } from 'src/models/HaikuListModels';
 import lockIcon from 'src/components/LockIcon.vue';
 export default defineComponent({
@@ -477,6 +485,18 @@ export default defineComponent({
       rangeChange();
     });
 
+    const viewRecords = computed(() => {
+      if (selectPoster.value == null || selectPoster.value == '') {
+        return records.value;
+      } else {
+        return records.value.filter((it) => it.poster == selectPoster.value);
+      }
+    });
+    const selectPoster = ref('' as string | null);
+    const posterItems = computed(() =>
+      [...new Set(records.value.map((it) => it.poster))].sort()
+    );
+
     return {
       filter: ref(props.modelValue),
       listName: ref(props.label),
@@ -503,6 +523,10 @@ export default defineComponent({
       detailDisplay,
       rangeChange,
       displaySort,
+      // filter
+      viewRecords,
+      selectPoster,
+      posterItems,
     };
   },
 });

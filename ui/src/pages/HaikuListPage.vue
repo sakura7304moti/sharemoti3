@@ -7,6 +7,19 @@
       :height="tableHeight"
     />
     <haiku-list-component v-else v-model="listFilter" />
+    <!-- ページトップに戻るボタン -->
+    <button
+      v-if="isShowTopButton"
+      class="scroll-to-top"
+      @click="onTopScrollClick"
+    >
+      <img
+        style="height: 70px"
+        class="holotwitter-top-scroll-img"
+        src="../assets/Rocket Base 512x512.png"
+      />
+      <div>トップに戻る</div>
+    </button>
   </q-page>
 </template>
 <script lang="ts">
@@ -53,12 +66,29 @@ export default defineComponent({
       changeTableView();
     });
 
+    const isShowTopButton = ref(false);
+    const onTopScrollClick = function () {
+      // スムーズにページのトップに戻る
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    };
+
+    const checkTopButton = function () {
+      isShowTopButton.value = window.scrollY > 100;
+    };
+
+    window.addEventListener('scroll', checkTopButton);
+
     return {
       tableView,
       listFilter: ref(''),
       tableFilter: ref(''),
       tableHeight: ref(document.documentElement.scrollHeight * 0.85),
       changeTableView,
+      isShowTopButton,
+      onTopScrollClick,
     };
   },
 });

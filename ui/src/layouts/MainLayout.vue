@@ -652,4 +652,27 @@ body {
     transform: translateY(0);
   }
 }
+/*
+  トップスクロール
+*/
+.scroll-to-top {
+  border: none;
+  background-color: rgba(0, 0, 0, 0);
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+@media (max-width: 800px) {
+  .scroll-to-top {
+    display: none;
+  }
+}
+
+.scroll-to-top:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
 </style>
