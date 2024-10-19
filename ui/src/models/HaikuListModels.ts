@@ -154,13 +154,13 @@ export function useHaikuListModel() {
     }
     console.log('request', request);
     await api
-      .search(request)
+      .search()
       .then((response) => {
         if (response) {
           console.log('response', response);
           records.value.splice(0);
           rows.value.splice(0);
-          response.records?.forEach((rec) => {
+          response.forEach((rec) => {
             records.value.push({
               id: rec.id,
               first: rec.first,
@@ -233,22 +233,20 @@ export function useHaikuListModel() {
         .then((response) => {
           if (response) {
             console.log('response', response);
-            if (response.success) {
-              quasar.notify({
-                color: 'blue',
-                position: 'top',
-                message: '追加完了しました',
-              });
-              insertCondition.value = {
-                first: '',
-                second: '',
-                third: '',
-                poster: '',
-                detail: '',
-                valitationErr: '',
-              };
-              search();
-            }
+            quasar.notify({
+              color: 'blue',
+              position: 'top',
+              message: 'いい俳句やでぇ b',
+            });
+            insertCondition.value = {
+              first: '',
+              second: '',
+              third: '',
+              poster: '',
+              detail: '',
+              valitationErr: '',
+            };
+            search();
           }
         })
         .catch((e) => {
@@ -290,17 +288,16 @@ export function useHaikuListModel() {
         .then((response) => {
           if (response) {
             console.log('response', response);
-            if (response.success) {
-              search();
 
-              displayCondition.value.update = false;
+            search();
 
-              quasar.notify({
-                color: 'blue',
-                position: 'top',
-                message: '更新完了しました',
-              });
-            }
+            displayCondition.value.update = false;
+
+            quasar.notify({
+              color: 'blue',
+              position: 'top',
+              message: '更新した！',
+            });
           }
         })
         .catch((e) => {
@@ -327,18 +324,17 @@ export function useHaikuListModel() {
       .then((response) => {
         if (response) {
           console.log('response', response);
-          if (response.success) {
-            const index = records.value.findIndex(
-              (it) => it.id == updateSelectedCondition.value.id
-            );
-            records.value.splice(index, 1);
-            quasar.notify({
-              color: 'blue',
-              position: 'top',
-              message: '削除完了しました',
-            });
-            displayCondition.value.delete = false;
-          }
+
+          const index = records.value.findIndex(
+            (it) => it.id == updateSelectedCondition.value.id
+          );
+          records.value.splice(index, 1);
+          quasar.notify({
+            color: 'blue',
+            position: 'top',
+            message: '消しといたで！',
+          });
+          displayCondition.value.delete = false;
         }
       })
       .catch((e) => {

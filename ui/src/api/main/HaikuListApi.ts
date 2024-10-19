@@ -1,51 +1,34 @@
 import { MainAPIClient } from './MainBaseApi';
+import { PutResponse } from '../BaseApi';
 
 export class HaikuListApi extends MainAPIClient {
-  public search(
-    request: HaikuListSearchRequest
-  ): Promise<HaikuListSearchResponse | null> {
+  public search(): Promise<DataState[] | null> {
     const url = '/haikuList/search';
     const path = this.combineUrl(url);
 
-    return this.httpPost<HaikuListSearchRequest, HaikuListSearchResponse>(
-      path,
-      request
-    );
+    return this.httpGet<DataState[]>(path);
   }
 
-  public insert(
-    request: HaikuListInsertRequest
-  ): Promise<HaikuListStatusResponse | null> {
+  public insert(request: HaikuListInsertRequest): Promise<PutResponse | null> {
     const url = '/haikuList/insert';
     const path = this.combineUrl(url);
 
-    return this.httpPost<HaikuListInsertRequest, HaikuListStatusResponse>(
-      path,
-      request
-    );
+    return this.httpPost<HaikuListInsertRequest, PutResponse>(path, request);
   }
 
-  public update(
-    request: HaikuListUpdateReqeust
-  ): Promise<HaikuListStatusResponse | null> {
+  public update(request: HaikuListUpdateReqeust): Promise<PutResponse | null> {
     const url = '/haikuList/update';
     const path = this.combineUrl(url);
 
-    return this.httpPost<HaikuListUpdateReqeust, HaikuListStatusResponse>(
-      path,
-      request
-    );
+    return this.httpPost<HaikuListUpdateReqeust, PutResponse>(path, request);
   }
 
-  public delete(id: number): Promise<HaikuListStatusResponse | null> {
+  public delete(id: number): Promise<PutResponse | null> {
     const url = '/haikuList/delete';
     const path = this.combineUrl(url);
     const request = { id: id } as HaikuListDeleteRequest;
 
-    return this.httpPost<HaikuListDeleteRequest, HaikuListStatusResponse>(
-      path,
-      request
-    );
+    return this.httpPost<HaikuListDeleteRequest, PutResponse>(path, request);
   }
 }
 

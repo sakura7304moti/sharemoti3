@@ -1,35 +1,30 @@
+from src.route.service.module.utils import interface
 from src.route.service.module import haikulist
 
 """
 俳句一覧
 """
 
-def create_db():
-    """
-    テーブル作成
-    """
-    haikulist.init()
-
-def insert(first:str,second:str,third:str,poster:str,detail:str):
+def insert(condition:interface.Haiku):
     """
     レコード追加
     """
-    return haikulist.insert(first, second, third, poster, detail)
+    haikulist.insert(condition)
 
-def update(id:int,first:str,second:str,third:str,poster:str,detail:str):
+def update(condition:interface.Haiku):
     """
     レコード更新
     """
-    return haikulist.update(id, first, second, third, poster, detail)
+    haikulist.update(condition)
 
 def delete(id:int):
     """
     レコード削除
     """
-    return haikulist.delete(id)
+    haikulist.delete(id)
 
-def search(id:int,haiku_text:str,poster:str,detail:str):
+def search():
     """
     レコード検索
     """
-    return haikulist.select(id, haiku_text, poster, detail)
+    return haikulist.select()

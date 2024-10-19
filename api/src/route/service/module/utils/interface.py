@@ -793,3 +793,26 @@ class Word:
             "word":self.word,
             "detail":self.detail
         }
+    
+class Haiku:
+    def __init__(
+        self,
+        id:int,
+        first:str,second:str,third:str,poster:str,detail:str
+    ):
+        self.id = id
+        self.first = first
+        self.second = second
+        self.third = third
+        self.poster = poster
+        self.detail = detail
+
+    def to_args(self):
+        return {
+            "id":self.id,
+            "first":self.first,
+            "second":self.second,
+            "third":self.third,
+            "poster":self.poster,
+            "detail":self.detail
+        }

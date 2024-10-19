@@ -1,42 +1,20 @@
 <template>
   <!--SUB 1/3 上に表示する検索、追加等詳細な操作画面-->
   <div class="q-pb-md">
-    <q-card style="max-width: 600px" class="q-pa-sm" v-if="tableView == false">
+    <q-card style="max-width: 400px" class="q-pa-sm" v-if="tableView == false">
       <q-card-section>
         <div class="text-h6">{{ listName }}</div>
         <div
           class="haiku-upper"
           v-if="displayCondition.upper && tableView == false"
         >
-          <div class="row q-gutter-sm">
-            <!--search input-->
-            <div style="height: 60px; width: 320px">
-              <q-input
-                dense
-                debounce="300"
-                v-model="filter"
-                placeholder="検索"
-                style="width: 300px"
-                align="left"
-                :loading="LoadingCondition.search"
-              >
-                <template v-slot:append>
-                  <q-btn
-                    color="primary"
-                    @click.prevent="search(filter)"
-                    icon="search"
-                  />
-                </template>
-              </q-input>
-            </div>
-
+          <div class="row justify-between">
             <!--新規追加ボタン-->
-            <div class="q-pt-xs">
+            <div class="q-pt-sm">
               <q-btn
                 label="ここで一句"
                 icon-right="note_add"
-                color="grey-6"
-                outline
+                color="primary"
                 @click="insertClick"
               />
             </div>
@@ -50,29 +28,26 @@
               />
             </div>
           </div>
-          <div class="row q-gutter-md q-pt-md">
-            <div>
+          <div class="row q-pt-md">
+            <div class="col">
               <q-toggle
                 v-model="detailDisplay"
                 label="解説を表示"
                 color="primary"
               />
             </div>
-            <div>
-              <div>
-                <q-toggle
-                  v-model="displaySort"
-                  label="新しい順"
-                  color="primary"
-                />
-              </div>
+            <div class="col">
+              <q-toggle
+                v-model="displaySort"
+                label="新しい順"
+                color="primary"
+              />
             </div>
           </div>
         </div>
       </q-card-section>
     </q-card>
   </div>
-
   <div
     v-for="rec in records"
     :key="rec.id"
@@ -147,7 +122,19 @@
       <q-card class="q-pa-md" style="max-width: 700px">
         <q-section>
           <div style="font-family: HinaMincho-Regular" class="text-h6">
-            王将マンによる俳句審査<q-checkbox
+            <div class="row justify-between">
+              <div>王将マンの俳句審査</div>
+              <div>
+                <q-btn
+                  @click="displayCondition.insert = false"
+                  icon="close"
+                  text-color="grey"
+                  label="閉じる"
+                  dense
+                />
+              </div>
+            </div>
+            <q-checkbox
               class="text-subtitle1 text-weight-medium"
               v-model="insertHaikuOmake"
               label="みちゃやーよ"
@@ -231,6 +218,9 @@
                     <div style="margin-right: 20px">
                       {{ insertCondition.third }}
                     </div>
+                    <div style="margin-right: 20px">
+                      {{ insertCondition.poster }}
+                    </div>
                   </div>
                 </div>
                 <img src="../assets/senno_rikyu.png" width="200" />
@@ -242,7 +232,7 @@
           <hr />
           <div>
             <q-btn
-              label="追加"
+              label="追加する"
               color="primary"
               class="text-weight-bold"
               :disable="
@@ -262,12 +252,22 @@
     <q-dialog v-model="displayCondition.update">
       <q-card class="q-pa-md" style="max-width: 1200px">
         <q-section>
-          <div class="text-h6">編集</div>
+          <div class="row justify-between">
+            <div class="text-h6">俳句の編集</div>
+            <div>
+              <q-btn
+                @click="displayCondition.update = false"
+                icon="close"
+                text-color="grey"
+                label="閉じる"
+                dense
+              />
+            </div>
+          </div>
           <hr />
           <div class="row q-gutter-md">
             <!--編集後-->
             <div>
-              <div class="text-subtitle1">編集後</div>
               <div class="row q-gutter-xs">
                 <!--inputs-->
                 <div style="width: 320px">
