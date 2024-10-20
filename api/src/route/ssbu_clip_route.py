@@ -2,14 +2,13 @@
 スマブラの切り抜きのルーティング
 """
 import json
-import os
 
 
 from flask import Blueprint, request, jsonify, send_file
 
 
 from src.route.service import ssbu_clip_service as service
-from src.route.service.module.utils import interface,const
+from src.route.service.module.utils import interface
 
 def to_search_condition():
     """
