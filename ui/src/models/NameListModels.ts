@@ -65,7 +65,7 @@ export function useNameListModel() {
           console.log('response', response);
 
           records.value.splice(0);
-          response.records?.forEach((rec) => {
+          response.forEach((rec) => {
             records.value.push({
               id: rec.id,
               name: rec.name,
@@ -130,19 +130,17 @@ export function useNameListModel() {
             console.log('response', response);
 
             //追加した場合
-            if (response.success) {
-              search();
-              insertCondition.value.name = '';
-              insertCondition.value.ssbuName = '';
-              quasar.notify({
-                color: 'blue',
-                position: 'top',
-                message: '追加完了しました',
-              });
-              sortRecords();
-              //saveModalShow.value = false;
-              insertErr.value = '';
-            }
+            search();
+            insertCondition.value.name = '';
+            insertCondition.value.ssbuName = '';
+            quasar.notify({
+              color: 'blue',
+              position: 'top',
+              message: '「' + name + '」を追加したよ！ いい名前っ b',
+            });
+            sortRecords();
+            //saveModalShow.value = false;
+            insertErr.value = '';
           }
         })
         .catch((e) => {
@@ -185,17 +183,15 @@ export function useNameListModel() {
             console.log('response', response);
 
             //更新した場合
-            if (response.success) {
-              search();
-              insertCondition.value.name = '';
-              insertCondition.value.ssbuName = '';
-              quasar.notify({
-                color: 'blue',
-                position: 'top',
-                message: '更新完了しました',
-              });
-              editModalShow.value = false;
-            }
+            search();
+            insertCondition.value.name = '';
+            insertCondition.value.ssbuName = '';
+            quasar.notify({
+              color: 'blue',
+              position: 'top',
+              message: '更新した！',
+            });
+            editModalShow.value = false;
           }
         })
         .catch((e) => {
@@ -216,6 +212,9 @@ export function useNameListModel() {
   const deleteRecord = async function (id: number) {
     isDeleteLoading.value = true;
 
+    const item = records.value.find((it) => it.id == id);
+    const deleteName = item?.name ?? '';
+
     await api
       .dell({ id: id })
       .then((response) => {
@@ -223,22 +222,14 @@ export function useNameListModel() {
           console.log('response', response);
 
           //削除成功した場合
-          if (response.success) {
-            quasar.notify({
-              color: 'blue',
-              position: 'top',
-              message: '削除完了しました',
-            });
-            search();
-            editModalShow.value = false;
-            deleteCheckModalShow.value = false;
-          } else {
-            quasar.notify({
-              color: 'red',
-              position: 'top',
-              message: 'データの削除に失敗しました',
-            });
-          }
+          quasar.notify({
+            color: 'blue',
+            position: 'top',
+            message: deleteName + 'を消したでぇ',
+          });
+          search();
+          editModalShow.value = false;
+          deleteCheckModalShow.value = false;
         }
       })
       .catch((e) => {

@@ -7,33 +7,7 @@ import datetime
 from src.route.service.module.utils import const, interface
 p = const.Path()
 dbname = p.db_main_share()
-
-def init():
-    conn = sqlite3.connect(dbname)
-
-    # データベースへのコネクションを閉じる。(必須)
-    conn.close()
-    
-    """
-    CREATE TABLE
-    """
-    conn = sqlite3.connect(dbname)
-    # sqliteを操作するカーソルオブジェクトを作成
-    cur = conn.cursor()
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS nameList2(
-                id INTEGER PRIMARY KEY,
-                name STRING,
-                ssbu_name STRING,
-                create_at STRING,
-                update_at STRING
-                )
-                """
-    )
-    
-    # データベースへコミット。これで変更が反映される。
-    conn.commit()
-    conn.close()
+query_model = const.PsqlBase()
 
 def exists(
     name:str,
@@ -63,104 +37,72 @@ def insert(
     name:str,
     ssbu_name:str
 ):
-    try:
-        if not exists(name,ssbu_name):
-            # データベースに接続する
-            conn = sqlite3.connect(dbname)
-            cursor = conn.cursor()
-        
-            # 現在の日時を取得
-            current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    query = """
+        INSERT INTO sharemoti.name(
+            name, ssbu_name, create_at, update_at
+        ) VALUES (
+            %(name)s, 
+            %(ssbu_name)s, 
+            %(current_time)s, 
+            %(current_time)s 
+        )
+    """
+    args = {
+        "name": name, 
+        "ssbu_name" : ssbu_name, 
+        "current_time" : query_model.current_time()
+    }
+    query_model.execute_commit(query, args)
     
-            query = "INSERT INTO nameList2 (name, ssbu_name, create_at, update_at) VALUES (:name, :ssbu_name, :create_at, :update_at)"
-            args = {"name": name, "ssbu_name" : ssbu_name, "create_at" : current_time, "update_at" : current_time}
-    
-            cursor.execute(query, args)
-    
-            # 変更をコミットし、接続を閉じる
-            conn.commit()
-            conn.close()
-            return interface.DbResult(True,"")
-
-    except Exception as e:
-        err_text = str(e)
-        return interface.DbResult(False,err_text)
+def insert_custom(
+    name:str,
+    ssbu_name:str,
+    create_at,
+    update_at
+):
+    query = """
+    INSERT INTO sharemoti.name(
+        name, ssbu_name, create_at, update_at
+    ) VALUES (%(name)s, %(ssbu_name)s, %(create_at)s, %(update_at)s )
+    """
+    args = {"name": name, "ssbu_name" : ssbu_name, "create_at" : create_at, "update_at" : update_at}
+    query_model.execute_commit(query, args)
         
 def update(
     id:int,
     name:str,
     ssbu_name:str
 ):
-    try:
-        # データベースに接続する
-        conn = sqlite3.connect(dbname)
-        cursor = conn.cursor()
-    
-        # 現在の日時を取得
-        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-        query = """
-            UPDATE nameList2 Set 
-                name = :name, 
-                ssbu_name = :ssbu_name, 
-                update_at = :current_time
-            WHERE id = :id
-        """
-        args = {
-            "id" : id,
-            "name" : name,
-            "ssbu_name" : ssbu_name,
-            "current_time" : current_time
-        }
-
-        cursor.execute(query, args)
-        # 変更をコミットし、接続を閉じる
-        conn.commit()
-        conn.close()
-        return interface.DbResult(True,"")
-
-    except Exception as e:
-        err_text = str(e)
-        return interface.DbResult(False,err_text)
+    query = """
+        UPDATE sharemoti.name Set 
+            name = %(name)s, 
+            ssbu_name = %(ssbu_name)s, 
+            update_at = %(current_time)s
+        WHERE id = %(id)s
+    """
+    args = {
+        "id" : id,
+        "name" : name,
+        "ssbu_name" : ssbu_name,
+        "current_time" : query_model.current_time()
+    }
+    query_model.execute_commit(query, args)
 
 def delete(id:int):
-    try:
-        # データベースに接続する
-        conn = sqlite3.connect(dbname)
-        cursor = conn.cursor()
-    
-        query = "DELETE FROM nameList2 WHERE id = :id"
-        args = {"id" : id}
-    
-        # レコードを削除する
-        cursor.execute(query, args)
-    
-        # 変更をコミットし、接続を閉じる
-        conn.commit()
-        conn.close()
-        return interface.DbResult(True,"")
-
-    except Exception as e:
-        err_text = str(e)
-        return interface.DbResult(False,err_text)
+    query = "DELETE FROM sharemoti.name WHERE id = %(id)s"
+    args = {"id" : id}
+    query_model.execute_commit(query, args)
 
 def search():
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
-    query = "SELECT * FROM nameList2"
-    
-    # SELECTクエリを実行
-    cursor.execute(query)
-    results = cursor.fetchall()
-
-    # 結果を表示
-    records = []
-    for row in results:
-        rec = interface.NameList2Record(*row)
-        records.append(rec)
-
-    # 接続を閉じる
-    conn.close()
-    return records
+    query = """
+        SELECT
+            id,
+            name,
+            ssbu_name as "ssbuName",
+            TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
+            TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
+        from sharemoti.name
+        where is_display = TRUE
+        order by create_at, name
+    """
+    return query_model.execute_df(query)
