@@ -19,27 +19,13 @@ app = Blueprint('holoarchive',__name__)
 """
 @app.route("/holoArchive/search/channel",methods=["GET"])
 def holomovie_channel():
-    records = holoarchive_service.search_chennel()
-    # 辞書にまとめる
-    result = {
-        "records": json.dumps(
-            records, default=lambda obj: obj.__dict__(), ensure_ascii=False
-        )
+    df = holoarchive_service.search_chennel()
+    records = df.to_json(orient='records',force_ascii=False)
+    records_json = json.loads(records)
+    response = {
+        "records":records_json
     }
-    # レスポンスとしてJSONデータを返す
-    # JSON文字列に変換
-    json_data = json.dumps(result, ensure_ascii=False)
-    json_data = json_data.replace('"[{', "[{").replace('}]"', "}]")
-    
-    #改行文字だけ残してバックスラッシュは削除
-    json_data = json_data.replace('\\n',NEW_LINE_TEXT)
-    json_data = json_data.replace('\\','')
-    json_data = json_data.replace(NEW_LINE_TEXT,'\\n')
-    
-    if len(records) == 0:
-        json_data = "[]"
-    response = jsonify(json_data)
-    return response
+    return jsonify(json.dumps(response))
 
 """
 動画情報の一覧
@@ -57,34 +43,21 @@ def holomovie_movie():
     movie_type = json_data.get("movieType","")
 
     
-    records,total_pages = holoarchive_service.search_records(
+    df,total_count = holoarchive_service.search_records(
         page_no,page_size,
         title,
         from_date,to_date,
         channel_id,
         movie_type
     )
-    # 辞書にまとめる
-    result = {
-        "records": json.dumps(
-            records, default=lambda obj: obj.__dict__(), ensure_ascii=False
-        ),
-        "totalPages": total_pages
+    records = df.to_json(orient='records',force_ascii=False)
+    records_json = json.loads(records)
+
+    response = {
+        "records" : records_json,
+        "totalCount":total_count
     }
-    # レスポンスとしてJSONデータを返す
-    # JSON文字列に変換
-    json_data = json.dumps(result, ensure_ascii=False)
-    json_data = json_data.replace('"[{', "[{").replace('}]"', "}]")
-    
-    #改行文字だけ残してバックスラッシュは削除
-    json_data = json_data.replace('\\n',NEW_LINE_TEXT)
-    json_data = json_data.replace('\\','')
-    json_data = json_data.replace(NEW_LINE_TEXT,'\\n')
-    
-    if len(records) == 0:
-        json_data = "[]"
-    response = jsonify(json_data)
-    return response
+    return jsonify(json.dumps(response))
 
 """
 チャンネルURLの一覧

@@ -10,7 +10,8 @@ from pytube import YouTube
 
 from src.route.service.module.utils import const, interface
 
-p = const.Path()
+psql_model = const.PsqlBase()
+#p = const.Path()
 opt = const.Option()
 channel_url_list = opt.youtube_holo_channels()
 
@@ -164,14 +165,13 @@ def update_archives():
     archives = holo_archives()
 
     #追加前にレコード取得
-    make_database()
-    movies = search_movie()
+    movies = search_movie(page_size=1000000)
     channels = search_channel()
 
     # ----- チャンネル単位のループ -----
     for archive in tqdm(archives,desc="archives"):
         #チャンネルの追加・更新
-        if archive.channel.channel_id in [c.channel_id for c in channels]:
+        if archive.channel.channel_id in [channel_id for channel_id in channels['channelId']]:
             update_channel(
                 archive.channel.channel_id,
                 archive.channel.channel_name,
@@ -189,7 +189,7 @@ def update_archives():
             
         #動画の追加・更新
         for movie in archive.movie:
-            if movie.id in [m.id for m in movies]:
+            if movie.id in [movie_id for movie_id in movies['id']]:
                 update_movie(
                     movie.id,
                     movie.url,
@@ -211,7 +211,7 @@ def update_archives():
                 )
         #ショートの追加・更新
         for movie in archive.short:
-            if movie.id in [m.id for m in movies]:
+            if movie.id in [movie_id for movie_id in movies['id']]:
                 update_movie(
                     movie.id,
                     movie.url,
@@ -233,7 +233,7 @@ def update_archives():
                 )
         #ライブの追加・更新
         for movie in archive.live:
-            if movie.id in [m.id for m in movies]:
+            if movie.id in [movie_id for movie_id in movies['id']]:
                 update_movie(
                     movie.id,
                     movie.url,
@@ -257,47 +257,6 @@ def update_archives():
 """
 データベース用の関数
 """
-dbname = p.db_youtube()
-def make_database():
-    #dbファイル作成
-    conn = sqlite3.connect(dbname)
-    conn.close()
-
-    #動画のテーブル
-    conn = sqlite3.connect(dbname)
-    cur = conn.cursor()
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS movie(
-                id STRING PRIMARY KEY,
-                url STRING,
-                title STRING,
-                date STRING,
-                channel_id STRING,
-                view_count INTEGER,
-                thumbnail_url STRING,
-                movie_type STRING
-                )
-                """)
-    # データベースへコミット。これで変更が反映される。
-    conn.commit()
-    conn.close()
-
-    #チャンネルのテーブル
-    conn = sqlite3.connect(dbname)
-    cur = conn.cursor()
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS channel(
-                channel_id STRING PRIMARY KEY,
-                channel_name STRING,
-                description STRING,
-                header_url STRING,
-                avatar_url STRING
-                )
-                """)
-    # データベースへコミット。これで変更が反映される。
-    conn.commit()
-    conn.close()
-
 def search_movie(
     page_no = 1,
     page_size = 20,
@@ -306,11 +265,7 @@ def search_movie(
     to_date = '',
     channel_id = '',
     movie_type = ''
-) -> List[interface.MovieInfo]:
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
+):
     # SELECTクエリを実行
     query,args = search_query_args(
         page_size = page_size,
@@ -321,19 +276,7 @@ def search_movie(
         channel_id = channel_id,
         movie_type = movie_type
     )
-    cursor.execute(query,args)
-    results = cursor.fetchall()
-    
-    # 接続を閉じる
-    conn.close()
-
-    # 結果を表示
-    records = []
-    for row in results:
-        rec = interface.MovieInfo(*row)
-        records.append(rec)
-
-    return records
+    return psql_model.execute_df(query,args)
 
 def search_movie_count(
     page_size = 0,
@@ -355,21 +298,9 @@ def search_movie_count(
         channel_id,
         movie_type
     )# page_no = 1 , page_size = 0(max)
-    
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
-    #件数のみ取得
-    count_query = f'select count(*) from ({query})'
-    cursor.execute(count_query,args)
-    results = cursor.fetchall()
-    conn.close()
-
-    count = results[0][0]
-    page_count = math.floor(count/page_size)
-
-    return page_count
+    count_query = f'select count(*) as total from ({query}) as movie'
+    df = psql_model.execute_df(count_query,args)
+    return int(df["total"].iloc[0])
 
 def search_query_args(
     page_no = 1,
@@ -386,22 +317,33 @@ def search_query_args(
     #ページング設定
     offset = (max(page_no - 1,0))*page_size 
     
-    query = "SELECT * FROM movie where 1 = 1 "
+    query = """
+        SELECT 
+            id,
+            url,
+            title,
+            date,
+            channel_id as "channelId",
+            view_count as "viewCount",
+            thumbnail_url as "thumbnailUrl",
+            movie_type as "movieType"
+        FROM holo.youtube_movie where 1 = 1 
+    """
     if title != '':
-        query = query + "and title like :title "
+        query = query + "and title like %(title)s "
     if from_date != '':
-        query = query + "and date >= :from_date "
+        query = query + "and date >= %(from_date)s "
     if to_date != '':
-        query = query + "and date <= :to_date "
+        query = query + "and date <= %(to_date)s "
     if channel_id != '':
-        query = query + "and channel_id = :channel_id "
+        query = query + "and channel_id = %(channel_id)s "
     if movie_type != '':
-        query = query + "and movie_type = :movie_type "
+        query = query + "and movie_type = %(movie_type)s "
     
     query = query + "order by date desc,title "
     
     if page_size != 0:
-        query = query + "limit :page_size offset :offset "
+        query = query + "limit %(page_size)s offset %(offset)s "
     
     args = {
         'title' : f'%{title}%',
@@ -414,24 +356,19 @@ def search_query_args(
     }
     return query , args
 
-def search_channel() -> List[interface.ChannelInfo]:
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM channel")
-    results = cursor.fetchall()
-
-    # 接続を閉じる
-    conn.close()
-
-    # 結果をまとめる
-    records = []
-    for row in results:
-        rec = interface.ChannelInfo(*row)
-        records.append(rec)
-    
-    return records
+def search_channel():
+    df = psql_model.execute_df(
+        """
+            SELECT 
+                channel_id as "channelId",
+                channel_name as "channelName",
+                description,
+                header_url as "headerUrl",
+                avatar_url as "avatarUrl"
+            FROM holo.youtube_channel                       
+        """
+    )
+    return df
 
 def insert_movie(
     id:str,
@@ -443,13 +380,9 @@ def insert_movie(
     thumbnail_url:str,
     movie_type:str
 ):
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
     query = """
-    INSERT OR IGNORE INTO movie (id, url, title, date, channel_id, view_count, thumbnail_url, movie_type) 
-               VALUES (:id, :url, :title, :date, :channel_id, :view_count, :thumbnail_url, :movie_type)
+    INSERT INTO holo.youtube_movie (id, url, title, date, channel_id, view_count, thumbnail_url, movie_type) 
+               VALUES (%(id)s, %(url)s, %(title)s, %(date)s, %(channel_id)s, %(view_count)s, %(thumbnail_url)s, %(movie_type)s)
     """
     args = {
         "id":id,
@@ -461,10 +394,7 @@ def insert_movie(
         "thumbnail_url":thumbnail_url,
         "movie_type":movie_type
     }
-    
-    cursor.execute(query,args)
-    conn.commit()
-    conn.close()
+    psql_model.execute_commit(query, args)
 
 def insert_channel(
     channel_id:str,
@@ -473,13 +403,9 @@ def insert_channel(
     header_url:str,
     avatar_url:int
 ):
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
     query = """
-    INSERT INTO channel (channel_id, channel_name, description, header_url, avatar_url) 
-               VALUES (:channel_id, :channel_name, :description, :header_url, :avatar_url)
+    INSERT INTO holo.youtube_channel (channel_id, channel_name, description, header_url, avatar_url) 
+               VALUES (%(channel_id)s, %(channel_name)s, %(description)s, %(header_url)s, %(avatar_url)s)
     """
     args = {
         "channel_id":channel_id,
@@ -488,10 +414,8 @@ def insert_channel(
         "header_url":header_url,
         "avatar_url":avatar_url
     }
-    
-    cursor.execute(query,args)
-    conn.commit()
-    conn.close()
+
+    psql_model.execute_commit(query, args)
 
 def update_movie(
     id:str,
@@ -500,17 +424,13 @@ def update_movie(
     view_count:int,
     thumbnail_url:str,
 ):
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
     query = """
-    UPDATE movie SET
-        url = :url,
-        title = :title,
-        view_count = :view_count,
-        thumbnail_url = :thumbnail_url
-    WHERE id = :id
+    UPDATE holo.youtube_movie SET
+        url = %(url)s,
+        title = %(title)s,
+        view_count = %(view_count)s,
+        thumbnail_url = %(thumbnail_url)s
+    WHERE id = %(id)s
     """
     args = {
         "id":id,
@@ -520,9 +440,7 @@ def update_movie(
         "thumbnail_url":thumbnail_url
     }
     
-    cursor.execute(query,args)
-    conn.commit()
-    conn.close()
+    psql_model.execute_commit(query, args)
 
 def update_channel(
     channel_id:str,
@@ -531,17 +449,13 @@ def update_channel(
     header_url:str,
     avatar_url:int
 ):
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-
     query = """
-    UPDATE channel SET
-        channel_name = :channel_name,
-        description = :description,
-        header_url = :header_url,
-        avatar_url = :avatar_url 
-    WHERE channel_id = :channel_id
+    UPDATE holo.youtube_channel SET
+        channel_name = %(channel_name)s,
+        description = %(description)s,
+        header_url = %(header_url)s,
+        avatar_url = %(avatar_url)s 
+    WHERE channel_id = %(channel_id)s
     """
     args = {
         "channel_id":channel_id,
@@ -551,9 +465,7 @@ def update_channel(
         "avatar_url":avatar_url
     }
     
-    cursor.execute(query,args)
-    conn.commit()
-    conn.close()
+    psql_model.execute_commit(query, args)
 
 
 

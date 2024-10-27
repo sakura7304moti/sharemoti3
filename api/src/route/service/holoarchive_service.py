@@ -28,7 +28,7 @@ def search_records(
     """
     レコード検索
     """
-    records = holoarchive.search_movie(
+    df = holoarchive.search_movie(
         page_no,
         page_size,
         title,
@@ -45,7 +45,7 @@ def search_records(
         channel_id,
         movie_type
     )
-    return records, total_count
+    return df, total_count
 
 def search_chennel():
     """

@@ -68,6 +68,7 @@ export const useHoloArchiveStore = defineStore('holo-archive', {
         })
         .then((response) => {
           if (response) {
+            console.log('response', response);
             response.records.forEach((it) => {
               this.records.push({
                 id: it.id,
