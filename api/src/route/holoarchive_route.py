@@ -55,7 +55,7 @@ def holomovie_movie():
 
     response = {
         "records" : records_json,
-        "totalCount":total_count
+        "totalPages":total_count
     }
     return jsonify(json.dumps(response))
 
