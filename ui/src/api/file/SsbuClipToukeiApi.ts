@@ -6,6 +6,12 @@ export class SsbuClipToukeiApi extends FileAPIClient {
     const path = this.combineUrl(url);
     return this.httpGet<Rank[]>(path);
   }
+
+  public async first(text: string): Promise<First[] | null> {
+    const url = '/ssbu_clip/toukei/first/' + text;
+    const path = this.combineUrl(url);
+    return this.httpGet<First[]>(path);
+  }
 }
 
 const api = new SsbuClipToukeiApi();
@@ -15,4 +21,9 @@ interface Rank {
   name: string;
   total: number;
   rank: number;
+}
+
+interface First {
+  name: string;
+  date: string;
 }
