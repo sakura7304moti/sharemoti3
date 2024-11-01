@@ -128,10 +128,6 @@ export default defineComponent({
         title: 'memory',
       },
       {
-        url: '/holoarchive',
-        title: 'archive',
-      },
-      {
         url: '/',
         title: 'my home',
       },

@@ -402,10 +402,6 @@ function usePage() {
       title: '記念配信',
       url: '/holomemory',
     },
-    {
-      title: 'アーカイブ',
-      url: '/holoarchive',
-    },
   ] as PageState[]);
 
   function callPageList(no: number) {
