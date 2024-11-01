@@ -1,6 +1,6 @@
 <template>
   <q-page class="q-ma-md">
-    <div class="text-h6">切り抜き統計学</div>
+    <div class="text-h6">切り抜きの記録</div>
     <q-card class="q-mt-md" style="max-width: 500px; width: 100%">
       <q-card-section>
         <div class="q-mb-xs">
@@ -71,10 +71,14 @@
               ><span class="q-ml-sm text-body1">{{ rec.name }}</span>
             </td>
             <td class="text-right">
-              <span class="text-body1 text-primary">{{ rec.total }}</span>
+              <span class="text-body1 text-primary" v-if="rec.total > 0">{{
+                rec.total
+              }}</span>
             </td>
             <td class="text-right">
-              <span class="text-body1">{{ rec.rank }}</span>
+              <span class="text-body1" v-if="rec.total > 0">{{
+                rec.rank
+              }}</span>
             </td>
           </tr>
         </tbody>
