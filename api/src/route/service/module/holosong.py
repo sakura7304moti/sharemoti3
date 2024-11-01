@@ -69,7 +69,7 @@ def get_memory_movies() -> list[interface.HoloMemoryRecord]:
     # 指定したURLからHTMLを取得
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser') 
-    table_element = soup.find(id="table_edit_1 content_block_45")
+    table_element = soup.find(id="table_edit_1 content_block_46")
     tr_elements = table_element.find("tbody").find_all("tr")
 
     records = []
