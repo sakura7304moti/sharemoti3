@@ -98,6 +98,13 @@ const routes: RouteRecordRaw[] = [
     children: [{ path: '', component: () => import('pages/SsbuClipPage.vue') }],
   },
   {
+    path: '/ssbu_clip/toukei',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/SsbuClipToukeiPage.vue') },
+    ],
+  },
+  {
     path: '/movie',
     component: () => import('layouts/MainLayout.vue'),
     children: [

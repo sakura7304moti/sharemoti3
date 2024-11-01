@@ -23,6 +23,7 @@ from src.route import karaokeList_route
 from src.route import radioList_route
 from src.route import ssbuList_route
 from src.route import ssbu_clip_route
+from src.route import ssbu_clip_toukei_route
 from src.route import voiceList_route
 from src.route import support_route
 from src.route import movieList_route
@@ -60,6 +61,7 @@ app.register_blueprint(karaokeList_route.app)
 app.register_blueprint(radioList_route.app)
 app.register_blueprint(ssbuList_route.app)
 app.register_blueprint(ssbu_clip_route.app)
+app.register_blueprint(ssbu_clip_toukei_route.app)
 app.register_blueprint(voiceList_route.app)
 app.register_blueprint(support_route.app)
 app.register_blueprint(movieList_route.app)

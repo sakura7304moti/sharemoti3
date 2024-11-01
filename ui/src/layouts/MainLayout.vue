@@ -360,6 +360,10 @@ function usePage() {
       url: '/ssbu_clip',
     },
     {
+      title: '切り抜きの記録',
+      url: '/ssbu_clip/toukei',
+    },
+    {
       title: 'オム子レイディオ',
       url: '/radio',
     },
