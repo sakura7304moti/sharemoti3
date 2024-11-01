@@ -47,9 +47,7 @@ export default defineComponent({
     const getName = async function () {
       await api.search().then((response) => {
         if (response) {
-          const filreco = response.records.filter(
-            (it) => it.name != it.ssbuName
-          );
+          const filreco = response.filter((it) => it.name != it.ssbuName);
           const rowCount = filreco.length;
           const index = Math.floor(Math.random() * (rowCount - 1));
           ssbuName.value = filreco[index].name;
