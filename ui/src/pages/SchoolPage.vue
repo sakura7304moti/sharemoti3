@@ -25,37 +25,53 @@
       </div>
     </div>
 
-    <div
-      class="q-ml-md row q-gutter-sm"
-      style="
-        max-width: 300px;
-        background-color: rgb(226, 220, 202);
-        margin-bottom: 16px;
-        border-radius: 20px;
-      "
-    >
-      <div class="q-pl-sm text-subtitle1">並び順</div>
-      <div>
-        <q-radio
-          v-model="sortType"
-          val="name"
-          label="名前順"
-          @update:model-value="sortSchools"
-        />
+    <div class="row wrap">
+      <div
+        class="row q-gutter-sm q-mr-md"
+        style="
+          max-width: 300px;
+          width: 100%;
+          background-color: rgb(226, 220, 202);
+          margin-bottom: 16px;
+          border-radius: 20px;
+        "
+      >
+        <div class="q-pl-sm text-subtitle1">並び順</div>
+        <div>
+          <q-radio
+            v-model="sortType"
+            val="name"
+            label="名前順"
+            @update:model-value="sortSchools"
+          />
+        </div>
+        <div>
+          <q-radio
+            v-model="sortType"
+            val="date"
+            label="開講日順"
+            @update:model-value="sortSchools"
+          />
+        </div>
       </div>
-      <div>
-        <q-radio
-          v-model="sortType"
-          val="date"
-          label="開講日順"
-          @update:model-value="sortSchools"
-        />
+      <div
+        style="
+          max-width: 300px;
+          width: 100%;
+          background-color: rgb(226, 220, 202);
+          margin-bottom: 16px;
+          border-radius: 20px;
+        "
+      >
+        <q-toggle v-model="commentDisplay" label="コメントの表示" />
       </div>
     </div>
+
     <school-card
       :editting="editting"
       :data-state="sc"
       :detail="false"
+      :comment="commentDisplay"
       v-for="sc in schools"
       :key="sc.id"
       @updated="getSchools"
@@ -67,7 +83,7 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import SchoolCard from 'src/components/school/SchoolCard.vue';
-import CreateSchoolButton from 'src/components/school/CreateSchoolButton.vue';
+import CreateSchoolButton from 'src/components/school/CreateSChoolButton.vue';
 import api from 'src/api/main/SchoolApi';
 import { useQuasar } from 'quasar';
 import { useRoute, useRouter } from 'vue-router';
@@ -79,8 +95,14 @@ export default defineComponent({
     CreateSchoolButton,
   },
   setup() {
-    const { isLoading, schools, getSchools, sortType, sortSchools } =
-      useSearchModel();
+    const {
+      isLoading,
+      schools,
+      getSchools,
+      sortType,
+      sortSchools,
+      commentDisplay,
+    } = useSearchModel();
     const editting = ref(false);
     const route = useRoute();
 
@@ -108,6 +130,7 @@ export default defineComponent({
       getSchools,
       sortType,
       sortSchools,
+      commentDisplay,
     };
   },
 });
@@ -117,6 +140,7 @@ export default defineComponent({
 function useSearchModel() {
   const isLoading = ref(false);
   const sortType = ref('name');
+  const commentDisplay = ref(false);
   const sortSchools = function () {
     if (sortType.value == 'name') {
       schools.value.sort((a, b) => (a.schoolName > b.schoolName ? 1 : -1));
@@ -170,6 +194,7 @@ function useSearchModel() {
     getSchools,
     sortType,
     sortSchools,
+    commentDisplay,
   };
 }
 /**

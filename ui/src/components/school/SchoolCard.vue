@@ -64,12 +64,60 @@
     <div class="q-pt-sm">
       <q-btn
         icon-right="chat"
-        label="コメントを見る"
+        :label="topComment ? 'コメントを編集する' : 'コメントを見る'"
         color="primary"
         dense
         @click="navigateDetail"
         v-if="!commentView"
       />
+    </div>
+    <!--トップのコメント欄 トップでかつtopCommentのときだけ表示させる-->
+    <div v-if="topComment && !commentView" class="q-mt-md">
+      <div v-for="cm in comments" :key="cm.id" class="q-pl-sm q-pb-md">
+        <q-chat-message
+          :stamp="cm.updateAt.split(' ')[0]"
+          :name="cm.postPerson"
+        >
+          <div style="white-space: pre-wrap; word-wrap: break-word">
+            <div class="q-pb-xs">
+              <q-rating
+                v-model="cm.star"
+                size="1.5em"
+                :max="5"
+                color="yellow-7"
+                readonly
+                v-if="(cm.star ?? 0) > 0"
+              />
+            </div>
+            <div>
+              {{ cm.comment }}
+            </div>
+            <div v-if="editIconDisplay" class="row justify-evenly">
+              <div class="col">
+                <q-btn
+                  icon="edit"
+                  dense
+                  flat
+                  color="primary"
+                  @click="selectComment(cm)"
+                />
+              </div>
+              <div class="col">
+                <q-btn
+                  icon="delete"
+                  dense
+                  flat
+                  color="negative"
+                  @click="selectDeleteComment(cm.id)"
+                />
+              </div>
+            </div>
+            <div v-if="commentDeleteId == cm.id && commentDeleteDialog">
+              <q-chip>選択中...</q-chip>
+            </div>
+          </div>
+        </q-chat-message>
+      </div>
     </div>
 
     <!--コメント欄 表示モードのときだけ表示させる-->
@@ -432,12 +480,17 @@ export default defineComponent({
       required: true,
       default: false,
     },
+    comment: {
+      type: Boolean,
+      default: false,
+    },
   },
   components: { SchoolSlogan },
   setup(props, context) {
     const quasar = useQuasar();
     const router = useRouter();
     const commentView = computed(() => props.detail);
+    const topComment = computed(() => props.comment);
     const state = ref({
       id: props.dataState.id,
       schoolName: props.dataState.schoolName,
@@ -703,7 +756,11 @@ export default defineComponent({
       commentDeleteDialog.value = true;
     };
     /**初期化処理 */
-    //getComments(props.dataState.id);
+    watch(props, () => {
+      if (props.comment == true) {
+        getComments(props.dataState.id);
+      }
+    });
 
     watch(props, () => {
       if (props.detail) {
@@ -732,6 +789,7 @@ export default defineComponent({
       selectDeleteComment,
       commentView,
       navigateDetail,
+      topComment,
     };
   },
 });

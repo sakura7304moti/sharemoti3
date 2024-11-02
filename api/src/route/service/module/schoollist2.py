@@ -37,11 +37,11 @@ def get_comment(id:int):
     query = """
     SELECT
         id,
-        school_id as schoolId,
+        school_id as "schoolId",
         star as star,
         title as title,
         comment as comment,
-        post_person as postPerson,
+        post_person as "postPerson",
         TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
         TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
     from sharemoti.school_comment
