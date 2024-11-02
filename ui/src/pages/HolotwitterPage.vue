@@ -149,6 +149,7 @@
                   width: 100%;
                   max-height: 70vh;
                   height: 100%;
+                  object-fit: contain;
                 "
               />
             </div>
@@ -159,7 +160,7 @@
                 class="backgroud-video"
                 v-if="media.playUrl"
                 :src="media.playUrl"
-                style="min-width: 100%; max-width: 800px; width: 100%"
+                style="max-width: 800px; width: 100%"
                 :ratio="16 / 9"
               />
               <div
@@ -173,7 +174,13 @@
                 <img
                   v-if="!media.playUrl"
                   :src="media.metaImageUrl"
-                  style="max-width: 800px; width: 100%"
+                  style="
+                    max-width: 800px;
+                    width: 100%;
+                    max-height: 70vh;
+                    height: 100%;
+                    object-fit: contain;
+                  "
                   class="cursor-pointer holotwitter-movie-img"
                   @click="media.playUrl = movieDownloadUrl(media.mediaUrl)"
                 />
