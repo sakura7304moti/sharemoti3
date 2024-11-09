@@ -5,13 +5,7 @@ export class APIClient {
   public route = useRoute();
 
   public apiEndpoint = function () {
-    if (location.origin.includes('sakura0moti')) {
-      return 'http://api.sakura0moti.com';
-    } else {
-      const originUrl = new URL(window.location.origin);
-      originUrl.port = '5000';
-      return originUrl.toString();
-    }
+    return 'https://api.sakura0moti.com';
   };
   public config = {
     headers: {
