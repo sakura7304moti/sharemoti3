@@ -243,6 +243,9 @@ def search(condition:interface.SsbuClipSearchCondition):
             if len(recs) == 1:
                 urls.append(recs[0].url)
                 icons.append(recs[0].icon)
+            else:
+                urls.append('')
+                icons.append('')
         df["fullIcon"] = urls
         df["smallIcon"] = icons
         return df
