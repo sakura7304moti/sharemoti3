@@ -762,7 +762,7 @@ class SsbuClipSearchCondition:
         self.ssbu_name = ssbu_name
         self.date = date
         self.cate = cate
-        self.page_size = 20
+        self.page_size = 40
         self.page_no = page_no
 
     def to_args(self):
