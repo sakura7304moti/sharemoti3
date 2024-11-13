@@ -9,24 +9,30 @@
           padding-top: 16px;
           padding-left: 24px;
           display: flex;
+          justify-content: space-between;
         "
       >
         <!--ヘッダーの左側-->
         <div
           style="
-            font-size: 20px;
-            font-weight: 500;
-            width: 300px;
+            font-size: 18px;
+            width: 200px;
             color: rgb(51, 51, 51);
+            background-color: white;
+            border-radius: 0px 10px 10px 0px;
+            position: relative;
+            left: -24px;
           "
           class="fadeDown"
           v-if="!menuView"
         >
-          韓国のおばあちゃんち
+          <div style="padding-left: 8px; padding-top: 8px">
+            韓国のおばあちゃんち
+          </div>
         </div>
 
         <!--ヘッダーの右側(PC用)-->
-        <div class="nav-top fadeRight">
+        <div class="nav-top fadeRight bg-white">
           <div
             @click.prevent="
               router.replace('/');
@@ -35,31 +41,40 @@
             class="nav-child"
           >
             トップ
-          </div>
-          <!--各種ページ-->
-          <div v-for="p in pages" :key="p.id" class="nav-child">
-            <div @mouseover="headerOpen(p.id)" @click="headerOpen(p.id)">
-              <q-icon name="expand_more" />{{ p.title }}
-            </div>
+            <div class="balloon1-top fadeRight" v-if="head.id == 1">
+              <div>
+                <div class="row">
+                  <div
+                    class="col"
+                    v-for="p in pages"
+                    :key="p.id"
+                    style="color: rgb(0, 167, 137); font-size: 16px"
+                  >
+                    <div class="q-mb-sm">{{ p.title }}</div>
 
-            <div v-if="head.id == p.id">
-              <div
-                v-for="item in callPageList(p.id)"
-                :key="item.url"
-                class="nav-child-page"
-                :class="{ 'nav-child-select': head.id == p.id }"
-              >
-                <div
-                  @click="
-                    router.replace(item.url);
-                    headerClose();
-                  "
-                >
-                  <div class="q-pa-sm">
-                    {{ item.title }}
+                    <div
+                      v-for="content in callPageList(p.id)"
+                      :key="content.url"
+                      style="color: rgb(51, 51, 51)"
+                    >
+                      <div
+                        class="nav-content q-pb-xs"
+                        @click="
+                          router.replace(content.url);
+                          headerClose();
+                        "
+                      >
+                        {{ content.title }}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+          <div class="nav-child">
+            <div @mouseover="headerOpen(1)" @click="headerOpen(1)">
+              <q-icon name="expand_more" />ページ
             </div>
           </div>
 
@@ -446,20 +461,21 @@ function usePage() {
   width: 52px;
 }
 body {
-  background-color: rgb(240, 238, 220);
+  background-color: rgb(255, 246, 230);
   color: #333;
   font-family: 'Noto Sans JP', sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 500;
 }
 /*navigation */
 .nav-top {
   justify-content: flex-end;
   display: flex;
-  padding-top: 20px;
+  padding-top: 10px;
   padding-right: 20px;
-  width: calc(100% - 300px);
+  padding-left: 10px;
+  width: calc(100% - 200px);
+  max-width: 600px;
   height: 100%;
+  border-radius: 10px 0 0 10px;
 }
 @media (max-width: 1030px) {
   .nav-top {
@@ -586,7 +602,7 @@ body {
   cursor: pointer;
   font-size: 1rem;
   line-height: 1.85;
-  transition: color 0.2s ease;
+  transition: color 0.3s ease;
   padding-right: 32px;
   height: 100%;
   width: 120px;
@@ -594,7 +610,7 @@ body {
   z-index: 2;
 }
 .nav-child:hover {
-  color: #808080;
+  color: #498e677a;
 }
 .nav-child-select {
   background-color: rgba(202, 220, 175, 1);
@@ -674,5 +690,42 @@ body {
 
 .scroll-to-top:hover {
   background-color: rgba(255, 255, 255, 0.2);
+}
+.balloon1-top {
+  position: relative;
+  display: inline-block;
+  left: -220px;
+  margin: 1.5em 0;
+  padding: 10px 14px;
+  width: 500px;
+  color: #555;
+  font-size: 16px;
+  background: white;
+}
+
+.balloon1-top:before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 70%;
+  margin-left: -15px;
+  border: 15px solid transparent;
+  border-bottom: 15px solid white;
+}
+
+.balloon1-top p {
+  margin: 0;
+  padding: 0;
+}
+.nav-content {
+  cursor: pointer;
+  font-size: 14px;
+}
+.nav-content:hover {
+  transition: 0.3s;
+  color: rgb(0, 167, 137);
+}
+body {
+  overflow-x: hidden;
 }
 </style>
