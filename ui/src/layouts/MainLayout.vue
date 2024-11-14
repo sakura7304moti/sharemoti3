@@ -75,7 +75,19 @@
                   :key="page.id"
                   style="color: rgb(0, 167, 137); font-size: 16px"
                 >
-                  <div class="q-mb-sm">{{ page.title }}</div>
+                  <div class="q-mb-sm row">
+                    <div>{{ page.title }}</div>
+                    <div
+                      class="q-ml-xs"
+                      style="position: relative; top: 2px; left: 2px"
+                    >
+                      <img
+                        v-if="page.img"
+                        :src="page.img"
+                        style="height: 20px; width: 20px; object-fit: contain"
+                      />
+                    </div>
+                  </div>
 
                   <div
                     v-for="item in nowPageList(page.id, head.id)"
@@ -83,13 +95,20 @@
                     style="color: rgb(51, 51, 51)"
                   >
                     <a
-                      class="nav-content q-pb-xs"
+                      class="nav-content q-pb-xs row"
                       @click.prevent="
                         router.replace(item.url);
                         headerClose();
                       "
                     >
-                      {{ item.title }}
+                      <div>{{ item.title }}</div>
+                      <div class="q-ml-xs">
+                        <img
+                          v-if="item.img"
+                          :src="item.img"
+                          style="height: 20px; width: 20px; object-fit: contain"
+                        />
+                      </div>
                     </a>
                   </div>
                 </div>
@@ -292,6 +311,8 @@ export default defineComponent({
 interface headItem {
   title: string;
   id: number;
+  img?: string;
+  icon?: string;
 }
 interface head {
   id: number;
@@ -300,6 +321,7 @@ interface head {
 interface PageState {
   title: string;
   url: string;
+  img?: string;
 }
 
 /*page function */
@@ -404,14 +426,17 @@ function usePage() {
     {
       id: 1,
       title: 'テーブル',
+      img: 'https://img.icons8.com/ios/250/000000/notepad.png',
     },
     {
       id: 2,
       title: 'お土産',
+      img: 'https://img.icons8.com/ios/250/000000/picture.png',
     },
     {
       id: 3,
       title: 'hololive',
+      img: 'src/assets/holo_icon.jpg',
     },
   ] as headItem[]);
 
@@ -419,10 +444,12 @@ function usePage() {
     {
       id: 1,
       title: 'YouTube',
+      img: 'https://img.icons8.com/ios/250/000000/youtube-play.png',
     },
     {
       id: 2,
       title: '共有',
+      img: 'https://img.icons8.com/ios/250/000000/upload-2.png',
     },
   ] as headItem[]);
 
@@ -445,10 +472,12 @@ function usePage() {
     {
       title: 'Google Drive',
       url: 'https://drive.google.com/drive/folders/1XSRGqBx5FeJaOSJj9UtF3e2M7S3Z3PsG?usp=sharing',
+      img: 'https://img.icons8.com/color/48/google-drive--v2.png',
     },
     {
       title: 'Notion',
       url: 'https://brindle-spring-0d6.notion.site/URL-2998ca28318d430cbdd7d5b7ad034ccf?pvs=4',
+      img: 'https://upload.wikimedia.org/wikipedia/commons/4/45/Notion_app_logo.png',
     },
   ] as PageState[]);
 
