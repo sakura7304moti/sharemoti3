@@ -35,7 +35,7 @@
         </div>
 
         <!--ヘッダーの右側(PC用)-->
-        <div class="nav-top fadeRight bg-white">
+        <div class="nav-top fadeRight bg-white" style="padding-right: 200px">
           <div class="nav-child">
             <span
               @click.prevent="
@@ -65,6 +65,7 @@
           <div
             class="balloon1-top fadeRight"
             :class="{ 'hover-page': head.id == 1, 'hover-other': head.id != 1 }"
+            style="cursor: default"
             v-if="head.id > 0"
           >
             <div>
@@ -535,7 +536,7 @@ body {
   padding-right: 20px;
   padding-left: 10px;
   width: calc(100% - 200px);
-  max-width: 600px;
+  max-width: 550px;
   height: 100%;
   border-radius: 10px 0 0 10px;
 }
@@ -755,20 +756,20 @@ body {
 }
 .balloon1-top {
   position: absolute;
-  left: -400px;
+  left: -410px;
   margin: 1.5em 0;
   padding: 10px 14px;
   width: 500px;
   color: #555;
   font-size: 16px;
   background: white;
+  border-radius: 20px;
 }
 
 .balloon1-top:before {
   content: '';
   position: absolute;
   top: -30px;
-  left: 60%;
   margin-left: -15px;
   border: 15px solid transparent;
   border-bottom: 15px solid white;
@@ -789,22 +790,11 @@ body {
 body {
   overflow-x: hidden;
 }
-.nav-select {
-  justify-content: flex-end;
-  display: flex;
-  padding-top: 10px;
-  padding-right: 20px;
-  padding-left: 10px;
-  width: calc(100% - 200px);
-  max-width: 600px;
-  height: 100%;
-  border-radius: 10px 0 0 10px;
-}
 .hover-page::before {
-  left: 60%;
+  left: 30%;
 }
 
 .hover-other::before {
-  left: 85%;
+  left: 50%;
 }
 </style>
