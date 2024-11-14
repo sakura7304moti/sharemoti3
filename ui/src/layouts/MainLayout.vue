@@ -37,13 +37,7 @@
         <!--ヘッダーの右側(PC用)-->
         <div class="nav-top fadeRight bg-white" style="padding-right: 200px">
           <div class="nav-child">
-            <span
-              @click.prevent="
-                router.replace('/');
-                headerClose();
-              "
-              >トップ</span
-            >
+            <span @click.prevent="pageClick('/', 0)">トップ</span>
           </div>
           <div class="nav-child">
             <div @mouseover="headerOpen(1)" @click="headerOpen(1)">
@@ -97,10 +91,7 @@
                   >
                     <a
                       class="nav-content q-pb-xs row"
-                      @click.prevent="
-                        router.replace(item.url);
-                        headerClose();
-                      "
+                      @click.prevent="pageClick(item.url, head.id)"
                     >
                       <div>{{ item.title }}</div>
                       <div class="q-ml-xs">
@@ -238,17 +229,17 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { Router, useRoute, useRouter } from 'vue-router';
 import { createPinia, setActivePinia } from 'pinia';
 
 export default defineComponent({
   name: 'MainLayout',
 
   setup() {
+    const router = useRouter();
     const opened = ref(false);
     setActivePinia(createPinia());
     const leftDrawerOpen = computed(() => opened.value);
-    const router = useRouter();
 
     const head = ref({
       id: 0,
@@ -281,10 +272,16 @@ export default defineComponent({
       callOtherPageList,
       nowPage,
       nowPageList,
-    } = usePage();
+      openLink,
+    } = usePage(router);
 
     const otherPageClick = function (url: string) {
       window.open(url);
+      headerClose();
+    };
+
+    const pageClick = function (url: string, headId: number) {
+      openLink(url, headId);
       headerClose();
     };
 
@@ -306,6 +303,7 @@ export default defineComponent({
       callOtherPageList,
       nowPage,
       nowPageList,
+      pageClick,
     };
   },
 });
@@ -326,7 +324,7 @@ interface PageState {
 }
 
 /*page function */
-function usePage() {
+function usePage(router: Router) {
   const mainPages = ref([
     {
       title: '名言集',
@@ -508,6 +506,14 @@ function usePage() {
     return [];
   }
 
+  function openLink(url: string, headId: number) {
+    if (headId == 2) {
+      window.open(url, '_blank');
+    } else {
+      router.replace(url);
+    }
+  }
+
   return {
     pages,
     callPageList,
@@ -515,6 +521,7 @@ function usePage() {
     callOtherPageList,
     nowPage,
     nowPageList,
+    openLink,
   };
 }
 </script>
@@ -673,7 +680,7 @@ body {
   z-index: 2;
 }
 .nav-child:hover {
-  color: #498e677a;
+  color: rgb(0, 167, 137);
 }
 .nav-child-select {
   background-color: rgba(202, 220, 175, 1);
