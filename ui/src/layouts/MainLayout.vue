@@ -26,51 +26,24 @@
           class="fadeDown"
           v-if="!menuView"
         >
-          <div style="padding-left: 8px; padding-top: 8px">
+          <div
+            style="padding-left: 8px; padding-top: 8px; cursor: pointer"
+            @click="router.replace('/')"
+          >
             韓国のおばあちゃんち
           </div>
         </div>
 
         <!--ヘッダーの右側(PC用)-->
         <div class="nav-top fadeRight bg-white">
-          <div
-            @click.prevent="
-              router.replace('/');
-              headerClose();
-            "
-            class="nav-child"
-          >
-            トップ
-            <div class="balloon1-top fadeRight" v-if="head.id == 1">
-              <div>
-                <div class="row">
-                  <div
-                    class="col"
-                    v-for="p in pages"
-                    :key="p.id"
-                    style="color: rgb(0, 167, 137); font-size: 16px"
-                  >
-                    <div class="q-mb-sm">{{ p.title }}</div>
-
-                    <div
-                      v-for="content in callPageList(p.id)"
-                      :key="content.url"
-                      style="color: rgb(51, 51, 51)"
-                    >
-                      <div
-                        class="nav-content q-pb-xs"
-                        @click="
-                          router.replace(content.url);
-                          headerClose();
-                        "
-                      >
-                        {{ content.title }}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div class="nav-child">
+            <span
+              @click.prevent="
+                router.replace('/');
+                headerClose();
+              "
+              >トップ</span
+            >
           </div>
           <div class="nav-child">
             <div @mouseover="headerOpen(1)" @click="headerOpen(1)">
@@ -80,59 +53,46 @@
 
           <!--info-->
           <div class="nav-child">
-            <div @mouseover="headerOpen(5)" @click="headerOpen(5)">
-              <q-icon name="expand_more" />その他
+            <div @mouseover="headerOpen(2)" @click="headerOpen(2)">
+              <q-icon name="expand_more" />リンク
             </div>
-            <div v-if="head.id == 5">
-              <div
-                class="nav-child-page q-pa-sm"
-                :class="{ 'nav-child-select': head.id == 5 }"
-                style="width: 100px"
-                @click="
-                  otherPageClick(
-                    'https://drive.google.com/drive/folders/1XSRGqBx5FeJaOSJj9UtF3e2M7S3Z3PsG?usp=sharing'
-                  )
-                "
-              >
-                <img
-                  src="../assets/google_drive_icon.png"
-                  style="height: 32px"
-                  v-if="head.id == 5"
-                />
-              </div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-top" style="width: 100%; max-width: 100%">
+        <div style="width: 200px"></div>
+        <div class="nav-child">
+          <div
+            class="balloon1-top fadeRight"
+            :class="{ 'hover-page': head.id == 1, 'hover-other': head.id != 1 }"
+            v-if="head.id > 0"
+          >
+            <div>
+              <div class="row">
+                <div
+                  class="col"
+                  v-for="page in nowPage(head.id)"
+                  :key="page.id"
+                  style="color: rgb(0, 167, 137); font-size: 16px"
+                >
+                  <div class="q-mb-sm">{{ page.title }}</div>
 
-              <div
-                class="nav-child-page q-pa-sm"
-                :class="{ 'nav-child-select': head.id == 5 }"
-                style="width: 100px"
-                @click="
-                  otherPageClick(
-                    'https://brindle-spring-0d6.notion.site/URL-2998ca28318d430cbdd7d5b7ad034ccf?pvs=4'
-                  )
-                "
-              >
-                <img
-                  src="../assets/notion_icon.png"
-                  style="height: 32px"
-                  v-if="head.id == 5"
-                />
-              </div>
-
-              <div
-                class="nav-child-page q-pa-sm"
-                :class="{ 'nav-child-select': head.id == 5 }"
-                style="width: 100px"
-                @click="
-                  otherPageClick(
-                    'https://www.youtube.com/playlist?list=PLbP5km9K7tgfHKxHvk9nOx7hcbLbnHSuS'
-                  )
-                "
-              >
-                <img
-                  src="../assets/youtube_icon.png"
-                  style="height: 32px"
-                  v-if="head.id == 5"
-                />
+                  <div
+                    v-for="item in nowPageList(page.id, head.id)"
+                    :key="item.title"
+                    style="color: rgb(51, 51, 51)"
+                  >
+                    <a
+                      class="nav-content q-pb-xs"
+                      @click.prevent="
+                        router.replace(item.url);
+                        headerClose();
+                      "
+                    >
+                      {{ item.title }}
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -294,7 +254,14 @@ export default defineComponent({
     };
 
     /*page */
-    const { callPageList, pages, nextcloudUrl } = usePage();
+    const {
+      callPageList,
+      pages,
+      otherPages,
+      callOtherPageList,
+      nowPage,
+      nowPageList,
+    } = usePage();
 
     const otherPageClick = function (url: string) {
       window.open(url);
@@ -315,7 +282,10 @@ export default defineComponent({
       pages,
       otherPageClick,
       menuView: ref(false),
-      nextcloudUrl,
+      otherPages,
+      callOtherPageList,
+      nowPage,
+      nowPageList,
     };
   },
 });
@@ -445,14 +415,77 @@ function usePage() {
     },
   ] as headItem[]);
 
-  const nextcloudUrl = computed(() => {
-    const url = window.location.href; // 現在の URL を取得
-    const parsedUrl = new URL(url);
-    const baseUrl = `${parsedUrl.protocol}//${parsedUrl.host}`; // プロトコルとホスト名を組み合わせる
-    return baseUrl.replace('/#/', '').replace(':9000', '') + ':1000';
-  });
+  const otherPages = ref([
+    {
+      id: 1,
+      title: 'YouTube',
+    },
+    {
+      id: 2,
+      title: '共有',
+    },
+  ] as headItem[]);
 
-  return { pages, callPageList, nextcloudUrl, otherClass: 5 };
+  const youtubePages = ref([
+    {
+      title: 'スマブラ',
+      url: 'https://www.youtube.com/playlist?list=PLbP5km9K7tgfHKxHvk9nOx7hcbLbnHSuS',
+    },
+    {
+      title: '荒野行動',
+      url: 'https://www.youtube.com/playlist?list=PLbP5km9K7tgfq6DVQHvM3-8TSmOd6rALY',
+    },
+    {
+      title: 'オンライン飲み会',
+      url: 'https://www.youtube.com/playlist?list=PLbP5km9K7tgfeI0AQkD--BCUIW0syQ_3K',
+    },
+  ] as PageState[]);
+
+  const sharePages = ref([
+    {
+      title: 'Google Drive',
+      url: 'https://drive.google.com/drive/folders/1XSRGqBx5FeJaOSJj9UtF3e2M7S3Z3PsG?usp=sharing',
+    },
+    {
+      title: 'Notion',
+      url: 'https://brindle-spring-0d6.notion.site/URL-2998ca28318d430cbdd7d5b7ad034ccf?pvs=4',
+    },
+  ] as PageState[]);
+
+  function callOtherPageList(no: number) {
+    if (no == 1) return youtubePages.value;
+    if (no == 2) return sharePages.value;
+    return [] as PageState[];
+  }
+
+  function nowPage(id: number) {
+    if (id == 1) {
+      return pages.value;
+    }
+    if (id == 2) {
+      return otherPages.value;
+    }
+    return [];
+  }
+
+  function nowPageList(id: number, headId: number) {
+    if (headId == 1) {
+      return callPageList(id);
+    }
+    if (headId == 2) {
+      return callOtherPageList(id);
+    }
+    return [];
+  }
+
+  return {
+    pages,
+    callPageList,
+    otherPages,
+    callOtherPageList,
+    nowPage,
+    nowPageList,
+  };
 }
 </script>
 <style>
@@ -692,9 +725,8 @@ body {
   background-color: rgba(255, 255, 255, 0.2);
 }
 .balloon1-top {
-  position: relative;
-  display: inline-block;
-  left: -220px;
+  position: absolute;
+  left: -400px;
   margin: 1.5em 0;
   padding: 10px 14px;
   width: 500px;
@@ -707,7 +739,7 @@ body {
   content: '';
   position: absolute;
   top: -30px;
-  left: 70%;
+  left: 60%;
   margin-left: -15px;
   border: 15px solid transparent;
   border-bottom: 15px solid white;
@@ -727,5 +759,23 @@ body {
 }
 body {
   overflow-x: hidden;
+}
+.nav-select {
+  justify-content: flex-end;
+  display: flex;
+  padding-top: 10px;
+  padding-right: 20px;
+  padding-left: 10px;
+  width: calc(100% - 200px);
+  max-width: 600px;
+  height: 100%;
+  border-radius: 10px 0 0 10px;
+}
+.hover-page::before {
+  left: 60%;
+}
+
+.hover-other::before {
+  left: 85%;
 }
 </style>
