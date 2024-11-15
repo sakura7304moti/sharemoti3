@@ -28,6 +28,7 @@ from src.route import voiceList_route
 from src.route import support_route
 from src.route import movieList_route
 from src.route import top_image_route
+from src.route import top_news_route
 
 #scraper
 from src.route import twitter_route
@@ -67,6 +68,7 @@ app.register_blueprint(voiceList_route.app)
 app.register_blueprint(support_route.app)
 app.register_blueprint(movieList_route.app)
 app.register_blueprint(top_image_route.app)
+app.register_blueprint(top_news_route.app)
 #scraper
 app.register_blueprint(twitter_route.app)
 app.register_blueprint(holotwitter_route.app)
