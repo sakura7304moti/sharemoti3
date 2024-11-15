@@ -771,6 +771,7 @@ body {
   font-size: 16px;
   background: white;
   border-radius: 20px;
+  box-shadow: 0 0px 10px 0 rgba(0, 0, 0, 0.1);
 }
 
 .balloon1-top:before {
