@@ -25,12 +25,12 @@
     </div>
 
     <!--おしらせ-->
-    <div style="margin-top: 32px">
+    <div style="margin-top: 32px; text-align: center">
       <div>
         <span
           ><img
             src="../assets/lief-left.png"
-            style="width: 40px; height: 40px; object-fit: contain"
+            style="width: 40px; height: 20px; object-fit: contain"
         /></span>
         <span
           style="
@@ -47,6 +47,45 @@
             style="width: 40px; height: 40px; object-fit: contain"
         /></span>
       </div>
+      <div class="q-mt-md top-news-container">
+        <hr />
+        <div
+          v-for="(rec, idx) in newsDataState.records"
+          :key="idx"
+          class="top-news-card"
+        >
+          <div class="top-news-card-child">
+            <div
+              style="
+                text-align: left;
+                padding-left: 16px;
+                width: 100px;
+                font-family: EB Garamond;
+              "
+            >
+              {{ rec.createdAt }}
+            </div>
+            <div
+              style="
+                font-family: Noto Sans JP;
+
+                padding-left: 16px;
+              "
+            >
+              <span style="color: rgb(0, 167, 137)">{{ rec.page }}</span
+              >で新しいデータが追加されたよ！
+            </div>
+          </div>
+          <hr />
+        </div>
+        <q-pagination
+          v-model="newsCondition"
+          :max="newsDataState.totalCount"
+          color="teal-6"
+          @update:model-value="getNews"
+          class="q-mt-sm"
+        />
+      </div>
     </div>
   </q-page>
 </template>
@@ -56,9 +95,11 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import api from 'src/api/file/TopImageApi';
 import { TopNewsApi } from 'src/api/file/TopNewsApi';
+import { useQuasar } from 'quasar';
 export default defineComponent({
   name: 'IndexPage',
   setup() {
+    const quasar = useQuasar();
     const newsApi = new TopNewsApi();
     const router = useRouter();
     const imageUrl = computed(() => api.singleImageUrl());
@@ -71,16 +112,33 @@ export default defineComponent({
 
     const getNews = async function () {
       isTopNewsLoading.value = true;
-      await newsApi.news(newsCondition.value).then((response) => {
-        if (response) {
-          console.log('news', response);
-          newsDataState.value.totalCount = response.totalCount;
-          newsDataState.value.records = response.records;
-        }
-      });
+      await newsApi
+        .news(newsCondition.value)
+        .then((response) => {
+          if (response) {
+            console.log('news', response);
+            newsDataState.value.totalCount = response.totalCount;
+            newsDataState.value.records = response.records;
+          }
+        })
+        .catch((err) => {
+          console.log('schol err', err);
+          quasar.notify({
+            color: 'red',
+            position: 'top',
+            message: 'お知らせの取得でエラーになった...',
+          });
+        });
+      isTopNewsLoading.value = false;
     };
     getNews();
-    return { imageUrl };
+    return {
+      imageUrl,
+      isTopNewsLoading,
+      newsCondition,
+      newsDataState,
+      getNews,
+    };
   },
 });
 interface NewsDataState {
@@ -90,7 +148,7 @@ interface NewsDataState {
 
 interface TopNews {
   page: string;
-  createAt: string;
+  createdAt: string;
   total: number;
 }
 </script>
@@ -118,6 +176,31 @@ interface TopNews {
   }
   .top-image-container {
     max-width: 100vw;
+  }
+}
+/*ニュース */
+.top-news-card {
+  max-width: 800px;
+  font-size: 12px;
+  line-height: 20px;
+}
+.top-news-container {
+  max-width: 60%;
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+}
+.top-news-card-child {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  display: flex;
+}
+@media (max-width: 650px) {
+  .top-news-container {
+    max-width: 90%;
+  }
+  .top-news-card-child {
+    display: block;
   }
 }
 </style>

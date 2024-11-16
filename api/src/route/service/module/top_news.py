@@ -194,13 +194,15 @@ def get_news(page_no:int, page_size = 5):
         ORDER BY
             "createdAt" DESC,
             page_id
-         limit %(pageSize)s offset %(offset)s
     """
+    query_data = query + " limit %(pageSize)s offset %(offset)s"
     args = {
         'pageSize' : page_size,
         'offset' : (max(page_no - 1,0))*page_size
     }
-    df = query_model.execute_df(query, args)
-    total_count = len(df)
+    df = query_model.execute_df(query_data, args)
+    
+    count_df = query_model.execute_df(query)
+    total_count = len(count_df)
     page_count = int(math.ceil(total_count / page_size))
     return df,page_count

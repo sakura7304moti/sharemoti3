@@ -19,6 +19,6 @@ export interface TopNewsResponse {
 
 interface TopNews {
   page: string;
-  createAt: string;
+  createdAt: string;
   total: number;
 }
