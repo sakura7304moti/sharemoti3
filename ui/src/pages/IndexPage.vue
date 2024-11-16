@@ -10,7 +10,25 @@
           font-family: serif;
         "
       >
-        今日の一枚
+        <span
+          ><img
+            src="../assets/lief-left.png"
+            style="width: 40px; height: 20px; object-fit: contain"
+        /></span>
+        <span
+          style="
+            font-size: 32px;
+            font-family: serif;
+            margin-left: 16px;
+            margin-right: 16px;
+          "
+          >今日の一枚</span
+        >
+        <span
+          ><img
+            src="../assets/lief-right.png"
+            style="width: 40px; height: 40px; object-fit: contain"
+        /></span>
       </div>
       <div
         style="
@@ -20,7 +38,7 @@
           padding-bottom: 16px;
         "
       >
-        <img :src="imageUrl" class="top-image fadeDown" />
+        <img :src="imageUrl" class="top-image" />
       </div>
     </div>
 
