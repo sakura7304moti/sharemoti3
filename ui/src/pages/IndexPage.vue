@@ -17,65 +17,16 @@
         </div>
       </q-chat-message>
     </div>
-    <!--トップ画像-->
-    <div class="top-image-container zoomIn">
-      <div
-        style="
-          margin-left: 16px;
-          margin-bottom: 8px;
-          font-size: 32px;
-          font-family: serif;
-        "
-      >
-        <span
-          ><img
-            src="../assets/lief-left.png"
-            style="width: 40px; height: 20px; object-fit: contain"
-        /></span>
-        <span
-          style="
-            font-size: 32px;
-            font-family: serif;
-            margin-left: 16px;
-            margin-right: 16px;
-          "
-          >今日の一枚</span
-        >
-        <span
-          ><img
-            src="../assets/lief-right.png"
-            style="width: 40px; height: 40px; object-fit: contain"
-        /></span>
-      </div>
-      <div
-        style="
-          text-align: left;
-          max-width: 100vw;
-          width: 100%;
-          padding-bottom: 16px;
-        "
-      >
-        <img :src="imageUrl" class="top-image" />
-      </div>
-    </div>
 
     <!--おしらせ-->
-    <div style="margin-top: 32px; text-align: center">
+    <div style="margin: 32px 0; text-align: center">
       <div>
         <span
           ><img
             src="../assets/lief-left.png"
             style="width: 40px; height: 20px; object-fit: contain"
         /></span>
-        <span
-          style="
-            font-size: 32px;
-            font-family: serif;
-            margin-left: 16px;
-            margin-right: 16px;
-          "
-          >お知らせ</span
-        >
+        <span class="top-title">お知らせ</span>
         <span
           ><img
             src="../assets/lief-right.png"
@@ -110,13 +61,56 @@
           </div>
           <hr />
         </div>
-        <q-pagination
-          v-model="newsCondition"
-          :max="newsDataState.totalCount"
-          color="teal-6"
-          @update:model-value="getNews"
-          class="q-mt-sm"
-        />
+        <div
+          style="
+            display: flex;
+            justify-content: center; /* 中央揃え */
+            align-items: center; /* 垂直方向のセンタリング（必要に応じて） */
+            margin-top: 8px; /* 上下の余白を調整 */
+          "
+        >
+          <q-pagination
+            v-model="newsCondition"
+            :max="newsDataState.totalCount"
+            color="teal-6"
+            @update:model-value="getNews"
+            class="q-mt-sm"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!--トップ画像-->
+    <div class="top-image-container zoomIn">
+      <div
+        style="
+          margin-left: 16px;
+          margin-bottom: 8px;
+          font-size: 32px;
+          font-family: serif;
+        "
+      >
+        <span
+          ><img
+            src="../assets/lief-left.png"
+            style="width: 40px; height: 20px; object-fit: contain"
+        /></span>
+        <span class="top-title">今日の一枚</span>
+        <span
+          ><img
+            src="../assets/lief-right.png"
+            style="width: 40px; height: 40px; object-fit: contain"
+        /></span>
+      </div>
+      <div
+        style="
+          text-align: left;
+          max-width: 100vw;
+          width: 100%;
+          padding-bottom: 16px;
+        "
+      >
+        <img :src="imageUrl" class="top-image" />
       </div>
     </div>
   </q-page>
@@ -202,7 +196,7 @@ interface TopNews {
   padding-right: 16px;
 }
 .top-image-container {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.5);
   max-width: 50vw;
   border-radius: 20px;
   box-shadow: 10px;
@@ -213,6 +207,7 @@ interface TopNews {
   }
   .top-image-container {
     max-width: 100vw;
+    text-align: center;
   }
 }
 /*ニュース */
@@ -228,8 +223,7 @@ interface TopNews {
   margin-left: auto;
 }
 .top-news-card-child {
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding: 16px 0;
   display: flex;
 }
 @media (max-width: 650px) {
@@ -238,6 +232,7 @@ interface TopNews {
   }
   .top-news-card-child {
     display: block;
+    padding: 4px 0;
   }
 }
 .top-news-card-url {
@@ -251,13 +246,22 @@ interface TopNews {
 /*トップメッセージ */
 .top-message__text {
   font-family: 'Noto Serif JP', serif;
-  font-size: 20px;
+  font-size: 18px;
   line-height: 2.3;
+}
+.top-title {
+  font-size: 32px;
+  font-family: serif;
+  margin-left: 16px;
+  margin-right: 16px;
 }
 @media (max-width: 800px) {
   .top-message__text {
     font-size: 16px;
     line-height: 1.5;
+  }
+  .top-title {
+    font-size: 20px;
   }
 }
 </style>
