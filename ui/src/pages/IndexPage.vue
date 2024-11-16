@@ -186,7 +186,7 @@ interface TopNews {
 <style>
 /*画像 */
 .top-image {
-  max-width: 50vw;
+  max-width: 100vw;
   width: 100%;
   max-height: 50vh;
   height: 100%;
@@ -196,19 +196,10 @@ interface TopNews {
   padding-right: 16px;
 }
 .top-image-container {
-  background-color: rgba(255, 255, 255, 0.5);
-  max-width: 50vw;
+  max-width: 100vw;
   border-radius: 20px;
   box-shadow: 10px;
-}
-@media (max-width: 1030px) {
-  .top-image {
-    max-width: 100vw;
-  }
-  .top-image-container {
-    max-width: 100vw;
-    text-align: center;
-  }
+  text-align: center;
 }
 /*ニュース */
 .top-news-card {
