@@ -21,4 +21,5 @@ interface TopNews {
   page: string;
   createdAt: string;
   total: number;
+  url: string;
 }

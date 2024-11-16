@@ -65,14 +65,11 @@
             >
               {{ rec.createdAt }}
             </div>
-            <div
-              style="
-                font-family: Noto Sans JP;
-
-                padding-left: 16px;
-              "
-            >
-              <span style="color: rgb(0, 167, 137)">{{ rec.page }}</span
+            <div style="font-family: Noto Sans JP; padding-left: 16px">
+              <span class="top-news-card-url" @click="onPageClick(rec.url)"
+                ><q-tooltip transition-show="scale" transition-hide="scale"
+                  >{{ rec.page }}にジャンプする</q-tooltip
+                >{{ rec.page }}</span
               >で新しいデータが追加されたよ！
             </div>
           </div>
@@ -102,6 +99,9 @@ export default defineComponent({
     const quasar = useQuasar();
     const newsApi = new TopNewsApi();
     const router = useRouter();
+    const onPageClick = function (url: string) {
+      router.replace(url);
+    };
     const imageUrl = computed(() => api.singleImageUrl());
     const isTopNewsLoading = ref(false);
     const newsCondition = ref(1);
@@ -138,6 +138,7 @@ export default defineComponent({
       newsCondition,
       newsDataState,
       getNews,
+      onPageClick,
     };
   },
 });
@@ -150,6 +151,7 @@ interface TopNews {
   page: string;
   createdAt: string;
   total: number;
+  url: string;
 }
 </script>
 <style>
@@ -202,5 +204,13 @@ interface TopNews {
   .top-news-card-child {
     display: block;
   }
+}
+.top-news-card-url {
+  color: rgb(0, 167, 137);
+  cursor: pointer;
+}
+.top-news-card-url:hover {
+  opacity: 0.5;
+  transition: 0.3s;
 }
 </style>

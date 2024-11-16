@@ -12,6 +12,7 @@ def get_news(page_no:int, page_size = 5):
             SELECT
                 1 AS page_id,
                 '名言集' AS page,
+                '/wordList' as url,
                 TO_CHAR(create_at,
                     'YYYY-MM-DD') AS "createdAt",
                 count(TO_CHAR(create_at,
@@ -31,6 +32,7 @@ def get_news(page_no:int, page_size = 5):
             SELECT
                 2 AS page_id,
                 'あだ名' AS page,
+                '/nameList' as url,
                 TO_CHAR(create_at,
                     'YYYY-MM-DD') AS "createdAt",
                 count(TO_CHAR(create_at,
@@ -52,6 +54,7 @@ def get_news(page_no:int, page_size = 5):
             SELECT
                 3 AS page_id,
                 '焼き直し条約' AS page,
+                '/yaki' as url,
                 TO_CHAR(create_at,
                     'YYYY-MM-DD') AS "createdAt",
                 count(TO_CHAR(create_at,
@@ -73,6 +76,7 @@ def get_news(page_no:int, page_size = 5):
             SELECT
                 4 AS page_id,
                 '俳句' AS page,
+                '/haiku' as url,
                 TO_CHAR(create_at,
                     'YYYY-MM-DD') AS "createdAt",
                 count(TO_CHAR(create_at,
@@ -94,6 +98,7 @@ def get_news(page_no:int, page_size = 5):
             SELECT
                 5 AS page_id,
                 '学校' AS page,
+                '/school' as url,
                 TO_CHAR(create_at,
                     'YYYY-MM-DD') AS "createdAt",
                 count(TO_CHAR(create_at,
@@ -115,6 +120,7 @@ def get_news(page_no:int, page_size = 5):
             SELECT
                 6 AS page_id,
                 '学校コメント' AS page,
+                '/school' as url,
                 TO_CHAR(create_at,
                     'YYYY-MM-DD') AS "createdAt",
                 count(TO_CHAR(create_at,
@@ -136,6 +142,7 @@ def get_news(page_no:int, page_size = 5):
             SELECT
                 7 AS page_id,
                 'スマブラの切り抜き' AS page,
+                '/ssbu_clip' as url,
                 TO_CHAR(date(sp.date),'YYYY-MM-DD') AS "createdAt",
                 count(date(sp.date)) AS total
             FROM
