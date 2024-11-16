@@ -1,5 +1,22 @@
 <template>
   <q-page class="">
+    <!--トップメッセージ-->
+    <div class="q-mb-md">
+      <q-chat-message
+        name="オム子"
+        avatar="src/assets/omuko_icon2.jpg"
+        bg-color="white"
+      >
+        <div
+          class="top-message__text"
+          style="white-space: pre-wrap; word-wrap: break-word"
+        >
+          <div>ここは韓国のおばあちゃんち。</div>
+          <div>あの時の名言やあだ名、スマブラの切り抜きなど...</div>
+          <div>たくさんの思い出があるわ。ゆっくりしていってね。</div>
+        </div>
+      </q-chat-message>
+    </div>
     <!--トップ画像-->
     <div class="top-image-container zoomIn">
       <div
@@ -88,7 +105,7 @@
                 ><q-tooltip transition-show="scale" transition-hide="scale"
                   >{{ rec.page }}にジャンプする</q-tooltip
                 >{{ rec.page }}</span
-              >で新しいデータが追加されたよ！
+              >に新しいデータが追加されたよ！
             </div>
           </div>
           <hr />
@@ -230,5 +247,17 @@ interface TopNews {
 .top-news-card-url:hover {
   opacity: 0.5;
   transition: 0.3s;
+}
+/*トップメッセージ */
+.top-message__text {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 20px;
+  line-height: 2.3;
+}
+@media (max-width: 800px) {
+  .top-message__text {
+    font-size: 16px;
+    line-height: 1.5;
+  }
 }
 </style>
