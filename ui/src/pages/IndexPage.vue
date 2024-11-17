@@ -4,7 +4,7 @@
     <div class="q-mb-md">
       <q-chat-message
         name="オム子"
-        avatar="/src/assets/omuko_icon2.jpg"
+        avatar="../assets/omuko_icon2.jpg"
         bg-color="white"
       >
         <div
@@ -23,13 +23,13 @@
       <div>
         <span
           ><img
-            src="/src/assets/lief-left.png"
+            src="../assets/lief-left.png"
             style="width: 40px; height: 20px; object-fit: contain"
         /></span>
         <span class="top-title">お知らせ</span>
         <span
           ><img
-            src="/src/assets/lief-right.png"
+            src="../assets/lief-right.png"
             style="width: 40px; height: 40px; object-fit: contain"
         /></span>
       </div>
