@@ -170,7 +170,7 @@
         © 韓国のおばあちゃんち製作委員会
         <span>
           <img
-            src="/src/assets/kimutaku.png"
+            src="../assets/kimutaku.png"
             style="
               position: relative;
               top: 10px;
