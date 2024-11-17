@@ -385,7 +385,7 @@ function usePage(router: Router) {
     {
       id: 3,
       title: 'hololive',
-      img: '../assets/holo_icon.jpg',
+      img: 'src/assets/holo_icon.jpg',
     },
   ] as headItem[]);
 
