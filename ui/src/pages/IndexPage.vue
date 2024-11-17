@@ -4,7 +4,7 @@
     <div class="q-mb-md">
       <q-chat-message
         name="オム子"
-        avatar="src/assets/omuko_icon2.jpg"
+        avatar="/src/assets/omuko_icon2.jpg"
         bg-color="white"
       >
         <div
@@ -23,13 +23,13 @@
       <div>
         <span
           ><img
-            src="../assets/lief-left.png"
+            src="/src/assets/lief-left.png"
             style="width: 40px; height: 20px; object-fit: contain"
         /></span>
         <span class="top-title">お知らせ</span>
         <span
           ><img
-            src="../assets/lief-right.png"
+            src="/src/assets/lief-right.png"
             style="width: 40px; height: 40px; object-fit: contain"
         /></span>
       </div>
@@ -81,7 +81,7 @@
     </div>
 
     <!--トップ画像-->
-    <div class="top-image-container zoomIn">
+    <div class="top-image-container zoomIn" style="margin: 32px 0">
       <div
         style="
           margin-left: 16px;
@@ -113,25 +113,104 @@
         <img :src="imageUrl" class="top-image" />
       </div>
     </div>
+
+    <!--スペシャルサンクス-->
+    <div style="margin: 32px 0; text-align: center">
+      <div>
+        <span
+          ><img
+            src="../assets/lief-left.png"
+            style="width: 40px; height: 20px; object-fit: contain"
+        /></span>
+        <span class="top-title">Special Thanks</span>
+        <span
+          ><img
+            src="../assets/lief-right.png"
+            style="width: 40px; height: 40px; object-fit: contain"
+        /></span>
+      </div>
+      <div class="text-left">
+        <span class="top-sp-subtitle" @click="onLinkClick('/namelist')"
+          >学校<q-tooltip transition-show="scale" transition-hide="scale"
+            >学校のページにジャンプする</q-tooltip
+          ></span
+        >
+      </div>
+      <div class="row q-mb-md">
+        <div
+          class="wrap top-sp-content-school"
+          v-for="sc in schoolNames"
+          :key="sc.id"
+          @click="onClickSchoolName(sc.id)"
+        >
+          {{ sc.schoolName }}
+        </div>
+      </div>
+      <div class="text-left">
+        <span class="top-sp-subtitle" @click="onLinkClick('/namelist')"
+          >お友達<q-tooltip transition-show="scale" transition-hide="scale"
+            >あだ名のページにジャンプする</q-tooltip
+          ></span
+        >
+      </div>
+      <div class="row">
+        <div
+          class="wrap top-sp-content-member"
+          v-for="staff in members"
+          :key="staff"
+        >
+          {{ staff }}
+        </div>
+      </div>
+    </div>
+
+    <!--フッター-->
+    <div style="margin: 32px 0; text-align: center">
+      <div style="font-family: EB Garamond">
+        © 韓国のおばあちゃんち製作委員会
+        <span>
+          <img
+            src="/src/assets/kimutaku.png"
+            style="
+              position: relative;
+              top: 10px;
+              height: 40px;
+              width: 40px;
+              object-fit: contain;
+            "
+          />
+        </span>
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import api from 'src/api/file/TopImageApi';
+import { TopImageApi } from 'src/api/file/TopImageApi';
 import { TopNewsApi } from 'src/api/file/TopNewsApi';
+import { SchoolApi } from 'src/api/main/SchoolApi';
+import { NameList2Api } from 'src/api/main/NameList2Api';
 import { useQuasar } from 'quasar';
 export default defineComponent({
   name: 'IndexPage',
   setup() {
     const quasar = useQuasar();
+    // API
+    const topImageApi = new TopImageApi();
     const newsApi = new TopNewsApi();
+    const schoolApi = new SchoolApi();
+    const nameApi = new NameList2Api();
+
+    // STATES
+    const schoolNames = ref([] as School[]);
+    const members = ref([] as string[]);
     const router = useRouter();
     const onPageClick = function (url: string) {
-      router.replace(url);
+      router.push(url);
     };
-    const imageUrl = computed(() => api.singleImageUrl());
+    const imageUrl = computed(() => topImageApi.singleImageUrl());
     const isTopNewsLoading = ref(false);
     const newsCondition = ref(1);
     const newsDataState = ref({
@@ -139,6 +218,7 @@ export default defineComponent({
       totalCount: 0,
     } as NewsDataState);
 
+    // API CALL
     const getNews = async function () {
       isTopNewsLoading.value = true;
       await newsApi
@@ -160,14 +240,46 @@ export default defineComponent({
         });
       isTopNewsLoading.value = false;
     };
+    const getSchoolNames = async function () {
+      await schoolApi.school().then((response) => {
+        if (response) {
+          console.log('school', response);
+          schoolNames.value = response;
+        }
+      });
+    };
+    const onClickSchoolName = function (id: number) {
+      router.push('/school/' + id);
+    };
+
+    const getMemberNames = async function () {
+      await nameApi.search().then((response) => {
+        if (response) {
+          console.log('names', response);
+          members.value = response.reverse().map((it) => it.name);
+        }
+      });
+    };
+
+    const onLinkClick = function (url: string) {
+      router.push(url);
+    };
+
+    // 初期化処理
     getNews();
+    getSchoolNames();
+    getMemberNames();
     return {
       imageUrl,
       isTopNewsLoading,
       newsCondition,
       newsDataState,
+      schoolNames,
+      members,
       getNews,
       onPageClick,
+      onClickSchoolName,
+      onLinkClick,
     };
   },
 });
@@ -181,6 +293,14 @@ interface TopNews {
   createdAt: string;
   total: number;
   url: string;
+}
+interface School {
+  id: number;
+  schoolName: string;
+  principal: string;
+  detail: string;
+  slogan: string;
+  avgStar: null | number;
 }
 </script>
 <style>
@@ -246,12 +366,44 @@ interface TopNews {
   margin-left: 16px;
   margin-right: 16px;
 }
+/*sp */
+.top-sp-subtitle {
+  text-align: left;
+  color: #18bfa0;
+  margin-left: 16px;
+  margin-bottom: 8px;
+  font-size: 32px;
+  font-family: serif;
+  cursor: pointer;
+}
+.top-sp-subtitle:hover {
+  opacity: 0.5;
+  transition: 0.3s;
+}
+.top-sp-content-school {
+  margin-right: 16px;
+  padding-bottom: 8px;
+  font-family: serif;
+  cursor: pointer;
+}
+.top-sp-content-school:hover {
+  opacity: 0.5;
+  transition: 0.3s;
+}
+.top-sp-content-member {
+  margin-right: 16px;
+  padding-bottom: 8px;
+  font-family: serif;
+}
 @media (max-width: 800px) {
   .top-message__text {
     font-size: 16px;
     line-height: 1.5;
   }
   .top-title {
+    font-size: 20px;
+  }
+  .top-sp-subtitle {
     font-size: 20px;
   }
 }

@@ -28,7 +28,7 @@
         >
           <div
             style="padding-left: 8px; padding-top: 8px; cursor: pointer"
-            @click="router.replace('/')"
+            @click="router.push('/')"
           >
             韓国のおばあちゃんち
           </div>
@@ -122,102 +122,50 @@
 
     <nav id="g-nav" :class="{ panelactive: menuView }">
       <div id="g-nav-list">
-        <ul>
-          <li>
-            <a
-              href="#"
-              @click.prevent="
-                router.replace('/');
-                menuView = false;
-              "
+        <div class="g-nav-main">
+          <div v-for="headId in [1, 2]" :key="headId">
+            <div
+              class="g-nav-item"
+              v-for="page in nowPage(headId)"
+              :key="page.id"
+              style="color: rgb(0, 167, 137); font-size: 16px"
             >
-              <q-icon name="home" />トップに戻る
-            </a>
-          </li>
-          <q-separator style="padding-top: 2px" />
-          <li v-for="item in callPageList(1)" :key="item.url">
-            <a
-              href="#"
-              @click.prevent="
-                router.replace(item.url);
-                menuView = false;
-              "
-            >
-              {{ item.title }}
-            </a>
-          </li>
-          <q-separator style="padding-top: 2px" />
+              <div class="q-mb-sm row q-mt-md">
+                <div>{{ page.title }}</div>
+                <div
+                  class="q-ml-xs"
+                  style="position: relative; top: 2px; left: 2px"
+                >
+                  <img
+                    v-if="page.img"
+                    :src="page.img"
+                    style="height: 20px; width: 20px; object-fit: contain"
+                  />
+                </div>
+              </div>
 
-          <li v-for="item in callPageList(2)" :key="item.url">
-            <a
-              href="#"
-              @click.prevent="
-                router.replace(item.url);
-                menuView = false;
-              "
-            >
-              {{ item.title }}
-            </a>
-          </li>
-          <q-separator style="padding-top: 2px" />
-
-          <li v-for="item in callPageList(3)" :key="item.url">
-            <a
-              href="#"
-              @click.prevent="
-                router.replace(item.url);
-                menuView = false;
-              "
-            >
-              {{ item.title }}
-            </a>
-          </li>
-
-          <q-separator style="padding-top: 2px" />
-
-          <li v-for="item in callPageList(4)" :key="item.url">
-            <a
-              href="#"
-              @click.prevent="
-                router.replace(item.url);
-                menuView = false;
-              "
-            >
-              {{ item.title }}
-            </a>
-          </li>
-
-          <q-separator style="padding-top: 2px" />
-
-          <li>
-            <a
-              href="https://drive.google.com/drive/folders/1XSRGqBx5FeJaOSJj9UtF3e2M7S3Z3PsG?usp=sharing"
-            >
-              Google Drive
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://brindle-spring-0d6.notion.site/URL-2998ca28318d430cbdd7d5b7ad034ccf?pvs=4"
-            >
-              Notion
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://brindle-spring-0d6.notion.site/e2d3e427b3574e9e8e25c729b8f7abe9?pvs=4"
-            >
-              俺たちの<br />旅の思い出
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://www.youtube.com/playlist?list=PLbP5km9K7tgfHKxHvk9nOx7hcbLbnHSuS"
-            >
-              YouTube
-            </a>
-          </li>
-        </ul>
+              <div
+                v-for="item in nowPageList(page.id, headId)"
+                :key="item.title"
+                style="color: rgb(51, 51, 51)"
+              >
+                <a
+                  class="nav-content q-pb-xs row"
+                  @click.prevent="pageClick(item.url, headId)"
+                >
+                  <div>{{ item.title }}</div>
+                  <div class="q-ml-xs">
+                    <img
+                      v-if="item.img"
+                      :src="item.img"
+                      style="height: 20px; width: 20px; object-fit: contain"
+                    />
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </nav>
     <!--ページ-->
@@ -238,6 +186,7 @@ export default defineComponent({
   setup() {
     const router = useRouter();
     const opened = ref(false);
+    const menuView = ref(false);
     setActivePinia(createPinia());
     const leftDrawerOpen = computed(() => opened.value);
 
@@ -254,6 +203,7 @@ export default defineComponent({
     const headerClose = function () {
       head.value.id = 0;
       head.value.display = false;
+      menuView.value = false;
     };
 
     const headerClick = function (id: number) {
@@ -298,7 +248,7 @@ export default defineComponent({
       callPageList,
       pages,
       otherPageClick,
-      menuView: ref(false),
+      menuView,
       otherPages,
       callOtherPageList,
       nowPage,
@@ -435,7 +385,7 @@ function usePage(router: Router) {
     {
       id: 3,
       title: 'hololive',
-      img: 'src/assets/holo_icon.jpg',
+      img: '/src/assets/holo_icon.jpg',
     },
   ] as headItem[]);
 
@@ -510,7 +460,7 @@ function usePage(router: Router) {
     if (headId == 2) {
       window.open(url, '_blank');
     } else {
-      router.replace(url);
+      router.push(url);
     }
   }
 
@@ -617,7 +567,7 @@ body {
   left: 0;
   width: 100%;
   height: 100vh; /*ナビの高さ*/
-  background: #bdbbbb;
+  background: white;
   /*動き*/
   transition: all 0.6s;
   overflow-y: scroll;
@@ -640,7 +590,7 @@ body {
 }
 
 /*ナビゲーション*/
-#g-nav ul {
+#g-nav .g-nav-main {
   position: absolute;
   z-index: 999;
   /*ナビゲーション天地中央揃え*/
@@ -650,21 +600,19 @@ body {
 }
 
 /*リストのレイアウト設定*/
-
-#g-nav li {
+#g-nav .g-nav-item {
   list-style: none;
   text-align: center;
   z-index: 10;
 }
 
-#g-nav li a {
+#g-nav .g-nav-item a {
   color: rgb(51, 51, 51);
   text-decoration: none;
   padding: 10px;
   display: block;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-weight: bold;
 }
 .nav-child {
   color: #333;
@@ -795,9 +743,7 @@ body {
   transition: 0.3s;
   color: rgb(0, 167, 137);
 }
-body {
-  overflow-x: hidden;
-}
+
 .hover-page::before {
   left: 30%;
 }
