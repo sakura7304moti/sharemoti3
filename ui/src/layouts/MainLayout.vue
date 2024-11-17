@@ -35,7 +35,7 @@
         </div>
 
         <!--ヘッダーの右側(PC用)-->
-        <div class="nav-top fadeRight bg-white" style="padding-right: 200px">
+        <div class="nav-top fadeDown bg-white" style="padding-right: 200px">
           <div class="nav-child">
             <span @click.prevent="pageClick('/', 0)">トップ</span>
           </div>
@@ -57,7 +57,7 @@
         <div style="width: 200px"></div>
         <div class="nav-child">
           <div
-            class="balloon1-top fadeRight"
+            class="balloon1-top fadeDown"
             :class="{ 'hover-page': head.id == 1, 'hover-other': head.id != 1 }"
             style="cursor: default"
             v-if="head.id > 0"

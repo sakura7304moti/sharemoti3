@@ -34,7 +34,10 @@
         /></span>
       </div>
       <div class="q-mt-md top-news-container">
-        <hr />
+        <div class="top-news-card">
+          <hr />
+        </div>
+
         <div
           v-for="(rec, idx) in newsDataState.records"
           :key="idx"
@@ -53,7 +56,10 @@
             </div>
             <div style="font-family: Noto Sans JP; padding-left: 16px">
               <span class="top-news-card-url" @click="onPageClick(rec.url)"
-                ><q-tooltip transition-show="scale" transition-hide="scale"
+                ><q-tooltip
+                  class="top-tooltip"
+                  transition-show="scale"
+                  transition-hide="scale"
                   >{{ rec.page }}にジャンプする</q-tooltip
                 >{{ rec.page }}</span
               >に新しいデータが追加されたよ！
@@ -131,7 +137,10 @@
       </div>
       <div class="text-left">
         <span class="top-sp-subtitle" @click="onLinkClick('/namelist')"
-          >学校<q-tooltip transition-show="scale" transition-hide="scale"
+          >学校<q-tooltip
+            class="top-tooltip"
+            transition-show="scale"
+            transition-hide="scale"
             >学校のページにジャンプする</q-tooltip
           ></span
         >
@@ -148,7 +157,10 @@
       </div>
       <div class="text-left">
         <span class="top-sp-subtitle" @click="onLinkClick('/namelist')"
-          >お友達<q-tooltip transition-show="scale" transition-hide="scale"
+          >お友達<q-tooltip
+            class="top-tooltip"
+            transition-show="scale"
+            transition-hide="scale"
             >あだ名のページにジャンプする</q-tooltip
           ></span
         >
@@ -405,6 +417,9 @@ interface School {
   }
   .top-sp-subtitle {
     font-size: 20px;
+  }
+  .top-tooltip {
+    display: none;
   }
 }
 </style>
