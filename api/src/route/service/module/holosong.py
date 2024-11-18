@@ -7,6 +7,7 @@ import re
 
 from src.route.service.module.utils import const, interface
 opt = const.Option()
+query_model = const.PsqlBase()
 
 def get_cover_songs() -> list[interface.SongQueryRecord]:
     records = []

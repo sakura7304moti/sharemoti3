@@ -13,7 +13,7 @@ from src.route.service.module.utils import const, interface
 
 p = const.Path()
 dbname = p.db_holotwitter()
-query_base = const.DbBase(dbname)
+query_base = const.PsqlBase()
 
 def extract_username(url: str) -> str:
     """
@@ -76,7 +76,7 @@ def format_data(item:dict):
         
     # ツイート
     tweet = interface.HolotwitterTweet(
-        item['id'],
+        int(item['id']),
         item.get('displayText', ''),
         parse_date(item['createdAt']),
         item.get('rtCount', 0),
@@ -99,7 +99,7 @@ def format_data(item:dict):
         for m in item['media']:
             medias.append(
                 interface.HolotwitterMedia(
-                    item['id'],
+                    int(item['id']),
                     m.get('type', ''),
                     m['item'].get('url', ''),
                     m['item'].get('mediaUrl', ''),
@@ -113,7 +113,7 @@ def format_data(item:dict):
         for u in item['urls']:
             urls.append(
                 interface.HolotwitterUrl(
-                    item['id'],
+                    int(item['id']),
                     u.get('expandedUrl', '')
                 )
             )
@@ -183,7 +183,7 @@ def get_tweet(user_id:str):
 
 def make_table():    
     tweet_query = """
-    CREATE TABLE IF NOT EXISTS tweet (
+    CREATE TABLE IF NOT EXISTS holo.holox_tweet (
         id INTEGER PRIMARY KEY,
         text TEXT,
         created_at TEXT,
@@ -194,7 +194,7 @@ def make_table():
     """
 
     user_query = """
-    CREATE TABLE IF NOT EXISTS user (
+    CREATE TABLE IF NOT EXISTS holo.holox_user (
         name TEXT,
         screen_name TEXT PRIMARY KEY,
         profile_image TEXT
@@ -202,22 +202,22 @@ def make_table():
     """
 
     media_query = """
-    CREATE TABLE IF NOT EXISTS media (
+    CREATE TABLE IF NOT EXISTS holo.holox_media (
         tweet_id INTEGER,
         type TEXT,
         url TEXT,
         media_url TEXT,
         meta_image_url TEXT,
-        FOREIGN KEY (tweet_id) REFERENCES tweet (id),
+        FOREIGN KEY (tweet_id) REFERENCES holo.holox_tweet (id),
         PRIMARY KEY (tweet_id, media_url)
     );
     """
 
     url_query = """
-    CREATE TABLE IF NOT EXISTS url (
+    CREATE TABLE IF NOT EXISTS holo.holox_url (
         tweet_id INTEGER,
         expanded_url TEXT,
-        FOREIGN KEY (tweet_id) REFERENCES tweet (id),
+        FOREIGN KEY (tweet_id) REFERENCES holo.holox_tweet (id),
         PRIMARY KEY (tweet_id, expanded_url)
     );
     """
@@ -229,7 +229,7 @@ def make_table():
 def save_tweet(condition:interface.HolotwitterTweet):
     # 要素の存在チェック
     check_df = query_base.execute_df(
-        'SELECT * from tweet where id = :id',
+        'SELECT * from holo.holox_tweet where id = %(id)s',
         {
             'id' : condition.id
         }
@@ -238,7 +238,7 @@ def save_tweet(condition:interface.HolotwitterTweet):
     if len(check_df) == 0:
         # insert
         query = """
-        INSERT INTO tweet(
+        INSERT INTO holo.holox_tweet(
             id,
             text,
             created_at,
@@ -247,24 +247,24 @@ def save_tweet(condition:interface.HolotwitterTweet):
             user_screen_name
         )
         VALUES(
-            :id,
-            :text,
-            :createdAt,
-            :rtCount,
-            :likesCount,
-            :userScreenName
+            %(id)s,
+            %(text)s,
+            %(createdAt)s,
+            %(rtCount)s,
+            %(likesCount)s,
+            %(userScreenName)s
         )
         """
     else:
         # update
         query = """
-        UPDATE tweet
+        UPDATE holo.holox_tweet
         SET
-            text = :text,
-            rt_count = :rtCount,
-            likes_count = :likesCount
+            text = %(text)s,
+            rt_count = %(rtCount)s,
+            likes_count = %(likesCount)s
         where
-            id = :id
+            id = %(id)s
         """
     args = condition.to_args()
     query_base.execute_commit(query, args)
@@ -274,7 +274,7 @@ def save_tweet(condition:interface.HolotwitterTweet):
 def save_user(condition:interface.HolotwitterUser):
     # 要素の存在チェック
     check_df = query_base.execute_df(
-        'SELECT * from user where screen_name = :screenName',
+        'SELECT * from holo.holox_user where screen_name = %(screenName)s',
         {
             'screenName' : condition.screen_name
         }
@@ -282,32 +282,32 @@ def save_user(condition:interface.HolotwitterUser):
 
     if len(check_df) == 0:
         query = """
-        INSERT INTO user(
+        INSERT INTO holo.holox_user(
             name,
             screen_name,
             profile_image
         )
         VALUES(
-            :name,
-            :screenName,
-            :profileImage
+            %(name)s,
+            %(screenName)s,
+            %(profileImage)s
         )
         """
     else:
         query = """
-        UPDATE user
+        UPDATE holo.holox_user
         SET
-            name = :name,
-            profile_image = :profileImage
+            name = %(name)s,
+            profile_image = %(profileImage)s
         WHERE
-            screen_name = :screenName
+            screen_name = %(screenName)s
         """
     args = condition.to_args()
     query_base.execute_commit(query, args)
 
 def save_media(condition:interface.HolotwitterMedia):
     query = """
-    INSERT INTO media(
+    INSERT INTO holo.holox_media(
         tweet_id,
         type,
         url,
@@ -316,18 +316,18 @@ def save_media(condition:interface.HolotwitterMedia):
     )
     SELECT * FROM(
         VALUES(
-            :tweetId,
-            :type,
-            :url,
-            :mediaUrl,
-            :metaImageUrl
+            %(tweetId)s,
+            %(type)s,
+            %(url)s,
+            %(mediaUrl)s,
+            %(metaImageUrl)s
         )
     ) as add_item
     WHERE NOT EXISTS (
-        SELECT * FROM media
+        SELECT * FROM holo.holox_media
         WHERE
-            tweet_id = :tweetId and
-            media_url = :mediaUrl
+            tweet_id = %(tweetId)s and
+            media_url = %(mediaUrl)s
     )
     
     """
@@ -337,21 +337,21 @@ def save_media(condition:interface.HolotwitterMedia):
 
 def save_url(condition:interface.HolotwitterUrl):
     query = """
-    INSERT INTO url(
+    INSERT INTO holo.holox_url(
         tweet_id,
         expanded_url
     )
     SELECT * FROM(
         VALUES(
-            :tweetId,
-            :expandedUrl
+            %(tweetId)s,
+            %(expandedUrl)s
         )
     ) as add_item
     WHERE NOT EXISTS (
-        SELECT * FROM url
+        SELECT * FROM holo.holox_url
         WHERE
-            tweet_id = :tweetId and
-            expanded_url = :expandedUrl
+            tweet_id = %(tweetId)s and
+            expanded_url = %(expandedUrl)s
     )
     
     """
@@ -361,7 +361,7 @@ def save_url(condition:interface.HolotwitterUrl):
 
 def scraping():
     # テーブル作成
-    make_table()
+    #make_table()
     
     # アカウント情報の取得
     twitter_acount = get_twitter_acount()
