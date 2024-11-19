@@ -143,16 +143,16 @@ def get_news(page_no:int, page_size = 5):
                 7 AS page_id,
                 'スマブラの切り抜き' AS page,
                 '/ssbu_clip' as url,
-                TO_CHAR(date(sp.date),'YYYY-MM-DD') AS "createdAt",
-                count(date(sp.date)) AS total
+                TO_CHAR(date(sp.create_at),'YYYY-MM-DD') AS "createdAt",
+                count(date(sp.create_at)) AS total
             FROM
                 sharemoti.ssbu_clip AS sp
             WHERE
-                date(sp.date) IS NOT NULL
+                date(sp.create_at) IS NOT NULL
             GROUP BY
-                date(sp.date)
+                date(sp.create_at)
             ORDER BY
-                date(sp.date)
+                date(sp.create_at)
                 DESC
             LIMIT 5
         ),

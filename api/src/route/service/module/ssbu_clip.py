@@ -112,14 +112,16 @@ def insert_clip(condition:interface.SsbuClip):
         file_name,
         dir_name,
         char_name,
-        date
+        date,
+        create_at
     )
     VALUES(
         %(title)s,
         %(fileName)s,
         %(dirName)s,
         %(charName)s,
-        %(date)s
+        %(date)s,
+        %(createAt)s
     )
     """
     clip_args = condition.to_args()
