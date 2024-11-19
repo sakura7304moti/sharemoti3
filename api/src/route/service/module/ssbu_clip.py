@@ -3,7 +3,10 @@ import glob
 from typing import List
 import pandas as pd
 import math
+import datetime
 
+
+from pathlib import Path
 from tqdm import tqdm
 
 
@@ -58,6 +61,8 @@ def get_clip(path:str, index:int, category_list:List[str]) -> interface.SsbuClip
     dir_name = os.path.dirname(path.replace(SSBU_CLIP_DIR, ''))
     date = os.path.basename(dir_name)
     cates = [c for c in category_list if c in file_name]
+    p = Path(path)
+    create_at = datetime.datetime.fromtimestamp(p.stat().st_ctime).strftime('%Y-%m-%d')
 
     clip = interface.SsbuClip(
         index,
@@ -66,6 +71,7 @@ def get_clip(path:str, index:int, category_list:List[str]) -> interface.SsbuClip
         char_name,
         dir_name,
         date,
+        create_at,
         cates
     )
     return clip

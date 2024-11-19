@@ -727,6 +727,7 @@ class SsbuClip:
         char_name:str,
         dir_name:str,
         date:str,
+        create_at:str,
         cates:List[str]
     ):
         self.id = id
@@ -735,6 +736,7 @@ class SsbuClip:
         self.char_name = char_name
         self.dir_name = dir_name
         self.date = date
+        self.create_at = create_at
         self.cates = cates
 
     def to_args(self):
@@ -744,7 +746,8 @@ class SsbuClip:
             "fileName":unicodedata.normalize('NFC', self.file_name),
             "charName":unicodedata.normalize('NFC', self.char_name),
             "dirName":unicodedata.normalize('NFC', self.dir_name),
-            "date":unicodedata.normalize('NFC', self.date)
+            "date":unicodedata.normalize('NFC', self.date),
+            "createAt":unicodedata.normalize('NFC', self.create_at),
         }
     
 class SsbuClipSearchCondition:
