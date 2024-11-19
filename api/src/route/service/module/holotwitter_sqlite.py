@@ -8,7 +8,7 @@ import math
 
 p = const.Path()
 dbname = p.db_holotwitter()
-query_base = const.PsqlBase()
+query_base = const.DbBase(dbname)
 
 def get_acount():
     """
@@ -17,9 +17,9 @@ def get_acount():
     query = """
     SELECT
         name,
-        screen_name as "screenName",
-        profile_image as "profileImage"
-    from holo.holox_user
+        screen_name as screenName,
+        profile_image as profileImage
+    from user
     order by name
     """
     return query_base.execute_df(query)
@@ -44,24 +44,24 @@ def search_tweet(condition:interface.HoloTwitterSearchCondition):
         SELECT
             tw.id,
             tw.text,
-            datetime(tw.created_at, '+9 hours') as "createdAt",
-            tw.user_screen_name as "userScreenName",
-            us.name as "userName",
-            us.profile_image as "profileImage" 
+            datetime(tw.created_at, '+9 hours') as createdAt,
+            tw.user_screen_name as userScreenName,
+            us.name as userName,
+            us.profile_image as profileImage 
         from
-            holo.holox_tweet as tw
-        left join holo.holox_user as us 
+            tweet as tw
+        left join user as us 
         on tw.user_screen_name = us.screen_name
         where 1 = 1 
         """
         if cond.text != "":
-            query += "and (tw.text like %(likeText)s or tw.user_screen_name like %(likeText)s) "
+            query += "and (tw.text like :likeText or tw.user_screen_name like :likeText) "
 
         if cond.acount_name != "":
-            query += "and tw.user_screen_name = %(acountName)s "
+            query += "and tw.user_screen_name = :acountName "
 
         if cond.start_date != "":
-            query += "and tw.created_at >= %(startDate)s "
+            query += "and tw.created_at >= :startDate "
 
         query += """
         order by tw.created_at desc 
@@ -70,7 +70,7 @@ def search_tweet(condition:interface.HoloTwitterSearchCondition):
     
     # 1ページのレコード取得
     query = to_query(condition)
-    query += "limit %(pageSize)s offset %(offset)s"
+    query += "limit :pageSize offset :offset"
     args = condition.to_args()
     args["offset"] = (max(condition.page_no - 1,0))*condition.page_size
     df = query_base.execute_df(query, args) 
@@ -100,9 +100,9 @@ def get_media(id:int):
     SELECT
         type,
         url,
-        media_url as "mediaUrl",
-        meta_image_url as "metaImageUrl"
-    from holo.holox_media
-        where tweet_id = %(id)s
+        media_url as mediaUrl,
+        meta_image_url as metaImageUrl
+    from media
+        where tweet_id = :id
     """
     return query_base.execute_df(query, {"id":id})
