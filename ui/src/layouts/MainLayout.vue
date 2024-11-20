@@ -414,6 +414,10 @@ function usePage(router: Router) {
       title: 'オンライン飲み会',
       url: 'https://www.youtube.com/playlist?list=PLbP5km9K7tgfeI0AQkD--BCUIW0syQ_3K',
     },
+    {
+      title: 'なんでも',
+      url: 'https://www.youtube.com/playlist?list=PLbP5km9K7tgeK7NlQqAskIY2ZL1KT8sxJ',
+    },
   ] as PageState[]);
 
   const sharePages = ref([
