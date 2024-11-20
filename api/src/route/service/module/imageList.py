@@ -7,139 +7,80 @@ import datetime
 from src.route.service.module.utils import const, interface
 p = const.Path()
 dbname = p.db_main_share()
-
-"""
-CREATE DB
-"""
-def init():
-    conn = sqlite3.connect(dbname)
-    # データベースへのコネクションを閉じる。(必須)
-    conn.close()
-    """
-    CREATE TABLE
-    """
-    conn = sqlite3.connect(dbname)
-    # sqliteを操作するカーソルオブジェクトを作成
-    cur = conn.cursor()
-    
-    # テーブル作成
-    cur.execute(
-    """CREATE TABLE IF NOT EXISTS imageList2(
-        id INTEGER PRIMARY KEY,
-        file_name STRING,
-        ext STRING,
-        title STRING,
-        detail STRING,
-        create_at STRING,
-        update_at STRING
-    )
-    """
-    )
-    # データベースへコミット。これで変更が反映される。
-    conn.commit()
-    conn.close()
+query_model = const.PsqlBase()
     
 """
 INSERT
 """
-def insert(file_name:str,ext:str,title:str,detail:str):
-    try:
-        # 現在の日時を取得
-        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        # データベースに接続する
-        conn = sqlite3.connect(dbname)
-        cursor = conn.cursor()
-
-        query = """
-        INSERT INTO imageList2 (file_name , ext , title, detail , create_at, update_at) VALUES 
-        (:file_name, :ext ,  :title, :detail, :current_time, :current_time)
+def insert(condition:interface.Image):
+    query = """
+        INSERT INTO sharemoti.image(
+            file_name,
+            ext, 
+            title, 
+            detail, 
+            create_at, 
+            update_at
+        ) VALUES (
+            %(fileName)s, 
+            %(ext)s,  
+            %(title)s, 
+            %(detail)s, 
+            now(), 
+            now()
+        )
         """
-        args = {"file_name":file_name,"ext":ext,"title":title,"detail":detail,"current_time":current_time}
-        cursor.execute(query, args)
-
-        # データベースへコミット。これで変更が反映される。
-        conn.commit()
-        conn.close()
-        result = interface.ImageListStatusResult(True,"")
-    except Exception as e:
-        print(f'insert err -> {e}')
-        result = interface.ImageListStatusResult(False,str(e))
-    return result
+    query_model.execute_commit(query, condition.to_args())
     
 """
 UPDATE
 更新できるのはタイトルと詳細のみ
 """
-def update(id:int,title:str,detail:str):
-    try:
-        # 現在の日時を取得
-        current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        # データベースに接続する
-        conn = sqlite3.connect(dbname)
-        cursor = conn.cursor()
-        
-        query = """
-        UPDATE imageList2 SET title = :title , detail = :detail , update_at = :current_time WHERE id = :id
-        """
-        
-        args={
-            'id':id,
-            'title':title,
-            'detail':detail,
-            'current_time':current_time
-        }
-        cursor.execute(query, args)
-
-        # データベースへコミット。これで変更が反映される。
-        conn.commit()
-        conn.close()
-        result = interface.ImageListStatusResult(True,"")
-    except Exception as e:
-        print(f'update err -> {e}')
-        result = interface.ImageListStatusResult(False,str(e))
-    return result
+def update(condition:interface.Image):
+    query = """
+    UPDATE sharemoti.image 
+    SET 
+        title = %(title)s, 
+        detail = %(detail)s, 
+        update_at = now() 
+    WHERE 
+        id = %(id)s
+    """
+    query_model.execute_commit(query, condition.to_args())
+    
     
 """
 DELETE
 """
 def delete(id:int):
-    try:
-        # データベースに接続する
-        conn = sqlite3.connect(dbname)
-        cursor = conn.cursor()
-        query = "DELETE FROM imageList2 WHERE id = :id"
-        args = {"id":id}
-        # レコードを削除する
-        cursor.execute(query, args)
-
-        # 変更をコミットし、接続を閉じる
-        conn.commit()
-        conn.close()
-        
-        result = interface.ImageListStatusResult(True,"")
-    except Exception as e:
-        print(f'delete err -> {e}')
-        result = interface.ImageListStatusResult(False,str(e))
-    return result
+    query = "DELETE FROM sharemoti.image where id = %(id)s"
+    args = {'id' : id}
+    query_model.execute_commit(query, args)
     
 """
 検索
 """
-def search():
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
-    query = "SELECT * FROM imageList2"
-    # SELECTクエリを実行
-    cursor.execute(query)
-    results = cursor.fetchall()
-    
-    # 結果を表示
-    records = []
-    for row in results:
-        rec = interface.ImageListRecord(*row)
-        records.append(rec)
+def search(page_no:int, page_size:int):
+    base_query = """
+        SELECT
+            id,
+            file_name as "fileName",
+            ext,
+            title,
+            detail,
+            create_at as "createAt",
+            update_at as "updateAt"
+        from sharemoti.image
+        order by id
+        
+    """
+    data_query = base_query + " offset :offset limit :limit"
 
-    # 接続を閉じる
-    conn.close()
-    return records
+    args = {
+        'offset' : max(page_no - 1, 0) * page_size,
+        'limit' : page_size
+    }
+    df = query_model.execute_df(data_query, args)
+
+    count_df = query_model.execute_df(base_query)
+    return df, len(count_df)

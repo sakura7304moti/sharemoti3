@@ -1,3 +1,5 @@
+from pandas import DataFrame
+from src.route.service.module.utils import interface
 from src.route.service.module import imagelist
 
 """
@@ -10,17 +12,17 @@ def create_db():
     """
     imagelist.init()
 
-def insert(file_name:str,ext:str,title:str,detail:str):
+def insert(condition:interface.Image):
     """
     レコード追加
     """
-    return imagelist.insert(file_name, ext, title, detail)
+    imagelist.insert(condition)
 
-def update(id:int,title:str,detail:str):
+def update(condition:interface.Image):
     """
     レコード更新
     """
-    return imagelist.update(id, title, detail)
+    imagelist.update(condition)
 
 def delete(id:int):
     """
@@ -28,7 +30,7 @@ def delete(id:int):
     """
     return imagelist.delete(id)
 
-def search():
+def search() -> tuple[DataFrame, int]:
     """
     レコード一覧を取得
     """

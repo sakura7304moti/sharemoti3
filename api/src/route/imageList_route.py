@@ -6,47 +6,54 @@ import json
 import os
 from flask import Blueprint, flash, request, jsonify, send_file
 from werkzeug.utils import secure_filename
+from src.route.route_base import success_status
+from src.route.service.module.utils import interface
 from src.route.service import imagelist_service
 from src.route.service.module.utils import const
 
 
-#改行文字を取得
-NEW_LINE_TEXT = const.get_new_line_text()
+
 
 # Blueprintのオブジェクトを生成する
 app = Blueprint('imageList',__name__)
 
-# imageListの初期設定
-imagelist_service.create_db()
-
 # 保存先のフォルダーを取得・作成
 p = const.Path()
-UPLOAD_FOLDER = p.image_uploads()
-#print(f'uploads -> {UPLOAD_FOLDER}')
+UPLOAD_FOLDER = os.path.join(p.share_folder(), '画像', 'おばあちゃんち')
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-
-# ファイルアップロードを許可するか判別する
 def allowed_file(filename):
+    # ファイルアップロードを許可するか判別する
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+def to_condition():
+    """
+    検索条件
+    """
+    json_data = request.json
+    id = int(json_data.get("id", ""))
+    file_name = json_data.get("fileName", "")
+    ext = json_data.get("ext", "")
+    title = json_data.get("title", "")
+    detail = json_data.get("detail", "")
+    return interface.Image(
+        id = id,
+        file_name = file_name,
+        ext = ext,
+        title = title,
+        detail = detail
+    )
+
+
 @app.route('/imageList/insert',methods=['POST'])
 def imagelist_insert():
-    json_data = request.json
-    file_name = json_data.get("fileName","")
-    ext = json_data.get("ext","")
-    title = json_data.get("title","")
-    detail = json_data.get("detail","")
-    
-    result = imagelist_service.insert(file_name,ext,title,detail)
-    
-    # JSON文字列に変換
-    json_data = json.dumps(result.__dict__(), ensure_ascii=False)
-    response = jsonify(json_data)
-    return response
+    condition = to_condition()
+    imagelist_service.insert(condition)
+    return success_status()
     
 @app.route('/imageList/upload', methods=['GET', 'POST'])
 def imagelist_upload():
@@ -57,6 +64,7 @@ def imagelist_upload():
         jsondata = {"fileName":''}
         response = jsonify(jsondata)
         return response
+    
     file = request.files['file']
     # If the user does not select a file, the browser submits an
     # empty file without a filename.
@@ -84,60 +92,40 @@ def imagelist_upload():
         
 @app.route('/imageList/download',methods=['GET'])
 def imagelist_download():
-    #image file only
+    #idでダウンロードできるようにする
     file_name = request.args.get('fileName')
     ext = request.args.get('ext')
     
     path = os.path.join(UPLOAD_FOLDER,file_name+'.'+ext)
     print(f'download path -> {path}')
-    return send_file(path, mimetype='image/jpeg')
+    if ext == 'png':
+        minetype = 'image/png'
+    else:
+        minetype = 'image/jpeg'
+    return send_file(path, mimetype=minetype)
 
-@app.route("/imageList/search",methods=['GET'])
-def imagelist_search():
-    records = imagelist_service.search()
-    # 辞書にまとめる
-    result = {
-        "records": json.dumps(
-            records, default=lambda obj: obj.__dict__(), ensure_ascii=False
-        )
+@app.route("/imageList/search/<int:page>",methods=['GET'])
+def imagelist_search(page:int):
+    PAGE_SIZE = 8
+    df,total_count = imagelist_service.search(page, PAGE_SIZE)
+
+    records = df.to_json(orient='records',force_ascii=False)
+    records_json = json.loads(records)
+    response = {
+        "records" : records_json,
+        "totalCount":total_count
     }
-    # レスポンスとしてJSONデータを返す
-    # JSON文字列に変換
-    json_data = json.dumps(result, ensure_ascii=False)
-    json_data = json_data.replace('"[{', "[{").replace('}]"', "}]")
-    
-    #改行文字だけ残してバックスラッシュは削除
-    json_data = json_data.replace('\\n',NEW_LINE_TEXT)
-    json_data = json_data.replace('\\','')
-    json_data = json_data.replace(NEW_LINE_TEXT,'\\n')
-    
-    if len(records) == 0:
-        json_data = "[]"
-    response = jsonify(json_data)
-    return response
+    return jsonify(json.dumps(response))
 
 @app.route("/imageList/update",methods=["POST"])
 def imagelist_update():
-    json_data = request.json
-    id = json_data.get("id",-1)
-    title = json_data.get("title","")
-    detail = json_data.get("detail","")
-    
-    result = imagelist_service.update(id,title,detail)
-    
-    # JSON文字列に変換
-    json_data = json.dumps(result.__dict__(), ensure_ascii=False)
-    response = jsonify(json_data)
-    return response
+    condition = to_condition()
+    imagelist_service.update(condition)
+    return success_status()
 
 @app.route("/imageList/delete",methods=["POST"])
 def imagelist_delete():
     json_data = request.json
     id = json_data.get("id",-1)
-    
-    result = imagelist_service.delete(id)
-    
-    # JSON文字列に変換
-    json_data = json.dumps(result.__dict__(), ensure_ascii=False)
-    response = jsonify(json_data)
-    return response
+    imagelist_service.delete(id)
+    return success_status()

@@ -819,3 +819,28 @@ class Haiku:
             "poster":self.poster,
             "detail":self.detail
         }
+    
+
+class Image:
+    def __init__(
+        self,
+        id:int,
+        file_name:str,
+        ext:str,
+        title:str,
+        detail:str
+    ):
+        self.id = id
+        self.file_name = file_name
+        self.ext = ext
+        self.title = title
+        self.detail = detail
+    
+    def to_args(self):
+        return {
+            'id' : self.id,
+            'fileName' : self.file_name,
+            'ext':self.ext,
+            'title':self.title,
+            'detail':self.detail
+        }
