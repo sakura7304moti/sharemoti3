@@ -90,15 +90,13 @@ def imagelist_upload():
         response = jsonify(jsondata)
         return response
         
-@app.route('/imageList/download',methods=['GET'])
-def imagelist_download():
-    #idでダウンロードできるようにする
-    file_name = request.args.get('fileName')
-    ext = request.args.get('ext')
+@app.route('/imageList/download/<int:id>',methods=['GET'])
+def imagelist_download(id:int):
+    file_name = imagelist_service.get_file_name(id)
     
-    path = os.path.join(UPLOAD_FOLDER,file_name+'.'+ext)
+    path = os.path.join(UPLOAD_FOLDER,file_name)
     print(f'download path -> {path}')
-    if ext == 'png':
+    if 'png' in file_name:
         minetype = 'image/png'
     else:
         minetype = 'image/jpeg'

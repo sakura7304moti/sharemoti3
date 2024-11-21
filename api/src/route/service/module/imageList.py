@@ -1,6 +1,7 @@
 """
 画像一覧
 """
+import math
 import sqlite3
 import datetime
 
@@ -68,13 +69,13 @@ def search(page_no:int, page_size:int):
             ext,
             title,
             detail,
-            create_at as "createAt",
-            update_at as "updateAt"
+            TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
+            TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
         from sharemoti.image
-        order by id
+        order by update_at desc
         
     """
-    data_query = base_query + " offset :offset limit :limit"
+    data_query = base_query + " offset %(offset)s limit %(limit)s"
 
     args = {
         'offset' : max(page_no - 1, 0) * page_size,
@@ -83,4 +84,16 @@ def search(page_no:int, page_size:int):
     df = query_model.execute_df(data_query, args)
 
     count_df = query_model.execute_df(base_query)
-    return df, len(count_df)
+    total_count = math.ceil(len(count_df) / page_size)
+    return df, total_count
+
+def get_file_name(id:int) -> str:
+    query = """
+        SELECT
+            (file_name || '.' || ext) as "fileName"
+        from sharemoti.image
+        where id = %(id)s
+    """
+    args = {'id':id}
+    df = query_model.execute_df(query, args)
+    return str(df.iat[0,0])
