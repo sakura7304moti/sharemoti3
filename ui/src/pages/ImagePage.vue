@@ -13,7 +13,7 @@
         <div class="content-detail">
           {{ rec.detail }}
         </div>
-        <div>
+        <div class="flipDown">
           <img class="content-img" :src="imageUrl(rec.id)" />
         </div>
         <div class="text-grey">
@@ -22,6 +22,14 @@
         </div>
       </div>
     </div>
+    <button v-if="isShowTopButton" class="scroll-to-top" @click="onTopClick">
+      <img
+        style="height: 70px"
+        class="holotwitter-top-scroll-img"
+        src="../assets/Rocket Base 512x512.png"
+      />
+      <div>トップに戻る</div>
+    </button>
   </q-page>
 </template>
 <script lang="ts">
@@ -30,13 +38,14 @@ import api from 'src/api/main/ImageListApi';
 export default defineComponent({
   name: 'image-page',
   setup() {
+    const isShowTopButton = ref(false);
     const loadState = ref({
       isSave: false,
       isSearch: false,
       isDelete: false,
     } as LoadState);
     const pageNo = ref(1);
-    const maxPage = ref(0);
+    const maxPage = ref(1);
 
     const records = ref([] as Image[]);
 
@@ -56,13 +65,52 @@ export default defineComponent({
       return api.imageUrl(id);
     };
     search(pageNo.value);
+
+    const onScrollSearch = async function () {
+      console.log('scroll called');
+      if (!loadState.value.isSearch && pageNo.value < maxPage.value) {
+        console.log('scroll search...');
+        pageNo.value = pageNo.value + 1;
+        await search(pageNo.value);
+      }
+    };
+    const handleScroll = () => {
+      const bottomOfWindow =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.offsetHeight - 200;
+
+      if (bottomOfWindow && !loadState.value.isSearch) {
+        onScrollSearch();
+      }
+    };
+
+    const onTopClick = function () {
+      // スムーズにページのトップに戻る
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    };
+
+    const setTopBtn = function () {
+      isShowTopButton.value = window.scrollY > 100;
+    };
+
+    const onMount = function () {
+      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', setTopBtn);
+    };
+
+    onMount();
     return {
+      isShowTopButton,
       loadState,
       pageNo,
       maxPage,
       records,
       search,
       imageUrl,
+      onTopClick,
     };
   },
 });
@@ -83,7 +131,7 @@ interface Image {
 </script>
 <style>
 .content-card {
-  max-width: 800px;
+  max-width: 680px;
   margin-bottom: 48px;
   padding: 16px;
 }
@@ -114,7 +162,7 @@ interface Image {
   object-fit: contain;
   object-position: left;
 }
-@media (max-width: 800px) {
+@media (max-width: 680px) {
   .content-title {
     line-height: 20px;
     font-size: 18px;
@@ -122,6 +170,45 @@ interface Image {
   .content-detail {
     max-width: 100%;
     line-height: 20px;
+  }
+}
+/* 下へ */
+.flipDown {
+  animation-name: flipDownAnime;
+  animation-duration: 1.5s;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+
+@keyframes flipDownAnime {
+  from {
+    transform: perspective(2500px) rotateX(100deg);
+    opacity: 0;
+  }
+
+  to {
+    transform: perspective(2500px) rotateX(0);
+    opacity: 1;
+  }
+}
+/* 左へ */
+.flipLeft {
+  animation-name: flipLeftAnime;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  perspective-origin: left center;
+  opacity: 0;
+}
+
+@keyframes flipLeftAnime {
+  from {
+    transform: perspective(600px) translate3d(0, 0, 0) rotateY(30deg);
+    opacity: 0;
+  }
+
+  to {
+    transform: perspective(600px) translate3d(0, 0, 0) rotateY(0deg);
+    opacity: 1;
   }
 }
 </style>

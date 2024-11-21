@@ -48,7 +48,7 @@ def category_first(text:str):
         ) AS date
     FROM
         A
-    order by date asc nulls last;
+    order by date desc nulls last;
     """
     args = {
         "text" : f'%{text}%'
