@@ -72,7 +72,7 @@ def search(page_no:int, page_size:int):
             TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
             TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
         from sharemoti.image
-        order by update_at desc
+        order by create_at desc
         
     """
     data_query = base_query + " offset %(offset)s limit %(limit)s"
