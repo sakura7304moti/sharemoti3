@@ -1,8 +1,64 @@
 <template>
   <q-page class="">
-    <div class="text-h6">名画伯展覧会</div>
+    <div class="text-h6">
+      <span class="q-mr-sm">名画伯展覧会</span
+      ><q-icon
+        class="cursor-pointer"
+        name="info"
+        color="teal-4"
+        size="sm"
+        @click="ruleDialog = true"
+      ></q-icon>
+    </div>
+    <!--使い方ダイアログ-->
+    <q-dialog v-model="ruleDialog">
+      <q-card style="max-width: 500px">
+        <q-card-section>
+          <div class="text-h6">つかいかた！</div>
+          <div class="q-ma-md text-body1">
+            <div>1.編集は画像をクリックしてねっ</div>
+          </div>
+          <div>
+            <q-btn
+              icon="thumb_up_alt"
+              color="primary"
+              label="分かったよ、、、おれ、、、駄菓子屋になるよっ！！"
+              @click="ruleDialog = false"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
     <!--追加・検索・削除ボタン表示エリア-->
-    <div></div>
+    <div
+      style="
+        margin: 16px;
+        background-color: white;
+        height: 100px;
+        max-width: 400px;
+        border-radius: 10px;
+      "
+    >
+      <div style="position: relative; top: 16px; left: 16px; height: 60px">
+        <div
+          style="
+            cursor: pointer;
+            width: 200px;
+            height: 40px;
+            border-radius: 10px;
+            background-color: rgb(24, 191, 160);
+          "
+        >
+          <div class="text-center text-h6 text-white">歴史を刻む</div>
+        </div>
+      </div>
+      <q-toggle
+        v-model="deleteOpen"
+        label="削除アイコン表示"
+        icon="delete"
+        color="negative"
+      />
+    </div>
 
     <!--画像表示エリア-->
     <div>
@@ -20,13 +76,19 @@
             @click="editClick(rec.id)"
           />
         </div>
-        <div class="text-grey">
+        <div class="text-grey q-mb-sm">
           <span class="q-pr-sm">最終更新日</span><span class="q-pr-sm">:</span>
           <span class="q-pr-lg">{{
             rec.createAt < rec.updateAt ? rec.updateAt : rec.createAt
           }}</span>
-
-          <q-btn flat label="最大化する" icon="crop_free" size="md" />
+        </div>
+        <div>
+          <q-btn
+            label="最大化する"
+            icon="crop_free"
+            size="md"
+            @click="maxClick(rec.id)"
+          />
         </div>
       </div>
     </div>
@@ -40,7 +102,38 @@
       />
       <div>トップに戻る</div>
     </button>
-    <!---->
+    <!--最大化ダイアログ-->
+    <q-dialog v-model="maxDialog" maximized>
+      <q-card>
+        <q-bar class="bg-primary row justify-between" style="height: 40px">
+          <div class="text-white" style="font-size: 24px">
+            {{ records.find((it) => it.id == maxImageId)?.title }}
+          </div>
+          <div>
+            <q-icon
+              name="close"
+              color="white"
+              size="md"
+              style="cursor: pointer"
+              @click="maxDialog = false"
+            >
+              <q-tooltip>閉じる</q-tooltip>
+            </q-icon>
+          </div>
+        </q-bar>
+        <div>
+          <img
+            :src="imageUrl(maxImageId)"
+            style="
+              max-width: 100%;
+              width: 100%;
+              height: auto;
+              object-fit: contain;
+            "
+          />
+        </div>
+      </q-card>
+    </q-dialog>
     <!--編集ダイアログ-->
     <q-dialog v-model="editDialog">
       <q-card style="max-width: 800px; width: 100%" v-if="editItem">
@@ -84,18 +177,23 @@
               />
             </div>
             <div class="row justify-between">
-              <q-btn
-                label="キャンセルする"
-                color="grey-4"
-                text-color="black"
-                @click="editDialog = false"
-              />
-              <q-btn
-                label="保存する"
-                color="primary"
-                @click="edit(editItem)"
-                :loading="loadState.isSave"
-              />
+              <div>
+                <q-btn
+                  label="削除する"
+                  color="negative"
+                  @click="editDialog = false"
+                  v-if="deleteOpen"
+                />
+              </div>
+
+              <div>
+                <q-btn
+                  label="保存する"
+                  color="primary"
+                  @click="edit(editItem)"
+                  :loading="loadState.isSave"
+                />
+              </div>
             </div>
           </div>
         </q-card-section>
@@ -236,11 +334,34 @@ export default defineComponent({
       loadState.value.isSave = false;
     };
 
+    /**最大化 */
+    const maxDialog = ref(false);
+    const maxImageId = ref(-1);
+    const maxClick = function (id: number) {
+      maxDialog.value = true;
+      maxImageId.value = id;
+    };
+
+    const maxClose = function () {
+      maxDialog.value = false;
+      maxImageId.value = -1;
+    };
+
+    /**使い方説明 */
+    const ruleDialog = ref(false);
+
+    /**削除 */
+    const deleteOpen = ref(false);
+
     onMount();
     return {
       editItem,
+      maxImageId,
       editDialog,
+      maxDialog,
+      ruleDialog,
       isShowTopButton,
+      deleteOpen,
       loadState,
       pageNo,
       maxPage,
@@ -250,6 +371,8 @@ export default defineComponent({
       onTopClick,
       editClick,
       edit,
+      maxClick,
+      maxClose,
     };
   },
 });
