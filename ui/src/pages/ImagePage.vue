@@ -14,7 +14,7 @@
     <q-dialog v-model="ruleDialog">
       <q-card style="max-width: 500px">
         <q-card-section>
-          <div class="text-h6">つかいかた！</div>
+          <div class="text-subtitle1">つかいかた！</div>
           <div class="q-ma-md text-body1">
             <div>1.編集は画像をクリックしてねっ</div>
           </div>
@@ -30,35 +30,94 @@
       </q-card>
     </q-dialog>
     <!--追加・検索・削除ボタン表示エリア-->
-    <div
-      style="
-        margin: 16px;
-        background-color: white;
-        height: 100px;
-        max-width: 400px;
-        border-radius: 10px;
-      "
-    >
-      <div style="position: relative; top: 16px; left: 16px; height: 60px">
-        <div
-          style="
-            cursor: pointer;
-            width: 200px;
-            height: 40px;
-            border-radius: 10px;
-            background-color: rgb(24, 191, 160);
-          "
-        >
-          <div class="text-center text-h6 text-white">歴史を刻む</div>
-        </div>
-      </div>
-      <q-toggle
-        v-model="deleteOpen"
-        label="削除アイコン表示"
-        icon="delete"
-        color="negative"
+    <div class="q-mt-md q-ml-lg text-grey text-subtitle1">
+      登録・編集
+      <img
+        src="https://img.icons8.com/ios/250/000000/edit.png"
+        style="width: 13px; height: auto; object-fit: contain; margin-left: 4px"
       />
     </div>
+    <div class="row flex-wrap edit-area">
+      <div class="create-btn-outline">
+        <div class="create-btn">
+          <div class="text-center text-h6 text-white" @click="addDialog = true">
+            名画を寄贈する
+          </div>
+        </div>
+      </div>
+      <div class="q-mt-sm">
+        <q-toggle
+          v-model="deleteBtnDisplay"
+          label="削除アイコン表示"
+          icon="delete"
+          color="negative"
+          class="q-ml-sm"
+        />
+      </div>
+    </div>
+
+    <!--追加ダイアログ-->
+    <q-dialog v-model="addDialog">
+      <q-card class="edit-dialog">
+        <q-card-section>
+          <div class="row justify-between">
+            <div class="text-subtitle1">名画の登録審査</div>
+            <div>
+              <q-icon
+                name="close"
+                size="sm"
+                style="cursor: pointer"
+                @click="addDialog = false"
+              />
+            </div>
+          </div>
+          <div class="q-ma-md">
+            <div class="q-mb-md">
+              <q-file
+                v-model="pickFile"
+                :url="uploadUrl"
+                label="画像を選択する・画像をドロップする"
+                outlined
+                dense
+                :clearable="pickFile?.size != null"
+                style="max-width: 300px"
+                stack-label
+              />
+            </div>
+            <div class="q-mb-md">
+              <q-input
+                type="textarea"
+                label="タイトル"
+                outlined
+                stack-label
+                v-model="addItem.title"
+              />
+            </div>
+            <div class="q-mb-md">
+              <q-input
+                type="textarea"
+                label="詳細"
+                outlined
+                stack-label
+                v-model="addItem.detail"
+              />
+            </div>
+            <div class="q-mb-md" v-if="addImage">
+              <img :src="addImage" class="content-img editing" />
+            </div>
+            <div class="text-right">
+              <q-btn
+                label="追加する"
+                color="primary"
+                @click="insert()"
+                :disable="(pickFile?.size ?? 0) == 0"
+                :loading="loadState.isSave"
+              />
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
 
     <!--画像表示エリア-->
     <div>
@@ -87,6 +146,7 @@
             label="最大化する"
             icon="crop_free"
             size="md"
+            dense
             @click="maxClick(rec.id)"
           />
         </div>
@@ -105,8 +165,8 @@
     <!--最大化ダイアログ-->
     <q-dialog v-model="maxDialog" maximized>
       <q-card>
-        <q-bar class="bg-primary row justify-between" style="height: 40px">
-          <div class="text-white" style="font-size: 24px">
+        <q-bar class="bg-primary row justify-between" style="min-height: 40px">
+          <div class="text-white" style="font-size: 20px">
             {{ records.find((it) => it.id == maxImageId)?.title }}
           </div>
           <div>
@@ -136,7 +196,7 @@
     </q-dialog>
     <!--編集ダイアログ-->
     <q-dialog v-model="editDialog">
-      <q-card style="max-width: 800px; width: 100%" v-if="editItem">
+      <q-card class="edit-dialog" v-if="editItem">
         <q-card-section>
           <div class="row justify-between">
             <div class="text-subtitle1">名画に手を加える</div>
@@ -170,19 +230,15 @@
               />
             </div>
             <div class="q-mb-md">
-              <img
-                class="content-img editing"
-                :src="imageUrl(editItem.id)"
-                @click="editClick(editItem.id)"
-              />
+              <img class="content-img editing" :src="imageUrl(editItem.id)" />
             </div>
             <div class="row justify-between">
               <div>
                 <q-btn
                   label="削除する"
                   color="negative"
-                  @click="editDialog = false"
-                  v-if="deleteOpen"
+                  @click="deleteDialog = true"
+                  v-if="deleteBtnDisplay"
                 />
               </div>
 
@@ -199,10 +255,56 @@
         </q-card-section>
       </q-card>
     </q-dialog>
+
+    <!--削除確認-->
+    <q-dialog v-model="deleteDialog">
+      <q-card class="edit-dialog">
+        <q-card-section>
+          <div class="row justify-between">
+            <div class="text-subtitle1">
+              削除確認<q-icon
+                name="delete"
+                color="negative"
+                class="q-ml-sm"
+                size="xs"
+              />
+            </div>
+            <div>
+              <q-icon
+                name="close"
+                size="sm"
+                style="cursor: pointer"
+                @click="deleteDialog = false"
+              />
+            </div>
+          </div>
+          <div class="q-ma-md">
+            <div>次の画像を削除する？</div>
+            <div class="q-mb-md">
+              <img class="content-img editing" :src="imageUrl(editItem.id)" />
+            </div>
+            <div class="row justify-between">
+              <div>
+                <q-btn label="キャンセルする" @click="deleteDialog = false" />
+              </div>
+
+              <div>
+                <q-btn
+                  label="削除する"
+                  color="negative"
+                  @click="drop(editItem.id)"
+                  :loading="loadState.isDelete"
+                />
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import api from 'src/api/main/ImageListApi';
 import { useQuasar } from 'quasar';
 export default defineComponent({
@@ -246,7 +348,6 @@ export default defineComponent({
     const imageUrl = function (id: number) {
       return api.imageUrl(id);
     };
-    search(pageNo.value);
 
     const onScrollSearch = async function () {
       console.log('scroll called');
@@ -283,6 +384,7 @@ export default defineComponent({
     };
 
     const onMount = function () {
+      search(pageNo.value);
       window.addEventListener('scroll', handleScroll);
       window.addEventListener('scroll', setTopBtn);
     };
@@ -351,7 +453,126 @@ export default defineComponent({
     const ruleDialog = ref(false);
 
     /**削除 */
-    const deleteOpen = ref(false);
+    const deleteBtnDisplay = ref(false);
+    const deleteDialog = ref(false);
+    const drop = async function (id: number) {
+      loadState.value.isDelete = true;
+      await api
+        .dell(id)
+        .then((response) => {
+          if (response) {
+            console.log('delete image response', response);
+            records.value = records.value.filter((it) => it.id != id); // 消したレコードを除外
+            deleteDialog.value = false;
+            editDialog.value = false;
+            quasar.notify({
+              color: 'primary',
+              position: 'top',
+              message: '消したでぇ〜',
+            });
+          }
+        })
+        .catch((err) => {
+          console.log('delete err', err);
+          quasar.notify({
+            color: 'negative',
+            position: 'top',
+            message: '削除でエラーになった...',
+          });
+        });
+      loadState.value.isDelete = false;
+    };
+
+    /**追加 */
+    const pickFile = ref(null as File | null);
+    const addDialog = ref(false);
+    const addImage = ref('');
+    const uploadUrl = computed(() => api.uploadUrl());
+    const addItem = ref({
+      fileName: '',
+      ext: '',
+      title: '',
+      detail: '',
+    } as AddImage);
+    const insert = async function () {
+      loadState.value.isSave = true;
+      if (pickFile.value == null) {
+        loadState.value.isSave = false;
+        return;
+      }
+      const fileName = await uploadImage(pickFile.value);
+      if (fileName == null) {
+        loadState.value.isSave = false;
+        return;
+      }
+
+      addItem.value.fileName = fileName;
+      await addRecord(addItem.value);
+      loadState.value.isSave = false;
+      addDialog.value = false;
+      quasar.notify({
+        color: 'primary',
+        position: 'top',
+        message: '合格！登録したで！',
+      });
+    };
+    const uploadImage = async function (file: File) {
+      let fileName = null as string | null;
+      await api
+        .upload(file)
+        .then((response) => {
+          if (response) {
+            console.log('upload response', response);
+            fileName = response.fileName.split('.')[0];
+            addItem.value.fileName = fileName;
+            addItem.value.ext = response.fileName.split('.')[1];
+          }
+        })
+        .catch((err) => {
+          console.log('upload err', err);
+          quasar.notify({
+            color: 'negative',
+            position: 'top',
+            message: 'アップロードでエラーになった...',
+          });
+        });
+      return fileName;
+    };
+
+    const addRecord = async function (state: AddImage) {
+      await api
+        .insert(state)
+        .then((response) => {
+          if (response) {
+            console.log('insert repsonse', response);
+            records.value.splice(0);
+            pageNo.value = 1;
+            search(pageNo.value);
+            addItem.value = {
+              fileName: '',
+              ext: '',
+              title: '',
+              detail: '',
+            };
+            pickFile.value = null;
+          }
+        })
+        .catch((err) => {
+          console.log('insert err', err);
+          quasar.notify({
+            color: 'negative',
+            position: 'top',
+            message: '追加でエラーになった...',
+          });
+        });
+    };
+    watch(pickFile, () => {
+      if (pickFile.value) {
+        addImage.value = URL.createObjectURL(pickFile.value);
+      } else {
+        addImage.value = '';
+      }
+    });
 
     onMount();
     return {
@@ -360,19 +581,27 @@ export default defineComponent({
       editDialog,
       maxDialog,
       ruleDialog,
+      addDialog,
+      pickFile,
       isShowTopButton,
-      deleteOpen,
+      deleteBtnDisplay,
+      deleteDialog,
       loadState,
+      addImage,
+      addItem,
       pageNo,
       maxPage,
       records,
       search,
       imageUrl,
+      uploadUrl,
       onTopClick,
       editClick,
       edit,
       maxClick,
       maxClose,
+      drop,
+      insert,
     };
   },
 });
@@ -390,8 +619,43 @@ interface Image {
   createAt: string;
   updateAt: string;
 }
+interface AddImage {
+  fileName: string;
+  ext: string;
+  title: string;
+  detail: string;
+}
 </script>
 <style>
+/**検索欄や編集アイコンなど */
+.edit-area {
+  margin: 16px;
+  margin-top: 0px;
+  background-color: white;
+  height: 120px;
+  max-width: 420px;
+  width: calc(100% - 16px * 2);
+  border-radius: 10px;
+}
+.create-btn-outline {
+  position: relative;
+  top: 16px;
+  left: 16px;
+  height: 70px;
+  margin-right: 24px;
+}
+.create-btn {
+  cursor: pointer;
+  width: 200px;
+  height: 40px;
+  border-radius: 10px;
+  background-color: rgb(24, 191, 160);
+}
+.edit-dialog {
+  max-width: 800px;
+  width: 100%;
+}
+/**画像 */
 .content-card {
   max-width: 680px;
   margin-bottom: 48px;

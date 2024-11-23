@@ -55,19 +55,18 @@ export class ImageListApi extends MainAPIClient {
     );
   }
 
-  public dell(
-    request: ImageListDeleteRequest
-  ): Promise<ImageListStatusResult | null> {
-    const url = '/imageList/delete';
+  public dell(id: number): Promise<ImageListStatusResult | null> {
+    const url = '/imageList/delete/' + id;
     const path = this.combineUrl(url);
-    return this.httpPost<ImageListDeleteRequest, ImageListStatusResult>(
-      path,
-      request
-    );
+    return this.httpDelete<ImageListStatusResult>(path);
   }
 
   public imageUrl(id: number): string {
     return this.combineUrl('/imageList/download/' + id);
+  }
+
+  public uploadUrl() {
+    return this.combineUrl('/imageList/upload');
   }
 }
 

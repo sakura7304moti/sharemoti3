@@ -35,7 +35,7 @@ def to_condition():
     検索条件
     """
     json_data = request.json
-    id = int(json_data.get("id", ""))
+    id = int(json_data.get("id", "0"))
     file_name = json_data.get("fileName", "")
     ext = json_data.get("ext", "")
     title = json_data.get("title", "")
@@ -121,9 +121,10 @@ def imagelist_update():
     imagelist_service.update(condition)
     return success_status()
 
-@app.route("/imageList/delete",methods=["POST"])
-def imagelist_delete():
-    json_data = request.json
-    id = json_data.get("id",-1)
+@app.route("/imageList/delete/<int:id>",methods=["DELETE"])
+def imagelist_delete(id:int | None):
+    if(id == None):
+        return jsonify({'message': 'id not found'}), 404
+    
     imagelist_service.delete(id)
     return success_status()
