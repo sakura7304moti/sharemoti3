@@ -67,7 +67,11 @@ def search_illusts(query:str):
                 next_qs = api.parse_qs(json_result.next_url)
                 if next_qs is None:
                     return illusts
-                json_result = api.search_illust(**next_qs)
+                try:
+                    json_result = api.search_illust(**next_qs)
+                except Exception as e:
+                    print(e)
+                    return illusts
                 time.sleep(1)
                 if json_result is None:
                     return illusts
