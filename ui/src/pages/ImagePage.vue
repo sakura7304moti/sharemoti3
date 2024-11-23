@@ -236,19 +236,43 @@
                 style="max-width: 300px"
                 stack-label
               />
-              <q-toggle
-                v-model="isDefaultImage"
-                label="以前の画像にする"
-                v-if="editFile"
-              />
+              <div v-if="editFile" class="text-subtitle2 q-mt-sm">
+                保存する画像を選択してね
+              </div>
             </div>
-            <div class="q-mb-md">
+            <div class="q-mb-md" v-if="editFile == null">
               <div v-if="isDefaultImage">
                 <img class="content-img editing" :src="editItem.url" />
               </div>
               <div v-else>
                 <img class="content-img editing" :src="editImage" />
               </div>
+            </div>
+            <div class="row q-mb-md" v-if="editFile">
+              <div class="col-2"></div>
+              <div class="col-4 q-mr-sm">
+                <img
+                  class="content-img select"
+                  :class="{ 'not-selection': !isDefaultImage }"
+                  :src="editItem.url"
+                  @click="isDefaultImage = true"
+                />
+                <div v-if="isDefaultImage" class="text-center">
+                  <q-chip size="md">そのまま</q-chip>
+                </div>
+              </div>
+              <div class="col-4 q-ml-sm">
+                <img
+                  class="content-img select"
+                  :class="{ 'not-selection': isDefaultImage }"
+                  :src="editImage"
+                  @click="isDefaultImage = false"
+                />
+                <div v-if="!isDefaultImage" class="text-center">
+                  <q-chip size="md">New!</q-chip>
+                </div>
+              </div>
+              <div class="col-2"></div>
             </div>
             <div class="row justify-between">
               <div>
@@ -767,6 +791,18 @@ interface AddImage {
   max-height: 400px;
   object-position: center;
   cursor: default;
+}
+.content-img.select {
+  height: 100px;
+  object-position: center;
+  cursor: pointer;
+  background-color: rgba(200, 200, 200, 0.5);
+  border: 3px solid rgba(200, 200, 200, 1);
+  border-radius: 10px;
+  padding: 4px;
+}
+.not-selection {
+  opacity: 0.5;
 }
 .zoom-text {
   cursor: pointer;
