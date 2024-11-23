@@ -35,7 +35,6 @@ def insert(condition:interface.Image):
     
 """
 UPDATE
-更新できるのはタイトルと詳細のみ
 """
 def update(condition:interface.Image):
     query = """
@@ -48,6 +47,19 @@ def update(condition:interface.Image):
         id = %(id)s
     """
     query_model.execute_commit(query, condition.to_args())
+    before_full_file_name = get_file_name(condition.id)
+    after_full_file_name = f'{condition.file_name}.{condition.ext}'
+    if before_full_file_name != after_full_file_name:
+        query = """
+        UPDATE sharemoti.image 
+        SET 
+            file_name = %(fileName)s, 
+            ext = %(ext)s, 
+            update_at = now() 
+        WHERE 
+            id = %(id)s
+        """
+        query_model.execute_commit(query, condition.to_args())
     
     
 """

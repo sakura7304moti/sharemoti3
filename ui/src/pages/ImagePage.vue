@@ -129,11 +129,7 @@
           {{ rec.detail }}
         </div>
         <div class="flipDown">
-          <img
-            class="content-img"
-            :src="imageUrl(rec.id)"
-            @click="editClick(rec.id)"
-          />
+          <img class="content-img" :src="rec.url" @click="editClick(rec.id)" />
         </div>
         <div class="text-grey q-mb-sm">
           <span class="q-pr-sm">最終更新日</span><span class="q-pr-sm">:</span>
@@ -229,8 +225,30 @@
                 v-model="editItem.detail"
               />
             </div>
+            <div class="q-mb-sm">
+              <q-file
+                v-model="editFile"
+                :url="uploadUrl"
+                label="画像を変更する"
+                outlined
+                dense
+                :clearable="editFile?.size != null"
+                style="max-width: 300px"
+                stack-label
+              />
+              <q-toggle
+                v-model="isDefaultImage"
+                label="以前の画像にする"
+                v-if="editFile"
+              />
+            </div>
             <div class="q-mb-md">
-              <img class="content-img editing" :src="imageUrl(editItem.id)" />
+              <div v-if="isDefaultImage">
+                <img class="content-img editing" :src="editItem.url" />
+              </div>
+              <div v-else>
+                <img class="content-img editing" :src="editImage" />
+              </div>
             </div>
             <div class="row justify-between">
               <div>
@@ -246,7 +264,7 @@
                 <q-btn
                   label="保存する"
                   color="primary"
-                  @click="edit(editItem)"
+                  @click="edit()"
                   :loading="loadState.isSave"
                 />
               </div>
@@ -279,9 +297,15 @@
             </div>
           </div>
           <div class="q-ma-md">
-            <div>次の画像を削除する？</div>
+            <div class="q-mb-md text-subtitle2">次の画像を削除する？</div>
             <div class="q-mb-md">
-              <img class="content-img editing" :src="imageUrl(editItem.id)" />
+              <q-field dense label="タイトル" stack-label outlined>
+                {{ editItem.title }}
+              </q-field>
+            </div>
+
+            <div class="q-mb-md">
+              <img class="content-img editing" :src="editItem.url" />
             </div>
             <div class="row justify-between">
               <div>
@@ -331,7 +355,18 @@ export default defineComponent({
           if (response) {
             console.log('search response', response);
             maxPage.value = response.totalCount;
-            response.records.forEach((it) => records.value.push(it));
+            response.records.forEach((it) =>
+              records.value.push({
+                id: it.id,
+                title: it.title,
+                detail: it.detail,
+                fileName: it.fileName,
+                ext: it.ext,
+                createAt: it.createAt,
+                updateAt: it.updateAt,
+                url: imageUrl(it.id),
+              })
+            );
           }
         })
         .catch((err) => {
@@ -346,7 +381,7 @@ export default defineComponent({
     };
 
     const imageUrl = function (id: number) {
-      return api.imageUrl(id);
+      return api.imageUrl(id) + '?any=' + new Date().getTime();
     };
 
     const onScrollSearch = async function () {
@@ -395,6 +430,8 @@ export default defineComponent({
     /**編集 */
     const editDialog = ref(false);
     const editItem = ref({} as Image);
+    const editImage = ref('');
+    const isDefaultImage = ref(true);
     const editClick = function (id: number) {
       const found = records.value.find((it) => it.id == id);
       if (found) {
@@ -406,12 +443,28 @@ export default defineComponent({
           detail: found.detail,
           createAt: found.createAt,
           updateAt: found.updateAt,
+          url: imageUrl(id),
         };
         editDialog.value = true;
       }
     };
-    const edit = async function (image: Image) {
+    const edit = async function () {
       loadState.value.isSave = true;
+      if (isDefaultImage.value == false && editFile.value) {
+        const fileName = await uploadImage(editFile.value);
+        if (fileName == null) {
+          loadState.value.isSave = false;
+          return;
+        }
+        editItem.value.fileName = fileName.split('.')[0];
+        editItem.value.ext = fileName.split('.')[1];
+      }
+      await update(editItem.value);
+      editFile.value = null;
+      loadState.value.isSave = false;
+      editDialog.value = false;
+    };
+    const update = async function (image: Image) {
       await api
         .update(image)
         .then((response) => {
@@ -420,8 +473,8 @@ export default defineComponent({
           if (found) {
             found.title = image.title;
             found.detail = image.detail;
+            found.url = imageUrl(image.id);
           }
-          editDialog.value = false;
           quasar.notify({
             color: 'primary',
             position: 'top',
@@ -436,11 +489,11 @@ export default defineComponent({
             message: '更新でエラーになった...',
           });
         });
-      loadState.value.isSave = false;
     };
 
     /**最大化 */
     const maxDialog = ref(false);
+    const editFile = ref(null as File | null);
     const maxImageId = ref(-1);
     const maxClick = function (id: number) {
       maxDialog.value = true;
@@ -509,7 +562,8 @@ export default defineComponent({
         return;
       }
 
-      addItem.value.fileName = fileName;
+      addItem.value.fileName = fileName.split('.')[0];
+      addItem.value.ext = fileName.split('.')[1];
       await addRecord(addItem.value);
       loadState.value.isSave = false;
       addDialog.value = false;
@@ -526,9 +580,7 @@ export default defineComponent({
         .then((response) => {
           if (response) {
             console.log('upload response', response);
-            fileName = response.fileName.split('.')[0];
-            addItem.value.fileName = fileName;
-            addItem.value.ext = response.fileName.split('.')[1];
+            fileName = response.fileName;
           }
         })
         .catch((err) => {
@@ -577,6 +629,16 @@ export default defineComponent({
       }
     });
 
+    watch(editFile, () => {
+      if (editFile.value) {
+        editImage.value = URL.createObjectURL(editFile.value);
+        isDefaultImage.value = false;
+      } else {
+        editImage.value = '';
+        isDefaultImage.value = true;
+      }
+    });
+
     onMount();
     return {
       editItem,
@@ -585,8 +647,11 @@ export default defineComponent({
       maxDialog,
       ruleDialog,
       addDialog,
+      editFile,
+      editImage,
       pickFile,
       isShowTopButton,
+      isDefaultImage,
       deleteBtnDisplay,
       deleteDialog,
       loadState,
@@ -621,6 +686,7 @@ interface Image {
   detail: string;
   createAt: string;
   updateAt: string;
+  url: string;
 }
 interface AddImage {
   fileName: string;

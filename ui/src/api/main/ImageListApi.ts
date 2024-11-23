@@ -89,6 +89,8 @@ export interface ImageListUpdateRequest {
   id: number;
   title: string;
   detail: string;
+  fileName: string;
+  ext: string;
 }
 
 export interface ImageListDeleteRequest {

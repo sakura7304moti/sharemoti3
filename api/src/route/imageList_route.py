@@ -102,6 +102,18 @@ def imagelist_download(id:int):
         minetype = 'image/jpeg'
     return send_file(path, mimetype=minetype)
 
+@app.route('/imageList/download/<string:file_name>',methods=['GET'])
+def imagelist_download_filename(file_name:str):    
+    path = os.path.join(UPLOAD_FOLDER,file_name)
+    if(not os.path.exists(path)):
+        jsonify({'message': 'file not found'}), 404
+    print(f'download path -> {path}')
+    if 'png' in file_name:
+        minetype = 'image/png'
+    else:
+        minetype = 'image/jpeg'
+    return send_file(path, mimetype=minetype)
+
 @app.route("/imageList/search/<int:page>",methods=['GET'])
 def imagelist_search(page:int):
     PAGE_SIZE = 8
