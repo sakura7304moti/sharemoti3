@@ -357,16 +357,19 @@ export default defineComponent({
         await search(pageNo.value);
       }
     };
+    const isDialogClose = computed(
+      () =>
+        editDialog.value == false &&
+        maxDialog.value == false &&
+        addDialog.value == false &&
+        deleteDialog.value == false
+    );
     const handleScroll = () => {
       const bottomOfWindow =
         window.innerHeight + window.scrollY >=
         document.documentElement.offsetHeight - 200;
 
-      if (
-        bottomOfWindow &&
-        !loadState.value.isSearch &&
-        editDialog.value == false
-      ) {
+      if (bottomOfWindow && !loadState.value.isSearch && isDialogClose.value) {
         onScrollSearch();
       }
     };
@@ -636,6 +639,11 @@ interface AddImage {
   max-width: 420px;
   width: calc(100% - 16px * 2);
   border-radius: 10px;
+}
+@media (min-width: 500px) {
+  .edit-area {
+    height: 80px;
+  }
 }
 .create-btn-outline {
   position: relative;
