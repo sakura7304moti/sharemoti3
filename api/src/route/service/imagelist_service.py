@@ -30,11 +30,11 @@ def delete(id:int):
     """
     return imagelist.delete(id)
 
-def search(page:int, page_size:int) -> tuple[DataFrame, int]:
+def search(condition:interface.ImageSearch, page:int, page_size:int) -> tuple[DataFrame, int]:
     """
     レコード一覧を取得
     """
-    return imagelist.search(page, page_size)
+    return imagelist.search(condition, page, page_size)
 
 def get_file_name(id:int) -> str:
     """

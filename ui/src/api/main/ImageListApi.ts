@@ -1,8 +1,17 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 import { MainAPIClient } from './MainBaseApi';
 export class ImageListApi extends MainAPIClient {
-  public search(pageNo: number): Promise<ImageListSearchResponse | null> {
-    const url = '/imageList/search/' + pageNo;
+  public search(
+    param: SearchRequest,
+    pageNo: number
+  ): Promise<ImageListSearchResponse | null> {
+    const url =
+      '/imageList/search/' +
+      pageNo +
+      '?text=' +
+      param.text +
+      '&reverse=' +
+      param.reverse;
     const path = this.combineUrl(url);
 
     return this.httpGet<ImageListSearchResponse>(path);
@@ -98,6 +107,10 @@ export interface ImageListDeleteRequest {
 }
 
 /*レスポンス */
+interface SearchRequest {
+  text?: string | null;
+  reverse?: string | null;
+}
 export interface ImageListSearchResponse {
   records: searchRec[];
   totalCount: number;

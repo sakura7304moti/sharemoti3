@@ -844,3 +844,17 @@ class Image:
             'title':self.title,
             'detail':self.detail
         }
+    
+class ImageSearch:
+    def __init__(
+        self,
+        text:str,
+        reverse:bool
+    ):
+        self.text = text
+        self.reverse = reverse
+
+    def to_args(self):
+        return {
+            'text':f"%{self.text}%"
+        }

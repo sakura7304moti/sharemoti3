@@ -73,7 +73,7 @@ def delete(id:int):
 """
 検索
 """
-def search(page_no:int, page_size:int):
+def search(condition:interface.ImageSearch, page_no:int, page_size:int):
     base_query = """
         SELECT
             id,
@@ -84,18 +84,22 @@ def search(page_no:int, page_size:int):
             TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
             TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
         from sharemoti.image
-        order by create_at desc
-        
     """
+    if condition.text != '':
+        base_query = base_query + " where title like %(text)s or detail like %(text)s "
+    base_query = base_query + f'order by create_at '
+    if not condition.reverse:
+        base_query = base_query + ' desc '
     data_query = base_query + " offset %(offset)s limit %(limit)s"
 
     args = {
         'offset' : max(page_no - 1, 0) * page_size,
-        'limit' : page_size
+        'limit' : page_size,
+        'text': f"%{condition.text}%"
     }
     df = query_model.execute_df(data_query, args)
 
-    count_df = query_model.execute_df(base_query)
+    count_df = query_model.execute_df(base_query, {'text': f"%{condition.text}%"})
     total_count = math.ceil(len(count_df) / page_size)
     return df, total_count
 

@@ -15,8 +15,9 @@
       <q-card style="max-width: 500px">
         <q-card-section>
           <div class="text-subtitle1">つかいかた！</div>
-          <div class="q-ma-md text-body1">
-            <div>1.編集は画像をクリックしてねっ</div>
+          <div class="q-ma-md q-pa-sm text-body1 bg-grey-2">
+            <div>編集するには画像をクリックしてねっ</div>
+            <div class="q-mt-md text-right q-pr-md">...以上！！</div>
           </div>
           <div>
             <q-btn
@@ -29,30 +30,92 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <!--追加・検索・削除ボタン表示エリア-->
-    <div class="q-mt-md q-ml-lg text-grey text-subtitle1">
-      登録・編集
-      <img
-        src="https://img.icons8.com/ios/250/000000/edit.png"
-        style="width: 13px; height: auto; object-fit: contain; margin-left: 4px"
-      />
-    </div>
-    <div class="row flex-wrap edit-area">
-      <div class="create-btn-outline">
-        <div class="create-btn">
-          <div class="text-center text-h6 text-white" @click="addDialog = true">
-            名画を寄贈する
+
+    <div class="top-area">
+      <div>
+        <div class="q-mt-md q-ml-lg text-grey text-subtitle1">
+          検索
+          <img
+            src="https://img.icons8.com/ios/250/000000/search--v1.png"
+            style="
+              width: 13px;
+              height: auto;
+              object-fit: contain;
+              margin-left: 4px;
+            "
+          />
+        </div>
+        <!--検索ボタン表示エリア-->
+
+        <div class="row flex-wrap edit-area big">
+          <div class="q-ml-md q-mt-md">
+            <q-input
+              v-model="searchCondition.text"
+              outlined
+              dense
+              label="テキスト"
+              stack-label
+            />
+          </div>
+          <div class="q-mt-sm">
+            <q-toggle
+              v-model="searchCondition.reverse"
+              label="日付新しい順"
+              icon="event"
+              color="primary"
+              class="q-ml-sm"
+              keep-color
+            />
+          </div>
+          <div
+            style="max-width: 100%; width: 100%"
+            class="text-right q-mr-md q-mb-md"
+          >
+            <q-btn
+              label="検索する"
+              color="primary"
+              dense
+              icon="search"
+              @click="topSearchClick"
+            />
           </div>
         </div>
       </div>
-      <div class="q-mt-sm">
-        <q-toggle
-          v-model="deleteBtnDisplay"
-          label="削除アイコン表示"
-          icon="delete"
-          color="negative"
-          class="q-ml-sm"
-        />
+      <div>
+        <!--追加・削除ボタン表示エリア-->
+        <div class="q-mt-md q-ml-lg text-grey text-subtitle1">
+          登録・編集
+          <img
+            src="https://img.icons8.com/ios/250/000000/edit.png"
+            style="
+              width: 13px;
+              height: auto;
+              object-fit: contain;
+              margin-left: 4px;
+            "
+          />
+        </div>
+        <div class="row flex-wrap edit-area">
+          <div class="create-btn-outline">
+            <div class="create-btn">
+              <div
+                class="text-center text-h6 text-white"
+                @click="addDialog = true"
+              >
+                名画を寄贈する
+              </div>
+            </div>
+          </div>
+          <div class="q-mt-sm q-mr-sm">
+            <q-toggle
+              v-model="deleteBtnDisplay"
+              label="削除アイコン表示"
+              icon="delete"
+              color="negative"
+              class="q-ml-sm"
+            />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -368,13 +431,23 @@ export default defineComponent({
     } as LoadState);
     const pageNo = ref(1);
     const maxPage = ref(1);
+    const searchCondition = ref({
+      text: '',
+      reverse: false,
+    } as SearchCondition);
 
     const records = ref([] as Image[]);
 
     const search = async function (page: number) {
       loadState.value.isSearch = true;
       await api
-        .search(page)
+        .search(
+          {
+            text: searchCondition.value.text,
+            reverse: searchCondition.value.reverse ? 'true' : '',
+          },
+          page
+        )
         .then((response) => {
           if (response) {
             console.log('search response', response);
@@ -406,6 +479,13 @@ export default defineComponent({
 
     const imageUrl = function (id: number) {
       return api.imageUrl(id) + '?any=' + new Date().getTime();
+    };
+
+    const topSearchClick = function () {
+      records.value.splice(0);
+      maxPage.value = 1;
+      pageNo.value = 1;
+      search(pageNo.value);
     };
 
     const onScrollSearch = async function () {
@@ -684,7 +764,9 @@ export default defineComponent({
       pageNo,
       maxPage,
       records,
+      searchCondition,
       search,
+      topSearchClick,
       imageUrl,
       uploadUrl,
       onTopClick,
@@ -697,6 +779,10 @@ export default defineComponent({
     };
   },
 });
+interface SearchCondition {
+  text: string | null;
+  reverse: boolean | null;
+}
 interface LoadState {
   isSave: boolean;
   isSearch: boolean;
@@ -721,6 +807,11 @@ interface AddImage {
 </script>
 <style>
 /**検索欄や編集アイコンなど */
+@media (min-width: 900px) {
+  .top-area {
+    display: flex;
+  }
+}
 .edit-area {
   margin: 16px;
   margin-top: 0px;
@@ -730,9 +821,16 @@ interface AddImage {
   width: calc(100% - 16px * 2);
   border-radius: 10px;
 }
+.edit-area.big {
+  height: 145px;
+  max-width: 360px;
+}
 @media (min-width: 500px) {
   .edit-area {
     height: 80px;
+  }
+  .edit-area.big {
+    height: 100px;
   }
 }
 .create-btn-outline {

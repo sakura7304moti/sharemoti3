@@ -32,7 +32,7 @@ def allowed_file(filename):
 
 def to_condition():
     """
-    検索条件
+    編集内容
     """
     json_data = request.json
     id = int(json_data.get("id", "0"))
@@ -47,6 +47,14 @@ def to_condition():
         title = title,
         detail = detail
     )
+
+def to_search_condition():
+    """
+    検索条件
+    """
+    text = request.args.get('text', '')
+    reverse = request.args.get('reverse', '') != ''
+    return interface.ImageSearch(text, reverse)
 
 
 @app.route('/imageList/insert',methods=['POST'])
@@ -117,7 +125,8 @@ def imagelist_download_filename(file_name:str):
 @app.route("/imageList/search/<int:page>",methods=['GET'])
 def imagelist_search(page:int):
     PAGE_SIZE = 8
-    df,total_count = imagelist_service.search(page, PAGE_SIZE)
+    condition = to_search_condition()
+    df,total_count = imagelist_service.search(condition, page, PAGE_SIZE)
 
     records = df.to_json(orient='records',force_ascii=False)
     records_json = json.loads(records)
