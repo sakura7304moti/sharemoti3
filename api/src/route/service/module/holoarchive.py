@@ -1,12 +1,10 @@
-import sqlite3
-import yt_dlp
 import datetime
-import math
-
-
-from typing import List
+from datetime import datetime,timedelta
+import requests
 from tqdm import tqdm
-from pytube import YouTube
+
+
+from tqdm import tqdm
 
 from src.route.service.module.utils import const, interface
 
@@ -14,245 +12,6 @@ psql_model = const.PsqlBase()
 #p = const.Path()
 opt = const.Option()
 channel_url_list = opt.youtube_holo_channels()
-
-
-"""
-検索用の関数
-"""
-def get_yt_info(url:str):
-    """
-    yt-dlpでチャンネルの情報を取得。数秒かかる。
-    """
-    # オプションを設定
-    ydl_opts = {
-        'quiet': True,  # 出力を非表示
-        'extract_flat': True,  # プレイリスト内の各動画を一つのリストに展開
-        # その他のオプションは必要に応じて設定
-    }
-    
-    # yt-dlpオブジェクトを生成
-    ydl = yt_dlp.YoutubeDL(ydl_opts)
-    
-    # プレイリストからURLリストを取得
-    with ydl:
-        result = ydl.extract_info(url, download=False)
-    return result
-
-def get_channel_info(result):
-    """
-    チャンネルの情報を元にconst.ChannelInfoを作成
-    """
-    #チャンネルid
-    channel_id = result['uploader_id']
-
-    #チャンネル名
-    channel_name = result['channel'].replace('"','')
-    
-    #概要
-    description = ''
-    try:
-        description = result['description'].replace('"','')
-    except:
-        pass
-    
-    
-    #ヘッダー画像URL
-    header_url = ''
-    try:
-        for rec in result['thumbnails']:
-            if 'resolution' in rec:
-                if rec['resolution'] == '1920x1080':
-                    header_url = rec['url']
-    except:
-        pass
-                
-    #プロフィール画像URL
-    avatar_url = result['thumbnails'][-2]['url']
-    return interface.ChannelInfo(channel_id,channel_name,description,header_url,avatar_url)
-
-def get_thumbnail_url(id):
-    return f'http://img.youtube.com/vi/{id}/maxresdefault.jpg'
-
-def get_movie_info(entrie):
-    id = entrie['id']
-    url = entrie['url']
-    title = entrie['title'].replace('"','')
-    if 'view_count' in entrie:
-        view_count = entrie['view_count']
-        thumbnail_url = get_thumbnail_url(id)
-        return [id,url,title,view_count,thumbnail_url]
-    else:
-        return None
-    
-def get_movie_list(entries):
-    movie_list = []
-    for rec in entries:
-        info = get_movie_info(rec)
-        if info is not None:
-            movie_info = interface.MovieInfo(info[0],info[1],info[2],'','',info[3],info[4],'')
-            movie_list.append(movie_info)
-    return movie_list
-
-def inferece_channenl(url:str) -> interface.Archive:
-    """
-    チャンネルの情報やアーカイブを取得する
-    """
-    result = get_yt_info(url)
-    channel = get_channel_info(result)
-    #動画
-    movie = get_movie_list(result['entries'][0]['entries'])
-
-    #ショート
-    short = get_movie_list(result['entries'][1]['entries'])
-
-    #live
-    try:
-        live = get_movie_list(result['entries'][2]['entries'])
-    except:
-        live = get_movie_list(result['entries'][1]['entries'])
-        short = []
-
-    archive = interface.Archive(channel,movie,short,live)
-    return archive
-
-def get_upload_date(url:str):
-    """
-    # オプションを設定
-    ydl_opts = {
-        'quiet': True,  # 出力を非表示
-        'date':True,
-        'output':'%(upload_date)'
-        # その他のオプションは必要に応じて設定
-    }
-    
-    # yt-dlpオブジェクトを生成
-    ydl = yt_dlp.YoutubeDL(ydl_opts)
-    
-    # プレイリストからURLリストを取得
-    with ydl:
-        result = ydl.extract_info(url, download=False)
-        stamp = result['release_timestamp']
-        if stamp is None:
-            stamp = result['upload_date']
-            # yyyymmdd形式の文字列をdatetimeオブジェクトに変換
-            dt = datetime.datetime.strptime(stamp, '%Y%m%d')
-        
-            # yyyy-mm-dd形式の文字列に変換
-            stamp = dt.strftime('%Y-%m-%d')
-            return stamp
-        else:
-            return str(datetime.datetime.fromtimestamp(stamp))
-    """
-    # YouTubeオブジェクトの作成
-    yt = YouTube(url)
-
-    # 投稿日の取得
-    publish_date = yt.publish_date
-    return publish_date
-
-    
-        
-
-def holo_archives() -> List[interface.Archive]:
-    archives = []
-    for url in tqdm(channel_url_list,desc="get archives"):
-        archive = inferece_channenl(url)
-        archives.append(archive)
-    return archives
-
-def update_archives():
-    #日付以外全て取得する
-    archives = holo_archives()
-
-    #追加前にレコード取得
-    movies = search_movie(page_size=1000000)
-    channels = search_channel()
-
-    # ----- チャンネル単位のループ -----
-    for archive in tqdm(archives,desc="archives"):
-        #チャンネルの追加・更新
-        if archive.channel.channel_id in [channel_id for channel_id in channels['channelId']]:
-            update_channel(
-                archive.channel.channel_id,
-                archive.channel.channel_name,
-                archive.channel.description,
-                archive.channel.header_url,
-                archive.channel.avatar_url)
-        else:
-            insert_channel(
-                archive.channel.channel_id,
-                archive.channel.channel_name,
-                archive.channel.description,
-                archive.channel.header_url,
-                archive.channel.avatar_url)
-            
-            
-        #動画の追加・更新
-        for movie in archive.movie:
-            if movie.id in [movie_id for movie_id in movies['id']]:
-                update_movie(
-                    movie.id,
-                    movie.url,
-                    movie.title,
-                    movie.view_count,
-                    movie.thumbnail_url,
-                )
-            else:
-                upload_date = get_upload_date(movie.url)
-                insert_movie(
-                    movie.id,
-                    movie.url,
-                    movie.title,
-                    upload_date,
-                    archive.channel.channel_id,
-                    movie.view_count,
-                    movie.thumbnail_url,
-                    'movie'
-                )
-        #ショートの追加・更新
-        for movie in archive.short:
-            if movie.id in [movie_id for movie_id in movies['id']]:
-                update_movie(
-                    movie.id,
-                    movie.url,
-                    movie.title,
-                    movie.view_count,
-                    movie.thumbnail_url,
-                )
-            else:
-                upload_date = get_upload_date(movie.url)
-                insert_movie(
-                    movie.id,
-                    movie.url,
-                    movie.title,
-                    upload_date,
-                    archive.channel.channel_id,
-                    movie.view_count,
-                    movie.thumbnail_url,
-                    'short'
-                )
-        #ライブの追加・更新
-        for movie in archive.live:
-            if movie.id in [movie_id for movie_id in movies['id']]:
-                update_movie(
-                    movie.id,
-                    movie.url,
-                    movie.title,
-                    movie.view_count,
-                    movie.thumbnail_url,
-                )
-            else:
-                upload_date = get_upload_date(movie.url)
-                insert_movie(
-                    movie.id,
-                    movie.url,
-                    movie.title,
-                    upload_date,
-                    archive.channel.channel_id,
-                    movie.view_count,
-                    movie.thumbnail_url,
-                    'live'
-                )
 
 """
 データベース用の関数
@@ -300,7 +59,7 @@ def search_movie_count(
     )# page_no = 1 , page_size = 0(max)
     count_query = f'select count(*) as total from ({query}) as movie'
     df = psql_model.execute_df(count_query,args)
-    return int(df["total"].iloc[0])
+    return int(df["total"].iloc[0]) 
 
 def search_query_args(
     page_no = 1,
@@ -322,7 +81,7 @@ def search_query_args(
             id,
             url,
             title,
-            date,
+            published_date as "date",
             channel_id as "channelId",
             view_count as "viewCount",
             thumbnail_url as "thumbnailUrl",
@@ -332,15 +91,15 @@ def search_query_args(
     if title != '':
         query = query + "and title like %(title)s "
     if from_date != '':
-        query = query + "and date >= %(from_date)s "
+        query = query + "and published_date >= %(from_date)s "
     if to_date != '':
-        query = query + "and date <= %(to_date)s "
+        query = query + "and published_date <= %(to_date)s "
     if channel_id != '':
         query = query + "and channel_id = %(channel_id)s "
     if movie_type != '':
         query = query + "and movie_type = %(movie_type)s "
     
-    query = query + "order by date desc,title "
+    query = query + "order by published_date desc,title "
     
     if page_size != 0:
         query = query + "limit %(page_size)s offset %(offset)s "
@@ -360,6 +119,7 @@ def search_channel():
     df = psql_model.execute_df(
         """
             SELECT 
+                id,
                 channel_id as "channelId",
                 channel_name as "channelName",
                 description,
@@ -380,21 +140,31 @@ def insert_movie(
     thumbnail_url:str,
     movie_type:str
 ):
-    query = """
-    INSERT INTO holo.youtube_movie (id, url, title, date, channel_id, view_count, thumbnail_url, movie_type) 
-               VALUES (%(id)s, %(url)s, %(title)s, %(date)s, %(channel_id)s, %(view_count)s, %(thumbnail_url)s, %(movie_type)s)
-    """
-    args = {
-        "id":id,
-        "url":url,
-        "title":title,
-        "date":date,
-        "channel_id":channel_id,
-        "view_count":view_count,
-        "thumbnail_url":thumbnail_url,
-        "movie_type":movie_type
-    }
-    psql_model.execute_commit(query, args)
+    if is_exists_video(id):
+        update_movie(
+            id,
+            url,
+            title,
+            view_count,
+            thumbnail_url
+        )
+    else:
+        query = """
+        INSERT INTO holo.youtube_movie (id, url, title, published_date, channel_id, view_count, thumbnail_url, movie_type) 
+                VALUES (%(id)s, %(url)s, %(title)s, %(date)s, %(channel_id)s, %(view_count)s, %(thumbnail_url)s, %(movie_type)s)
+        """
+        args = {
+            "id":id,
+            "url":url,
+            "title":title,
+            "date":date,
+            "channel_id":channel_id,
+            "view_count":view_count,
+            "thumbnail_url":thumbnail_url,
+            "movie_type":movie_type
+        }
+        psql_model.execute_commit(query, args)
+
 
 def insert_channel(
     channel_id:str,
@@ -467,6 +237,106 @@ def update_channel(
     
     psql_model.execute_commit(query, args)
 
+def is_exists_video(id:str):
+    query = f"""
+    select
+        id
+    from holo.youtube_movie
+    where id = '{id}'
+    """ 
+    df = psql_model.execute_df(query)
+    return len(df) > 0
 
+def update_archives():
+    channel_df = search_channel()
+    for _, row in tqdm(channel_df.iterrows(), total=len(channel_df)):
+        id = row['id']
+        channel_id = row['channelId']
 
+        playlist_id = get_playlist_id(id)
+        videos = get_videos_from_playlist(playlist_id, days=30)
+
+        # DBに追加
+        for video in videos:
+            video_id = video['video_id']
+            insert_movie(
+                id = id,
+                url = 'https://www.youtube.com/watch?v=' + video_id,
+                title = video['title'],
+                date = video['published_at'].strftime("%Y-%m-%d %H:%M:%S"),
+                channel_id=channel_id,
+                view_count=0,
+                thumbnail_url=f'http://img.youtube.com/vi/{video_id}/maxresdefault.jpg',
+                movie_type=video['type']
+            )
+
+API_KEY = 'AIzaSyBDqd8X6jgfnsdRyaooH8Mt2eRuN26LMt8'
+
+def get_playlist_id(channel_id:str):
+    """
+    チャンネルIDからアップロードプレイリストIDを取得
+    """
+    url = "https://www.googleapis.com/youtube/v3/channels"
+    params = {
+        "part": "contentDetails",
+        "id": channel_id,
+        "key": API_KEY,
+    }
+    response = requests.get(url, params=params)
+    response.raise_for_status()  # エラー時に例外を発生させる
+    data = response.json()
     
+    # アップロードプレイリストIDを取得
+    return data["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
+def get_videos_from_playlist(playlist_id, days=5):
+    """
+    プレイリストIDから動画一覧を取得し、過去指定日数以内の動画を返す
+    """
+    url = "https://www.googleapis.com/youtube/v3/playlistItems"
+    one_month_ago = datetime.utcnow() - timedelta(days=days)
+    next_page_token = None
+    videos = []
+
+    while True:
+        params = {
+            "part": "snippet",
+            "playlistId": playlist_id,
+            "maxResults": 50,
+            "key": API_KEY,
+            "pageToken": next_page_token,
+        }
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        data = response.json()
+
+        for item in data["items"]:
+            video_id = item["snippet"]["resourceId"]["videoId"]
+            video_title = item["snippet"]["title"]
+            published_at = item["snippet"]["publishedAt"]
+            
+            # 公開日をチェック
+            published_date = datetime.strptime(published_at, "%Y-%m-%dT%H:%M:%SZ")
+
+            # 進捗を更新
+            step_days = abs((one_month_ago - published_date).days - 30)
+
+            if published_date >= one_month_ago:
+                # 動画の種別を判定
+                video_type = ''
+                if '#short' in video_title:
+                    video_type = 'short'
+
+                videos.append({
+                    "video_id": video_id,
+                    "title": video_title,
+                    "published_at": published_date,
+                    "type": video_type,
+                })
+
+        # 次のページがあるか確認
+        next_page_token = data.get("nextPageToken")
+        if not next_page_token:
+            break
+
+    return videos

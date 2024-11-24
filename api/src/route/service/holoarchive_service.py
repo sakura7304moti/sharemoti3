@@ -1,4 +1,5 @@
 from src.route.service.module import holoarchive
+import math
 
 """
 ホロライブのYouTube動画一覧
@@ -9,12 +10,6 @@ def update_archives():
     テーブルに更新
     """
     holoarchive.update_archives()
-
-def make_db():
-    """
-    テーブル作成
-    """
-    holoarchive.make_database()
 
 def search_records(
     page_no = 1,
@@ -37,7 +32,7 @@ def search_records(
         channel_id,
         movie_type
     )
-    total_count = holoarchive.search_movie_count(
+    pages = holoarchive.search_movie_count(
         page_no,
         title,
         from_date,
@@ -45,6 +40,7 @@ def search_records(
         channel_id,
         movie_type
     )
+    total_count = math.ceil(pages/page_size)
     return df, total_count
 
 def search_chennel():
