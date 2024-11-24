@@ -270,7 +270,7 @@ def update_archives():
                 movie_type=video['type']
             )
 
-API_KEY = 'AIzaSyBDqd8X6jgfnsdRyaooH8Mt2eRuN26LMt8'
+API_KEY = ''
 
 def get_playlist_id(channel_id:str):
     """
