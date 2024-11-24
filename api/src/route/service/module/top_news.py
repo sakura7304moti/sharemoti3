@@ -156,6 +156,24 @@ def get_news(page_no:int, page_size = 5):
                 DESC
             LIMIT 5
         ),
+        p8 AS (
+            SELECT
+                8 AS page_id,
+                '画像' AS page,
+                '/img' as url,
+                TO_CHAR(date(img.create_at),'YYYY-MM-DD') AS "createdAt",
+                count(date(img.create_at)) AS total
+            FROM
+                sharemoti.image AS img
+            WHERE
+                date(img.create_at) IS NOT NULL
+            GROUP BY
+                date(img.create_at)
+            ORDER BY
+                date(img.create_at)
+                DESC
+            LIMIT 5
+        ),
         -- 各windowクエリをunion
         subtotal AS (
             SELECT
@@ -192,6 +210,11 @@ def get_news(page_no:int, page_size = 5):
                 *
             FROM
                 p7
+            UNION
+            SELECT
+                *
+            FROM
+                p8
         )
         -- 追加日順、ページID順でクエリ
         SELECT
