@@ -250,7 +250,7 @@ def is_exists_video(id:str):
 
 def get_api_key():
     try:
-        share_path = os.environ['SHARE_FOLDER']
+        share_path = os.environ['SHAREMOTI_YOUTUBE_API']
         return share_path
     except Exception as e:
         print(f"\033[31m APIキーの取得エラー {e.with_traceback} \033[0m")
