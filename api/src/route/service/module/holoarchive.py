@@ -2,6 +2,7 @@ import datetime
 from datetime import datetime,timedelta
 import requests
 from tqdm import tqdm
+import os
 
 
 from tqdm import tqdm
@@ -247,6 +248,13 @@ def is_exists_video(id:str):
     df = psql_model.execute_df(query)
     return len(df) > 0
 
+def get_api_key():
+    try:
+        share_path = os.environ['SHARE_FOLDER']
+        return share_path
+    except Exception as e:
+        print(f"\033[31m APIキーの取得エラー {e.with_traceback} \033[0m")
+
 def update_archives():
     channel_df = search_channel()
     for _, row in tqdm(channel_df.iterrows(), total=len(channel_df)):
@@ -260,7 +268,7 @@ def update_archives():
         for video in videos:
             video_id = video['video_id']
             insert_movie(
-                id = id,
+                id = video_id,
                 url = 'https://www.youtube.com/watch?v=' + video_id,
                 title = video['title'],
                 date = video['published_at'].strftime("%Y-%m-%d %H:%M:%S"),
@@ -270,12 +278,11 @@ def update_archives():
                 movie_type=video['type']
             )
 
-API_KEY = ''
-
 def get_playlist_id(channel_id:str):
     """
     チャンネルIDからアップロードプレイリストIDを取得
     """
+    API_KEY = get_api_key()
     url = "https://www.googleapis.com/youtube/v3/channels"
     params = {
         "part": "contentDetails",
@@ -293,6 +300,7 @@ def get_videos_from_playlist(playlist_id, days=5):
     """
     プレイリストIDから動画一覧を取得し、過去指定日数以内の動画を返す
     """
+    API_KEY = get_api_key()
     url = "https://www.googleapis.com/youtube/v3/playlistItems"
     one_month_ago = datetime.utcnow() - timedelta(days=days)
     next_page_token = None
