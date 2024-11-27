@@ -262,7 +262,7 @@ def update_archives():
         channel_id = row['channelId']
 
         playlist_id = get_playlist_id(id)
-        videos = get_videos_from_playlist(playlist_id, days=30)
+        videos = get_videos_from_playlist(playlist_id, days=7)
 
         # DBに追加
         for video in videos:
@@ -296,7 +296,7 @@ def get_playlist_id(channel_id:str):
     # アップロードプレイリストIDを取得
     return data["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
 
-def get_videos_from_playlist(playlist_id, days=5):
+def get_videos_from_playlist(playlist_id, days=7):
     """
     プレイリストIDから動画一覧を取得し、過去指定日数以内の動画を返す
     """
