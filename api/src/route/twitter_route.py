@@ -33,36 +33,22 @@ def nitter_search():
     max_like = json_data.get("max_like", 0)
 
     # search()関数を呼び出し
-    records = twitter_service.search(
+    df = twitter_service.search(
         page_no, page_size, hashtag, start_date, end_date, user_name,mode, min_like, max_like
     )
     count = twitter_service.search_count(
         hashtag, start_date, end_date, user_name,mode, min_like, max_like
     )
     totalPages = math.ceil(count / page_size)
+    records = df.to_json(orient='records',force_ascii=False)
+    records_json = json.loads(records)
 
     # 辞書にまとめる
     result = {
-        "records": json.dumps(
-            records, default=lambda obj: obj.__dict__(), ensure_ascii=False
-        ),
+        "records": records_json,
         "totalPages": totalPages,
     }
-
-    # レスポンスとしてJSONデータを返す
-    # JSON文字列に変換
-    json_data = json.dumps(result, ensure_ascii=False)
-    json_data = json_data.replace('"[{', "[{").replace('}]"', "}]")
-    
-    #改行文字だけ残してバックスラッシュは削除
-    json_data = json_data.replace('\\n',NEW_LINE_TEXT)
-    json_data = json_data.replace('\\','')
-    json_data = json_data.replace(NEW_LINE_TEXT,'\\n')
-    
-    if len(records) == 0:
-        json_data = "{'records':[],'totalPages':0}"
-    response = jsonify(json_data)
-    return response
+    return jsonify(json.dumps(result))
 
 
 @app.route("/twitter/search/count", methods=["POST"])

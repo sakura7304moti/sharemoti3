@@ -1,41 +1,7 @@
 import sqlite3
 import re
-from src.route.service.module.utils import const, interface
-p = const.Path()
-dbname = p.db_twitter()
-
-
-def init():
-    """
-    CREATE DB,TABLE
-    """
-    conn = sqlite3.connect(dbname)
-
-    # データベースへのコネクションを閉じる。(必須)
-    conn.close()
-
-    conn = sqlite3.connect(dbname)
-    # sqliteを操作するカーソルオブジェクトを作成
-    cur = conn.cursor()
-
-    # personsというtableを作成してみる
-    # 大文字部はSQL文。小文字でも問題ない。
-    cur.execute(
-        """CREATE TABLE IF NOT EXISTS twitter(
-                hashtag STRING,
-                mode STRING,
-                url STRING,
-                date STRING,
-                images STRING,
-                userId INTEGER,
-                userName STRING,
-                likeCount INTEGER
-                )
-                """)
-
-    # データベースへコミット。これで変更が反映される。
-    conn.commit()
-    conn.close()
+from src.route.service.module.utils import const
+query_model = const.PsqlBase()
 
 
 def _searchQuery(
@@ -55,22 +21,22 @@ def _searchQuery(
     #ページング設定
     offset = (max(page_no - 1,0))*page_size  
 
-    query = "SELECT * FROM twitter where 1 = 1 "
+    query = "SELECT * FROM holo.twitter where 1 = 1 "
     if hashtag != '':
-        query = query + "and hashtag like :hashtag "
+        query = query + "and hashtag like %(hashtag)s "
     if start_date != '' and end_date != '':
-        query = query + "and date BETWEEN :start_date AND :end_date "
+        query = query + "and date BETWEEN %(start_date)s AND %(end_date)s "
     if user_name != '':
-        query = query + "and userId = :user_name "
+        query = query + "and userId = %(user_name)s "
     if mode != '':
-        query = query + "and mode = :mode "
+        query = query + "and mode = %(mode)s "
     if min_like != 0:
-        query = query + "and likeCount >= :min_like "
+        query = query + "and likeCount >= %(min_like)s "
     if max_like != 0:
-        query = query + "and :max_like >= likeCount "
+        query = query + "and %(max_like)s >= likeCount "
     query = query + 'order by date desc,url '
     if page_size != 0:
-        limit_sql = 'limit :page_size offset :offset'
+        limit_sql = 'limit %(page_size)s offset %(offset)s'
         query = query + limit_sql
         
     args = {
@@ -96,13 +62,10 @@ def search(
         mode:str='',
         min_like:int=0,
         max_like:int=0
-) -> list[interface.TwitterQueryRecord]:
+):
     """
     レコードを取得する
     """
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
 
     # SELECTクエリを実行
     query,args = _searchQuery(
@@ -116,18 +79,7 @@ def search(
         min_like,
         max_like
     )
-    cursor.execute(query,args)
-    results = cursor.fetchall()
-
-    # 結果を表示
-    records = []
-    for row in results:
-        rec = interface.TwitterQueryRecord(*row)
-        records.append(rec)
-
-    # 接続を閉じる
-    conn.close()
-    return records
+    return query_model.execute_df(query, args)
 
 
 def search_count(
@@ -152,17 +104,11 @@ def search_count(
         mode,
         min_like,
         max_like)
-    
-    # データベースに接続する
-    conn = sqlite3.connect(dbname)
-    cursor = conn.cursor()
 
     #件数のみ取得
-    count_query = f'select count(*) from ({query})'
-    cursor.execute(count_query,args)
-    results = cursor.fetchall()
-
-    return results[0][0]
+    count_query = f'select count(*) as total from ({query}) as A'
+    df = query_model.execute_df(count_query, args)
+    return int(df["total"].iloc[0]) 
 
 def update(df,hashtag:str,mode:str):
     """
