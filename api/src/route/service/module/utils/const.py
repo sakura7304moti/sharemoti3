@@ -186,8 +186,9 @@ class Option:
         """
         スマブラのキャラ名・画像URL・アイコンURL
         """
-        df_path = os.path.join(self.p.option(), 'ssbu_names.csv')
-        df = pd.read_csv(df_path)
+        model = PsqlBase()
+        query = "select * from sharemoti.ssbu_names order by id"
+        df = model.execute_df(query)
         records = []
         for _, row in df.iterrows():
             name = row["name"]
