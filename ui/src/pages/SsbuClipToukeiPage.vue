@@ -35,82 +35,54 @@
         </div>
       </q-card-section>
     </q-card>
-    <div class="q-mt-md" style="max-width: 500px">
-      <q-markup-table v-if="selectTab == 'ランキング'">
-        <thead>
-          <tr>
-            <th>キャラ名</th>
-            <th class="text-right">数</th>
-            <th class="text-right">順位</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="rec in rankRecords" :key="rec.name">
-            <td>
-              <div>
+    <div class="q-mt-md" style="max-width: 400px">
+      <div v-if="selectTab == 'ランキング'">
+        <div v-for="rec in rankRecords" :key="rec.name">
+          <div style="padding-bottom: 24px">
+            <div
+              class="text-subtitle1 text-weight-bold q-mr-md"
+              v-if="rec.total > 0"
+            >
+              {{ rec.rank }}位
+            </div>
+            <div class="row">
+              <q-avatar class="q-mr-md">
                 <img
-                  v-if="rec.rank == 1"
-                  src="../assets/rank_1.png"
-                  style="height: 40px"
+                  :src="ssbuNameOptions.find((it) => it.name == rec.name)?.icon"
                 />
-                <img
-                  v-if="rec.rank == 2"
-                  src="../assets/rank_2.png"
-                  style="height: 40px"
-                />
-                <img
-                  v-if="rec.rank == 3"
-                  src="../assets/rank_3.png"
-                  style="height: 40px"
-                />
+              </q-avatar>
+              <div style="font-size: 32px" v-if="rec.total > 0">
+                {{ rec.total }}<span style="font-size: 16px"> こ </span>
               </div>
-              <q-avatar>
+            </div>
+
+            <div class="text-body1">{{ rec.name }}</div>
+          </div>
+        </div>
+      </div>
+      <div v-if="selectTab == '記念日'">
+        <div v-for="rec in firstRecords" :key="rec.name">
+          <div style="padding-bottom: 24px">
+            <div class="row">
+              <q-avatar class="q-mr-md">
                 <img
                   :src="ssbuNameOptions.find((it) => it.name == rec.name)?.icon"
-                /> </q-avatar
-              ><span class="q-ml-sm text-body1">{{ rec.name }}</span>
-            </td>
-            <td class="text-right">
-              <span class="text-body1 text-primary" v-if="rec.total > 0">{{
-                rec.total
-              }}</span>
-            </td>
-            <td class="text-right">
-              <span class="text-body1" v-if="rec.total > 0">{{
-                rec.rank
-              }}</span>
-            </td>
-          </tr>
-        </tbody>
-      </q-markup-table>
-      <q-markup-table v-if="selectTab == '記念日'">
-        <thead>
-          <tr>
-            <th>キャラ名</th>
-            <th>初めての</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="rec in firstRecords" :key="rec.name">
-            <td>
-              <q-avatar>
-                <img
-                  :src="ssbuNameOptions.find((it) => it.name == rec.name)?.icon"
-                /> </q-avatar
-              ><span class="q-ml-sm text-body1">{{ rec.name }}</span>
-            </td>
-            <td>
-              <span class="text-body2"> {{ rec.date }}</span>
-            </td>
-          </tr>
-        </tbody>
-      </q-markup-table>
+                />
+              </q-avatar>
+              <div style="font-size: 16px; padding-top: 8px" v-if="rec.date">
+                {{ rec.date }}
+              </div>
+            </div>
+
+            <div class="text-body1">{{ rec.name }}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import SsbuNameSelect from 'src/components/selects/SsbuNameSelect.vue';
 import api from 'src/api/file/SsbuClipToukeiApi';
 import { NameListApi } from 'src/api/main/NameListApi';
 const nameApi = new NameListApi();
