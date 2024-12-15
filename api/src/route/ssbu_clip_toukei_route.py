@@ -20,3 +20,9 @@ def ssbu_clip_toukei_first(text:str):
     df = ssbu_clip_toukei_service.category_first(text)
     records = df.to_json(orient='records',force_ascii=False)
     return jsonify(records)
+
+@app.route("/ssbu_clip/toukei/stamp/<text>", methods=["GET"])
+def ssbu_clip_toukei_stamp(text:str):
+    df = ssbu_clip_toukei_service.stamp_list(text)
+    records = df.to_json(orient='records',force_ascii=False)
+    return jsonify(records)

@@ -35,7 +35,7 @@
         </div>
       </q-card-section>
     </q-card>
-    <div class="q-mt-md" style="max-width: 400px">
+    <div class="q-mt-md" style="max-width: 900px">
       <div v-if="selectTab == 'ランキング'">
         <div v-for="rec in rankRecords" :key="rec.name">
           <div style="padding-bottom: 24px">
@@ -78,6 +78,16 @@
           </div>
         </div>
       </div>
+      <div v-if="selectTab == 'スタンプカード'" class="row wrap">
+        <div v-for="rec in stampRecords" :key="rec.name">
+          <q-avatar class="q-mr-md q-mb-sm">
+            <img
+              :src="ssbuNameOptions.find((it) => it.name == rec.name)?.icon"
+              :class="{ 'img-default': rec.comp != 1 }"
+            />
+          </q-avatar>
+        </div>
+      </div>
     </div>
   </q-page>
 </template>
@@ -97,6 +107,7 @@ export default defineComponent({
       tabItems,
       rankRecords,
       firstRecords,
+      stampRecords,
       ssbuNameOptions,
       getRank,
       getNames,
@@ -111,6 +122,7 @@ export default defineComponent({
       tabItems,
       rankRecords,
       firstRecords,
+      stampRecords,
       ssbuNameOptions,
       getRank,
       getNames,
@@ -123,9 +135,10 @@ const useModel = function () {
   const selectCategory = ref('ウルトラC');
   const categoryItems = ref(['ウルトラC', 'ウルツラC', '思い出', '焼き直し']);
   const selectTab = ref('ランキング');
-  const tabItems = ref(['ランキング', '記念日']);
+  const tabItems = ref(['ランキング', '記念日', 'スタンプカード']);
   const rankRecords = ref([] as Rank[]);
   const firstRecords = ref([] as First[]);
+  const stampRecords = ref([] as Stamp[]);
   const ssbuNameOptions = ref([] as SsbuNameState[]);
 
   const getNames = async function () {
@@ -182,12 +195,35 @@ const useModel = function () {
       });
   };
 
+  const getStamp = async function (text: string) {
+    await api
+      .stamp(text)
+      .then((response) => {
+        if (response) {
+          console.log('stamp response', response);
+          stampRecords.value.splice(0);
+          response.forEach((it) => stampRecords.value.push(it));
+        }
+      })
+      .catch((err) => {
+        console.log('rank err', err);
+        quasar.notify({
+          color: 'negative',
+          position: 'top',
+          message: 'データ取得でエラーになった...',
+        });
+      });
+  };
+
   const onSearchClick = function () {
     if (selectTab.value == 'ランキング') {
       getRank(selectCategory.value);
     }
     if (selectTab.value == '記念日') {
       getFirst(selectCategory.value);
+    }
+    if (selectTab.value == 'スタンプカード') {
+      getStamp(selectCategory.value);
     }
   };
 
@@ -198,6 +234,7 @@ const useModel = function () {
     tabItems,
     rankRecords,
     firstRecords,
+    stampRecords,
     ssbuNameOptions,
     getRank,
     getNames,
@@ -218,4 +255,13 @@ interface First {
   name: string;
   date: string;
 }
+interface Stamp {
+  name: string;
+  comp: number;
+}
 </script>
+<style>
+.img-default {
+  opacity: 0.5;
+}
+</style>

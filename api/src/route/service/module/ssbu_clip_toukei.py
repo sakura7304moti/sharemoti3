@@ -54,3 +54,46 @@ def category_first(text:str):
         "text" : f'%{text}%'
     }
     return query_model.execute_df(query, args)
+
+def stamp_list(text:str):
+    query = """
+    WITH
+	A1 AS (
+		SELECT
+			n.ssbu_name,
+			COUNT(
+				CASE
+					WHEN s.title LIKE %(text)s THEN 1
+				END
+			) AS total
+		FROM
+			sharemoti.name AS n
+			LEFT JOIN sharemoti.ssbu_clip AS s ON s.char_name = n.name
+		WHERE
+			n.ssbu_name <> 'その他'
+			AND n.ssbu_name <> 'Mrゲーム＆ウォッチ'
+			AND n.ssbu_name <> 'クッパ Jr'
+		GROUP BY
+			n.ssbu_name
+	),
+	A2 AS (
+		SELECT
+			ssbu_name AS name,
+			CASE
+				WHEN t.total > 0 THEN 1
+				ELSE 0
+			END AS comp,
+			sn.id
+		FROM
+			A1 AS t
+		left JOIN sharemoti.ssbu_names as sn on t.ssbu_name = sn."name"
+	)
+	SELECT 
+		name,
+		comp
+	from A2 order by A2.id
+    """
+    args = {
+        "text" : f'%{text}%'
+    }
+    return query_model.execute_df(query, args)

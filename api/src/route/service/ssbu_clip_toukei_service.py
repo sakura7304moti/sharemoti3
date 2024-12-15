@@ -5,3 +5,6 @@ def category_rank(text:str):
 
 def category_first(text:str):
     return query_service.category_first(text)
+
+def stamp_list(text:str):
+    return query_service.stamp_list(text)
