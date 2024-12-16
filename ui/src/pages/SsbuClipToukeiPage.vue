@@ -145,7 +145,29 @@
               <div class="q-px-md q-mb-sm" style="font-size: 20px">
                 {{ movies.find((it) => it.isPlay)?.title }}
               </div>
-              <q-toggle v-model="isAuto" label="自動再生" />
+              <div>
+                <q-radio
+                  keep-color
+                  color="primary"
+                  v-model="playMode"
+                  val="base"
+                  label="通常再生"
+                />
+                <q-radio
+                  keep-color
+                  color="primary"
+                  v-model="playMode"
+                  val="auto"
+                  label="自動"
+                />
+                <q-radio
+                  keep-color
+                  color="primary"
+                  v-model="playMode"
+                  val="shuffle"
+                  label="シャッフル"
+                />
+              </div>
             </div>
 
             <!--曲を選ぶドン-->
@@ -204,7 +226,7 @@ export default defineComponent({
       dialog,
       movies,
       selectedCondition,
-      isAuto,
+      playMode,
       onPlayClick,
       onSearchMovie,
       onVideoEnded,
@@ -226,7 +248,7 @@ export default defineComponent({
       dialog,
       movies,
       selectedCondition,
-      isAuto,
+      playMode,
       onPlayClick,
       onSearchMovie,
       onVideoEnded,
@@ -348,7 +370,7 @@ const useModel = function () {
 const useMovieModel = function () {
   const isLoading = ref(false);
   const dialog = ref(false);
-  const isAuto = ref(false);
+  const playMode = ref('base');
   const movies = ref([] as SsbuClip[]);
   const selectedCondition = ref({
     name: '',
@@ -367,7 +389,7 @@ const useMovieModel = function () {
 
   const onVideoEnded = function () {
     console.log('called');
-    if (isAuto.value == false) {
+    if (playMode.value == 'base') {
       return;
     }
 
@@ -376,11 +398,22 @@ const useMovieModel = function () {
       return;
     }
 
-    if (index < movies.value.length) {
-      const id = movies.value[index + 1].id;
-      onPlayClick(id);
-    } else {
-      const id = movies.value[0].id;
+    if (playMode.value == 'auto') {
+      if (index < movies.value.length) {
+        const id = movies.value[index + 1].id;
+        onPlayClick(id);
+      } else {
+        const id = movies.value[0].id;
+        onPlayClick(id);
+      }
+    }
+
+    if (playMode.value == 'shuffle') {
+      const ids = movies.value
+        .filter((it) => it.isPlay == false)
+        .map((x) => x.id);
+      const index = Math.floor(Math.random() * ids.length);
+      const id = movies.value[index].id;
       onPlayClick(id);
     }
   };
@@ -431,7 +464,7 @@ const useMovieModel = function () {
     dialog,
     movies,
     selectedCondition,
-    isAuto,
+    playMode,
     onPlayClick,
     onSearchMovie,
     onVideoEnded,
