@@ -123,7 +123,7 @@
             </div>
           </div>
 
-          <div class="row wrap">
+          <div class="row wrap" v-if="movies.length > 0">
             <!--動画再生エリア-->
             <div
               style="
@@ -143,9 +143,16 @@
                 v-if="movies.filter((it) => it.isPlay).length == 1"
               />
               <div class="q-px-md q-mb-sm" style="font-size: 20px">
-                {{ movies.find((it) => it.isPlay)?.title }}
+                <q-btn
+                  class="q-mr-sm"
+                  size="sm"
+                  icon="skip_next"
+                  color="primary"
+                  @click="onVideoEnded"
+                  v-if="playMode != 'base' && movies.find((it) => it.isPlay)"
+                />{{ movies.find((it) => it.isPlay)?.title }}
               </div>
-              <div>
+              <div class="q-mb-xs">
                 <q-radio
                   keep-color
                   color="primary"
@@ -190,6 +197,7 @@
               </div>
             </div>
           </div>
+          <div v-else class="q-pa-md">よいお年を</div>
         </q-card-section>
       </q-card>
     </q-dialog>
