@@ -767,6 +767,9 @@ class SsbuClipSearchCondition:
         self.cate = cate
         self.page_size = 40
         self.page_no = page_no
+        if self.page_no == -1:
+            self.page_size = 1000
+        
 
     def to_args(self):
         return {

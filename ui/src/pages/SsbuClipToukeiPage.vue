@@ -46,7 +46,10 @@
               {{ rec.rank }}位
             </div>
             <div class="row">
-              <q-avatar class="q-mr-md">
+              <q-avatar
+                class="q-mr-md ssbu-icon"
+                @click="onSearchMovie(rec.name, selectCategory)"
+              >
                 <img
                   :src="ssbuNameOptions.find((it) => it.name == rec.name)?.icon"
                 />
@@ -64,7 +67,10 @@
         <div v-for="rec in firstRecords" :key="rec.name">
           <div style="padding-bottom: 24px">
             <div class="row">
-              <q-avatar class="q-mr-md">
+              <q-avatar
+                class="q-mr-md ssbu-icon"
+                @click="onSearchMovie(rec.name, selectCategory)"
+              >
                 <img
                   :src="ssbuNameOptions.find((it) => it.name == rec.name)?.icon"
                 />
@@ -80,7 +86,10 @@
       </div>
       <div v-if="selectTab == 'スタンプカード'" class="row wrap">
         <div v-for="rec in stampRecords" :key="rec.name">
-          <q-avatar class="q-mr-md q-mb-sm">
+          <q-avatar
+            class="q-mr-md q-mb-sm ssbu-icon"
+            @click="onSearchMovie(rec.name, selectCategory)"
+          >
             <img
               :src="ssbuNameOptions.find((it) => it.name == rec.name)?.icon"
               :class="{ 'img-default': rec.comp != 1 }"
@@ -89,6 +98,79 @@
         </div>
       </div>
     </div>
+    <q-dialog v-model="dialog">
+      <q-card style="max-width: 1000px; width: 100%">
+        <q-card-section class="bg-black text-white q-pa-none">
+          <!--ヘッダー-->
+          <div class="bg-primary row justify-between">
+            <div class="row">
+              <q-avatar class="q-ma-xs" size="md">
+                <img
+                  :src="
+                    ssbuNameOptions.find(
+                      (it) => it.name == selectedCondition.name
+                    )?.icon
+                  "
+                />
+              </q-avatar>
+              <div class="dialog-title q-pt-sm">
+                {{ selectedCondition.category }}コレクション
+              </div>
+            </div>
+
+            <div class="q-pr-xs q-pt-sm">
+              <q-btn flat icon="close" @click="dialog = false" />
+            </div>
+          </div>
+
+          <div class="row wrap">
+            <!--動画再生エリア-->
+            <div
+              style="
+                max-width: min(600px, calc(100vw - 32px));
+                width: 100%;
+                margin: 0 auto;
+              "
+            >
+              <video
+                class="backgroud-video"
+                :src="movies.find((it) => it.isPlay)?.movieUrl ?? ''"
+                style="min-width: 100%; max-width: 600px; width: 100%"
+                :ratio="16 / 9"
+                @ended="onVideoEnded"
+                controls
+                autoplay
+                v-if="movies.filter((it) => it.isPlay).length == 1"
+              />
+              <div class="q-px-md q-mb-sm" style="font-size: 20px">
+                {{ movies.find((it) => it.isPlay)?.title }}
+              </div>
+              <q-toggle v-model="isAuto" label="自動再生" />
+            </div>
+
+            <!--曲を選ぶドン-->
+            <div id="movie-titles">
+              <div
+                v-for="rec in movies"
+                :key="rec.id"
+                class="q-pl-sm q-mt-sm movie-title"
+                @click="onPlayClick(rec.id)"
+                :class="{ 'text-primary': rec.isPlay }"
+              >
+                <q-icon
+                  text-color="white"
+                  :name="rec.isPlay ? 'audiotrack' : 'smart_display'"
+                  size="sm"
+                /><span class="q-ml-sm">
+                  {{ rec.title }}
+                </span>
+                <hr />
+              </div>
+            </div>
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 <script lang="ts">
@@ -97,6 +179,7 @@ import api from 'src/api/file/SsbuClipToukeiApi';
 import { NameListApi } from 'src/api/main/NameListApi';
 const nameApi = new NameListApi();
 import { useQuasar } from 'quasar';
+import { SsbuClipApi } from 'src/api/file/SsbuClipApi';
 export default defineComponent({
   name: 'ssbu-clip-toukei-page',
   setup() {
@@ -115,6 +198,17 @@ export default defineComponent({
     } = useModel();
     getNames();
     onSearchClick();
+
+    const {
+      isLoading,
+      dialog,
+      movies,
+      selectedCondition,
+      isAuto,
+      onPlayClick,
+      onSearchMovie,
+      onVideoEnded,
+    } = useMovieModel();
     return {
       selectCategory,
       categoryItems,
@@ -127,6 +221,15 @@ export default defineComponent({
       getRank,
       getNames,
       onSearchClick,
+      // movie **
+      isLoading,
+      dialog,
+      movies,
+      selectedCondition,
+      isAuto,
+      onPlayClick,
+      onSearchMovie,
+      onVideoEnded,
     };
   },
 });
@@ -241,6 +344,99 @@ const useModel = function () {
     onSearchClick,
   };
 };
+
+const useMovieModel = function () {
+  const isLoading = ref(false);
+  const dialog = ref(false);
+  const isAuto = ref(false);
+  const movies = ref([] as SsbuClip[]);
+  const selectedCondition = ref({
+    name: '',
+    category: '',
+  } as ClipCondition);
+
+  const onPlayClick = function (id: number) {
+    movies.value.forEach((it) => {
+      if (it.id == id) {
+        it.isPlay = true;
+      } else {
+        it.isPlay = false;
+      }
+    });
+  };
+
+  const onVideoEnded = function () {
+    console.log('called');
+    if (isAuto.value == false) {
+      return;
+    }
+
+    const index = movies.value.findIndex((it) => it.isPlay);
+    if (index == -1) {
+      return;
+    }
+
+    if (index < movies.value.length) {
+      const id = movies.value[index + 1].id;
+      onPlayClick(id);
+    } else {
+      const id = movies.value[0].id;
+      onPlayClick(id);
+    }
+  };
+
+  const onSearchMovie = async function (ssbuName: string, category: string) {
+    const api = new SsbuClipApi();
+    isLoading.value = true;
+    await api
+      .search({
+        text: '',
+        charName: '',
+        cate: category,
+        ssbuName: ssbuName,
+        date: '',
+        pageNo: -1,
+      })
+      .then((response) => {
+        if (response) {
+          console.log('movies', response);
+          movies.value.splice(0);
+
+          response.records.forEach((it) =>
+            movies.value.push({
+              id: it.id,
+              title: it.title,
+              fileName: it.fileName,
+              dirName: it.dirName,
+              charName: it.charName,
+              ssbuName: it.ssbuName,
+              date: it.date,
+              fullIcon: it.fullIcon,
+              smallIcon: it.smallIcon,
+              isPlay: false,
+              movieUrl: SsbuClipApi.MovieUrl(it.dirName, it.fileName),
+              videoIsLoading: false,
+            })
+          );
+          selectedCondition.value.name = ssbuName;
+          selectedCondition.value.category = category;
+          dialog.value = true;
+        }
+      })
+      .catch((err) => console.log('movie err', err));
+    isLoading.value = false;
+  };
+  return {
+    isLoading,
+    dialog,
+    movies,
+    selectedCondition,
+    isAuto,
+    onPlayClick,
+    onSearchMovie,
+    onVideoEnded,
+  };
+};
 interface SsbuNameState {
   name: string;
   url: string;
@@ -259,9 +455,64 @@ interface Stamp {
   name: string;
   comp: number;
 }
+interface ClipCondition {
+  name: string;
+  category: string;
+}
+interface SsbuClip {
+  id: number;
+  title: string;
+  fileName: string;
+  dirName: string;
+  charName: string;
+  ssbuName: string;
+  date: string;
+  fullIcon: string;
+  smallIcon: string;
+  isPlay: boolean;
+  movieUrl: string;
+  videoIsLoading: boolean;
+}
 </script>
 <style>
 .img-default {
-  opacity: 0.5;
+  opacity: 0.3;
+}
+.dialog-title {
+  font-size: 22px;
+}
+.ssbu-icon {
+  cursor: pointer;
+}
+.ssbu-icon:hover {
+  opacity: 0.7s;
+  transition: 0.3s;
+}
+.movie-title {
+  cursor: pointer;
+}
+.movie-title:hover {
+  transition: 0.3s;
+  color: orange;
+}
+#movie-titles {
+  max-width: min(300px, calc(100vw - 32px));
+  width: 100%;
+  max-height: calc(100vh - 150px);
+  overflow-y: scroll;
+}
+@media (max-width: 1000px) {
+  #movie-titles {
+    margin: 4px;
+    padding: 8px;
+    max-width: 100%;
+    width: 100%;
+    border: white 2px solid;
+    border-radius: 10px;
+    max-height: calc(100vh - 500px);
+  }
+  .dialog-title {
+    font-size: 18px;
+  }
 }
 </style>
