@@ -1,13 +1,14 @@
 """
 Flask Server
 """
+
 from flask import Flask
 from flask_cors import CORS
 
 """
 Blueprint import
 """
-#main
+# main
 from src.route import wordList_route
 from src.route import nameList_route
 from src.route import nameList2_route
@@ -18,7 +19,7 @@ from src.route import schoollist2_route
 from src.route import haikuList_route
 from src.route import imageList_route
 
-#file
+# file
 from src.route import karaokeList_route
 from src.route import radioList_route
 from src.route import ssbuList_route
@@ -29,8 +30,9 @@ from src.route import support_route
 from src.route import movieList_route
 from src.route import top_image_route
 from src.route import top_news_route
+from src.route import movie_route
 
-#scraper
+# scraper
 from src.route import twitter_route
 from src.route import holotwitter_route
 from src.route import holosong_route
@@ -49,7 +51,7 @@ CORS(app)
 """
 register blueprint
 """
-#main
+# main
 app.register_blueprint(wordList_route.app)
 app.register_blueprint(nameList_route.app)
 app.register_blueprint(nameList2_route.app)
@@ -58,7 +60,7 @@ app.register_blueprint(schoolList_route.app)
 app.register_blueprint(schoollist2_route.app)
 app.register_blueprint(haikuList_route.app)
 app.register_blueprint(imageList_route.app)
-#file
+# file
 app.register_blueprint(karaokeList_route.app)
 app.register_blueprint(radioList_route.app)
 app.register_blueprint(ssbuList_route.app)
@@ -69,7 +71,8 @@ app.register_blueprint(support_route.app)
 app.register_blueprint(movieList_route.app)
 app.register_blueprint(top_image_route.app)
 app.register_blueprint(top_news_route.app)
-#scraper
+app.register_blueprint(movie_route.app)
+# scraper
 app.register_blueprint(twitter_route.app)
 app.register_blueprint(holotwitter_route.app)
 app.register_blueprint(holosong_route.app)
@@ -77,8 +80,8 @@ app.register_blueprint(holomovie_route.app)
 app.register_blueprint(holoarchive_route.app)
 app.register_blueprint(hololewd_route.app)
 app.register_blueprint(pixiv_route.app)
-#sub
-#app.register_blueprint(rembg_route.app)
+# sub
+# app.register_blueprint(rembg_route.app)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=False)

@@ -59,3 +59,16 @@ def delete(id: int):
     query = "DELETE FROM sharemoti.movie WHERE id = %(id)s"
     args = {"id": id}
     query_model.execute_commit(query, args)
+
+
+def get_id(file_name: str) -> int:
+    query = """
+    SELECT
+        id as id
+    from sharemoti.movie
+    where
+        file_name = %(fileName)s
+    """
+    args = {"fileName": file_name}
+    df = query_model.execute_df(query, args)
+    return int(df.iloc[0]["id"])

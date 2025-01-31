@@ -39,3 +39,13 @@ def delete(movie_id: int, name: str):
     """
     args = {"id": movie_id, "name": name}
     query_model.execute_commit(query, args)
+
+
+def delete_movie(movie_id: int):
+    query = """
+    DELETE FROM sharemoti.movie_hashtag 
+    WHERE 
+        movie_id = %(id)s
+    """
+    args = {"id": movie_id}
+    query_model.execute_commit(query, args)
