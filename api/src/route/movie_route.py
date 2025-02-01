@@ -9,9 +9,10 @@
 """
 
 import datetime
+import mimetypes
 import json
 import os
-from flask import Blueprint, flash, request, jsonify, send_file
+from flask import Blueprint, flash, request, jsonify, send_file, abort
 from werkzeug.utils import secure_filename
 from src.route.route_base import success_status
 from src.route.service.module.utils import interface
@@ -106,3 +107,15 @@ def movie_create():
     for name in hashtags:
         movie_service.create_hashtag(id, name)
     return success_status()
+
+
+@app.route("/movie/<name>", methods=["GET"])
+def movie_download(name: str):
+    if name == "":
+        return abort(400)
+
+    path = os.path.join(UPLOAD_FOLDER, name)
+    if not os.path.exists(path):
+        return abort(404)
+    mime_type, _ = mimetypes.guess_type(path)
+    return send_file(path, mimetype=mime_type)
