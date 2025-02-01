@@ -29,3 +29,7 @@ def delete_movie(movie_id: int):
 
 def delete_hashtag(movie_id: int):
     movie_hashtag.delete_movie(movie_id)
+
+
+def get_movie_id(file_name: str):
+    return movie.get_id(file_name)

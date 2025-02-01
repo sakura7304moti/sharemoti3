@@ -127,3 +127,18 @@ def movie_download(name: str):
         return abort(404)
     mime_type, _ = mimetypes.guess_type(path)
     return send_file(path, mimetype=mime_type)
+
+
+@app.route("/movie/<name>", methods=["DELETE"])
+def movie_delete(name: str):
+    if name == "":
+        return abort(400)
+
+    path = os.path.join(UPLOAD_FOLDER, name)
+    if not os.path.exists(path):
+        return abort(404)
+
+    id = movie_service.get_movie_id(name)
+    movie_service.delete_movie(id)  # DBの削除
+    os.remove(path)  # ファイルの削除
+    return success_status()
