@@ -103,9 +103,17 @@ def movie_upload():
 @app.route("/movie", methods=["PUT"])
 def movie_create():
     condition, hashtags = to_condition()
-    id = movie_service.create_movie(condition)
-    for name in hashtags:
-        movie_service.create_hashtag(id, name)
+    if condition.id == 0:
+        print("作成処理を実行")
+        id = movie_service.create_movie(condition)
+        for name in hashtags:
+            movie_service.create_hashtag(id, name)
+    else:
+        print("更新処理を実行")
+        movie_service.update_movie(condition)
+        movie_service.delete_hashtag(condition.id)
+        for hashtag in hashtags:
+            movie_service.create_hashtag(condition.id, hashtag)
     return success_status()
 
 

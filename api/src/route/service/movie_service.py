@@ -25,3 +25,7 @@ def update_staff(staff_cd: int, name: str):
 def delete_movie(movie_id: int):
     movie.delete(movie_id)
     movie_hashtag.delete_movie(movie_id)
+
+
+def delete_hashtag(movie_id: int):
+    movie_hashtag.delete_movie(movie_id)

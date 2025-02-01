@@ -40,7 +40,7 @@ def create(condition: interface.Movie):
 
 def update(condition: interface.Movie):
     query = """
-    UPDATE sharemoti.movie(
+    UPDATE sharemoti.movie
     SET
         title = %(title)s,
         detail = %(detail)s,
@@ -48,7 +48,6 @@ def update(condition: interface.Movie):
         update_at = %(current_time)s 
     where
         id = %(id)s
-    )
     """
     args = condition.to_args()
     args["current_time"] = query_model.current_time()
