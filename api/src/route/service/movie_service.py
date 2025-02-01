@@ -1,3 +1,4 @@
+import pandas as pd
 from src.route.service.module import movie, movie_hashtag, movie_staff
 from src.route.service.module.utils import interface
 
@@ -21,6 +22,10 @@ def update_staff(staff_cd: int, name: str):
     movie_staff.update(staff_cd, name)
 
 
+def update_group(name: str, is_group: bool):
+    movie_hashtag.update_group(name, is_group)
+
+
 # 削除に使う関数
 def delete_movie(movie_id: int):
     movie.delete(movie_id)
@@ -33,3 +38,14 @@ def delete_hashtag(movie_id: int):
 
 def get_movie_id(file_name: str):
     return movie.get_id(file_name)
+
+
+# 検索に使う関数
+def hashtag_list():
+    return movie_hashtag.hashtag_list()
+
+
+def search_movie(keyword: str, hashtag: str, page_no: int, page_size: int):
+    df = movie.search(keyword, hashtag, page_no, page_size)
+    total_count = movie.search_total_count(keyword, hashtag, page_size)
+    return df, total_count

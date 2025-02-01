@@ -2,6 +2,7 @@
 OmuTube
 """
 
+import math
 from src.route.service.module.utils import const, interface
 
 query_model = const.PsqlBase()
@@ -71,3 +72,87 @@ def get_id(file_name: str) -> int:
     args = {"fileName": file_name}
     df = query_model.execute_df(query, args)
     return int(df.iloc[0]["id"])
+
+
+def search_params(keyword: str, hashtag: str):
+    query = """
+    SELECT
+        mv.id,
+        mv.title,
+        mv.detail,
+        mv.file_name AS "fileName",
+        mv.thumbnail_flg AS "thumbnailFlg",
+        mv.staff_cd AS "staffCd",
+        mv.create_at AS "createdAt",
+        mv.update_at AS "updateAt"
+    FROM
+        sharemoti.movie AS mv
+    WHERE
+    """
+    if keyword == "":
+        query += """
+        1 = 0  
+        """
+    else:
+        query += """
+        mv.title LIKE %(keyword)s
+        OR mv.detail LIKE %(keyword)s
+        OR EXISTS (
+            SELECT
+                hs.name
+            FROM
+                sharemoti.movie_hashtag AS hs
+            WHERE
+                hs.name LIKE %(keyword)s
+                AND mv.id = hs.movie_id
+        ) 
+        """
+
+    if hashtag == "":
+        query += """
+        OR 1 = 0 
+        """
+    else:
+        query += """
+        OR EXISTS (
+            SELECT
+                hs.name
+            FROM
+                sharemoti.movie_hashtag AS hs
+            WHERE
+                hs.name = %(hashtag)s
+                AND mv.id = hs.movie_id
+        ) 
+        """
+
+    if keyword == "" and hashtag == "":
+        query += """
+        OR 1 = 1
+        """
+    query += """
+    ORDER BY
+        mv.create_at DESC,
+        mv.update_at DESC
+    """
+    args = {"keyword": f"%{keyword}%", "hashtag": hashtag}
+    return query, args
+
+
+def search(keyword: str, hashtag: str, page_no: int, page_size: int):
+    query, args = search_params(keyword, hashtag)
+    query += " limit %(pageSize)s offset %(offset)s"
+    args["offset"] = (max(page_no - 1, 0)) * page_size
+    args["pageSize"] = page_size
+    return query_model.execute_df(query, args)
+
+
+def search_total_count(keyword: str, hashtag: str, page_size: int):
+    sub_query, args = search_params(keyword, hashtag)
+    query = f"""
+    SELECT 
+        count(*) as total
+    from ({sub_query}) A
+    """
+    df = query_model.execute_df(query, args)
+    total = int(df["total"].iloc[0])
+    return math.ceil(total / page_size)

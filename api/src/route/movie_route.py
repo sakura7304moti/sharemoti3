@@ -142,3 +142,33 @@ def movie_delete(name: str):
     movie_service.delete_movie(id)  # DBの削除
     os.remove(path)  # ファイルの削除
     return success_status()
+
+
+@app.route("/movie/hashtag", methods=["GET"])
+def movie_hashtag():
+    df = movie_service.hashtag_list()
+    records = df.to_json(orient="records", force_ascii=False)
+    return jsonify(records)
+
+
+@app.route("/movie/hashtag/<name>", methods=["PUT"])
+def movie_hashtag_update(name: str):
+    is_group = (
+        False if request.args.get("isGroup", "false") == "false" else True
+    )  # クエリパラメータがあれば星をつける
+    movie_service.update_group(name, is_group)
+    return success_status()
+
+
+@app.route("/movie", methods=["GET"])
+def movie_search():
+    keyword = request.args.get("keyword", "")
+    hashtag = request.args.get("hashtag", "")
+    page_no = int(request.args.get("page", "1"))
+    PAGE_SIZE = 20
+
+    df, total_count = movie_service.search_movie(keyword, hashtag, page_no, PAGE_SIZE)
+    records = df.to_json(orient="records", force_ascii=False)
+    records_json = json.loads(records)
+    response = {"records": records_json, "totalCount": total_count}
+    return jsonify(json.dumps(response))
