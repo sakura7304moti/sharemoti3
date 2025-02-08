@@ -48,6 +48,24 @@ export class APIClient {
     }
   }
 
+  public async httpPut<T, U>(url: string, request: T): Promise<U | null> {
+    try {
+      const res: AxiosResponse<string> = await axios.put<
+        T,
+        AxiosResponse<string>
+      >(url, request, this.config);
+      if (typeof res.data == 'string') {
+        const r = JSON.parse(res.data);
+        return r;
+      } else {
+        return res.data;
+      }
+    } catch (e) {
+      console.log('parse err', e);
+      return null;
+    }
+  }
+
   //http get
   public async httpGet<T>(url: string): Promise<T | null> {
     try {

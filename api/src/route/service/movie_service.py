@@ -1,5 +1,5 @@
 import pandas as pd
-from src.route.service.module import movie, movie_hashtag, movie_staff
+from src.route.service.module import movie, movie_hashtag, movie_staff, movie_thumbnail
 from src.route.service.module.utils import interface
 
 
@@ -11,6 +11,10 @@ def create_movie(condition: interface.Movie) -> int:
 
 def create_hashtag(movie_id: int, name: str):
     movie_hashtag.create(movie_id, name)
+
+
+def update_thumbnail_all():
+    movie_thumbnail.update_thumbnail_all()
 
 
 # 編集に使う関数
@@ -49,3 +53,7 @@ def search_movie(keyword: str, hashtag: str, page_no: int, page_size: int):
     df = movie.search(keyword, hashtag, page_no, page_size)
     total_count = movie.search_total_count(keyword, hashtag, page_size)
     return df, total_count
+
+
+def get_thumbnail_path(file_name: str):
+    return movie_thumbnail.get_thumbnail_path(file_name)

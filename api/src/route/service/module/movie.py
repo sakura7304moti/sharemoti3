@@ -83,8 +83,8 @@ def search_params(keyword: str, hashtag: str):
         mv.file_name AS "fileName",
         mv.thumbnail_flg AS "thumbnailFlg",
         mv.staff_cd AS "staffCd",
-        mv.create_at AS "createdAt",
-        mv.update_at AS "updateAt"
+        TO_CHAR(mv.create_at, 'YYYY-MM-DD') as "createAt",
+        TO_CHAR(mv.update_at, 'YYYY-MM-DD') as "updateAt"
     FROM
         sharemoti.movie AS mv
     WHERE

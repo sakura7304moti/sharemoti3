@@ -172,3 +172,18 @@ def movie_search():
     records_json = json.loads(records)
     response = {"records": records_json, "totalCount": total_count}
     return jsonify(json.dumps(response))
+
+
+@app.route("/movie/batch/thumbnail", methods=["GET"])
+def update_thumbnail_all():
+    movie_service.update_thumbnail_all()
+    return success_status()
+
+
+@app.route("/movie/thumbnail/<name>", methods=["GET"])
+def get_thumbnail(name: str):
+    path = movie_service.get_thumbnail_path(name)
+    if not os.path.exists(path):
+        return abort(404)
+    mime_type, _ = mimetypes.guess_type(path)
+    return send_file(path, mimetype=mime_type)

@@ -105,9 +105,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/movie',
     component: () => import('layouts/MainLayout.vue'),
-    children: [
-      { path: '', component: () => import('pages/MovieListPage.vue') },
-    ],
+    children: [{ path: '', component: () => import('pages/MoviePage.vue') }],
   },
   {
     path: '/holo',
