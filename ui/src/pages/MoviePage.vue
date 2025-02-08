@@ -1,33 +1,104 @@
 <template>
   <q-page class="">
-    <div class="row q-gutter-md">
-      <div style="max-width: 200px">
-        <q-input
-          outlined
-          dense
-          stack-label
-          v-model="searchCondition.keyword"
-          label="キーワード"
-          class="bg-white"
-        />
-      </div>
-      <div>
-        <q-btn
-          label="検索"
-          color="primary"
-          icon="search"
-          @click="searchMovie"
-          :loading="isLoading"
-        />
+    <img
+      src="../assets/movie_icon.webp"
+      style="
+        max-width: calc(min(90vw, 400px));
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      "
+    />
+    <div class="q-my-md" style="margin-bottom: 48px">
+      <div class="text-subtitle1">登録・編集は以下のリンクから！</div>
+      <div class="q-ml-md row q-gutter-md">
+        <div class="q-mr-md">
+          <a href="#" class="text-primary text-subtitle1 text-bold">
+            <q-icon name="upload" />
+            動画を投稿する
+          </a>
+        </div>
+        <div class="q-mr-md">
+          <a href="#" class="text-primary text-subtitle1 text-bold">
+            <q-icon name="edit" />
+            動画を編集する
+          </a>
+        </div>
+        <div>
+          <a href="#" class="text-primary text-subtitle1 text-bold">
+            <q-icon name="tag" />
+            ハッシュタグを編集する
+          </a>
+        </div>
       </div>
     </div>
+    <q-card style="max-width: 500px">
+      <q-card-section>
+        <div class="text-subtitle1">検索条件</div>
+        <div class="q-pt-xs row q-gutter-md" style="padding-left: 12px">
+          <div style="max-width: 200px">
+            <q-input
+              outlined
+              dense
+              stack-label
+              v-model="searchCondition.keyword"
+              label="キーワード"
+              class="bg-white"
+            />
+          </div>
+          <div style="max-width: 200px; width: 100%">
+            <q-select
+              outlined
+              dense
+              stack-label
+              :options="hashtags"
+              v-model="searchCondition.hashtag"
+              label="ハッシュタグ"
+              class="bg-white"
+              clearable
+            />
+          </div>
+        </div>
+        <div class="q-mt-lg">
+          <div class="text-subtitle1">表示方法</div>
+          <!--表示条件に応じて表示を切り替えたい(API)-->
+          <div>
+            <q-radio
+              v-model="searchCondition.mode"
+              :val="1"
+              label="サムネ(大)"
+            />
+            <q-radio v-model="searchCondition.mode" :val="2" label="リスト" />
+            <q-radio
+              v-model="searchCondition.mode"
+              :val="3"
+              label="シリーズ別"
+            />
+          </div>
+        </div>
+        <div class="text-right q-mt-md">
+          <q-btn
+            label="検索"
+            color="primary"
+            icon="search"
+            @click="searchMovie"
+            :loading="isLoading"
+          />
+        </div>
+      </q-card-section>
+    </q-card>
 
     <!--検索結果-->
     <div class="q-mt-md">
       <div v-for="mv in pageState.records" :key="mv.id" class="q-mb-lg">
         <div style="max-width: 400px">
-          <div class="content-title">{{ mv.title }}</div>
+          <div class="content-title">
+            {{ mv.title }}
+          </div>
           <div class="content-detail" v-if="mv.detail">{{ mv.detail }}</div>
+          <div>
+            <span v-for="tag in mv.hashtags" :key="tag">{{ tag }}</span>
+          </div>
           <img
             class="q-mt-sm thumbnail image"
             :src="getThumbnailLink(mv.fileName)"
@@ -53,25 +124,31 @@ export default defineComponent({
   name: 'movie-page',
   setup() {
     const {
-      isLoading,
       playId,
+      isLoading,
       page,
       searchCondition,
       pageState,
+      hashtags,
       searchMovie,
       getDownloadLink,
       getThumbnailLink,
+      getHashtags,
     } = useMovieModel();
+    searchMovie();
+    getHashtags();
 
     return {
-      isLoading,
       playId,
+      isLoading,
       page,
       searchCondition,
       pageState,
+      hashtags,
       searchMovie,
       getDownloadLink,
       getThumbnailLink,
+      getHashtags,
     };
   },
 });

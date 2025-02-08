@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import api, { MovieApi } from 'src/api/file/MovieApi';
+import api from 'src/api/file/MovieApi';
 
 export function useMovieModel() {
   const isLoading = ref(false);
@@ -8,7 +8,9 @@ export function useMovieModel() {
   const searchCondition = ref({
     keyword: '',
     hashtag: '',
+    mode: 1,
   } as SearchCondition);
+  const hashtags = ref([] as string[]);
 
   const pageState = ref({
     records: [],
@@ -21,6 +23,7 @@ export function useMovieModel() {
       .searchMovie(
         searchCondition.value.keyword,
         searchCondition.value.hashtag,
+        searchCondition.value.mode,
         page.value
       )
       .then((response) => {
@@ -38,6 +41,14 @@ export function useMovieModel() {
     isLoading.value = false;
   };
 
+  const getHashtags = async function () {
+    await api.hashtagList().then((response) => {
+      if (response) {
+        hashtags.value = response.map((it) => it.name);
+      }
+    });
+  };
+
   const getDownloadLink = function (fileName: string) {
     return api.downloadLink(fileName);
   };
@@ -52,14 +63,17 @@ export function useMovieModel() {
     page,
     searchCondition,
     pageState,
+    hashtags,
     searchMovie,
     getDownloadLink,
     getThumbnailLink,
+    getHashtags,
   };
 }
 interface SearchCondition {
   keyword: string | null;
   hashtag: string | null;
+  mode: number;
 }
 interface DataState {
   id: number;

@@ -83,6 +83,7 @@ export class MovieApi extends FileAPIClient {
   public async searchMovie(
     keyword: string | null,
     hashtag: string | null,
+    displayMode: number | null,
     pageNo: number
   ): Promise<SearchMovieResponse | null> {
     let url = '/movie?a=1';
@@ -91,6 +92,9 @@ export class MovieApi extends FileAPIClient {
     }
     if (hashtag) {
       url += `&hashtag=${hashtag}`;
+    }
+    if (displayMode != null) {
+      url += `&mode=${displayMode}`;
     }
     url += `&page=${pageNo}`;
     const path = this.combineUrl(url);
