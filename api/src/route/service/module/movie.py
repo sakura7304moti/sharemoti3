@@ -184,3 +184,19 @@ def search_total_count(keyword: str, hashtag: str, page_size: int):
     df = query_model.execute_df(query, args)
     total = int(df["total"].iloc[0])
     return math.ceil(total / page_size)
+
+
+def get_movie_hashtags(id_list: list[int]):
+    id_where = "({})".format(",".join(map(str, id_list)))
+    query = f"""
+    SELECT
+        movie_id as "movieId",
+        name,
+        is_group as "isGroup"
+    from sharemoti.movie_hashtag
+    WHERE
+        movie_id in {id_where}
+    order by movie_id, name 
+    """
+    df = query_model.execute_df(query)
+    return df

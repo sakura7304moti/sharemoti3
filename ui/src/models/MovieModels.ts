@@ -31,7 +31,24 @@ export function useMovieModel() {
           console.log('search response', response);
           playId.value = null;
           pageState.value.records.splice(0);
-          pageState.value.records = response.records;
+          response.records.forEach((it) => {
+            pageState.value.records.push({
+              id: it.id,
+              title: it.title,
+              detail: it.detail,
+              fileName: it.fileName,
+              thumbnailFlg: it.thumbnailFlg,
+              staffCd: it.staffCd,
+              hashtags: response.hashtags
+                .filter((x) => x.movieId == it.id)
+                .map((h) => {
+                  return {
+                    name: h.name,
+                    isGroup: h.isGroup == 1,
+                  } as HashtagState;
+                }),
+            });
+          });
           pageState.value.totalCount = response.totalCount;
         }
       })
@@ -81,8 +98,13 @@ interface DataState {
   detail: string;
   fileName: string;
   thumbnailFlg: number;
-  staffCd: string;
-  hashtags: string[];
+  staffCd: number;
+  hashtags: HashtagState[];
+}
+
+interface HashtagState {
+  name: string;
+  isGroup: boolean;
 }
 
 interface PageState {

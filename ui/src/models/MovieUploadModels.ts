@@ -104,6 +104,11 @@ export function useMovieUploadModels() {
     }
     isCreateLoading.value = true;
     setDefaultStaffCd(createForm.value.staff.staffCd);
+    const hashtags = [] as string[];
+    createForm.value.newHashtags.forEach((it) => hashtags.push(it.name));
+    createForm.value.hashtags
+      .filter((it) => it.check)
+      .forEach((it) => hashtags.push(it.name));
     await api
       .createMovie({
         title: createForm.value.title,
@@ -111,13 +116,12 @@ export function useMovieUploadModels() {
         fileName: createForm.value.fileName,
         thumbnailFlg: createForm.value.thumbnailFlg,
         staffCd: createForm.value.staff.staffCd,
-        hashtags: createForm.value.hashtags
-          .filter((it) => it.check)
-          .map((it) => it.name),
+        hashtags: hashtags,
       })
-      .then((response) => {
+      .then(async (response) => {
         if (response) {
           console.log('create response', response);
+          await updateGroupHashtag();
           formStep.value = 3;
         }
       });
@@ -127,6 +131,25 @@ export function useMovieUploadModels() {
   const thumbnailUrl = computed(() =>
     api.thumbnailLink(createForm.value.fileName)
   );
+
+  const updateGroupHashtag = async function () {
+    const hashtags = createForm.value.newHashtags.filter((it) => it.isGroup);
+    hashtags.forEach(async (tag) => {
+      await api
+        .createHashtag(createForm.value.fileName, tag.name, tag.isGroup)
+        .then((response) => {
+          if (response) {
+            console.log(
+              `update hashtag ${tag.name} is ${tag.isGroup}`,
+              response
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(`update hashtag ${tag.name} is ${tag.isGroup}`, err);
+        });
+    });
+  };
 
   return {
     uploadUrl,

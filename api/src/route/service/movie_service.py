@@ -52,7 +52,9 @@ def hashtag_list():
 def search_movie(keyword: str, hashtag: str, page_no: int, page_size: int):
     df = movie.search(keyword, hashtag, page_no, page_size)
     total_count = movie.search_total_count(keyword, hashtag, page_size)
-    return df, total_count
+    id_list = df["id"].to_list()
+    hashtag_df = movie.get_movie_hashtags(id_list)
+    return df, total_count, hashtag_df
 
 
 def get_thumbnail_path(file_name: str):

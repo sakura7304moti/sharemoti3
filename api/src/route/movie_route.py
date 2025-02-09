@@ -167,10 +167,22 @@ def movie_search():
     page_no = int(request.args.get("page", "1"))
     PAGE_SIZE = 20
 
-    df, total_count = movie_service.search_movie(keyword, hashtag, page_no, PAGE_SIZE)
+    df, total_count, hashtag_df = movie_service.search_movie(
+        keyword, hashtag, page_no, PAGE_SIZE
+    )
+
+    # 検索結果
     records = df.to_json(orient="records", force_ascii=False)
     records_json = json.loads(records)
-    response = {"records": records_json, "totalCount": total_count}
+
+    # ハッシュタグの一覧
+    hashtag_records = hashtag_df.to_json(orient="records", force_ascii=False)
+    tag_json = json.loads(hashtag_records)
+    response = {
+        "records": records_json,
+        "totalCount": total_count,
+        "hashtags": tag_json,
+    }
     return jsonify(json.dumps(response))
 
 

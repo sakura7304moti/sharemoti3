@@ -85,6 +85,20 @@ export class MovieApi extends FileAPIClient {
     return this.httpGet<MovieHashtag[]>(path);
   }
 
+  public async createHashtag(
+    fileName: string,
+    hashtag: string,
+    isGroup: boolean
+  ) {
+    const url =
+      '/movie/hashtag/' + hashtag + '?isGroup=' + (isGroup ? 'true' : 'false');
+    const path = this.combineUrl(url);
+
+    return this.httpPut<PutResponse, PutResponse>(path, {
+      status: '',
+    });
+  }
+
   public async searchMovie(
     keyword: string | null,
     hashtag: string | null,
@@ -120,6 +134,12 @@ interface CreateMovie {
   hashtags: string[];
 }
 
+interface MovieHashtagListBase {
+  movieId: number;
+  name: string;
+  isGroup: number;
+}
+
 interface Movie extends CreateMovie {
   id: number;
 }
@@ -136,4 +156,5 @@ interface MovieHashtag {
 interface SearchMovieResponse {
   records: Movie[];
   totalCount: number;
+  hashtags: MovieHashtagListBase[];
 }

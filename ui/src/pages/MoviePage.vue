@@ -36,11 +36,11 @@
         </div>
       </div>
     </div>
-    <q-card style="max-width: 600px">
+    <q-card style="max-width: 400px" id="search-card">
       <q-card-section>
         <div class="text-subtitle1">検索条件</div>
         <div class="q-pt-xs row q-gutter-md" style="padding-left: 12px">
-          <div style="max-width: 200px">
+          <div style="max-width: 300px; width: 100%">
             <q-input
               outlined
               dense
@@ -50,7 +50,7 @@
               class="bg-white"
             />
           </div>
-          <div style="max-width: 200px; width: 100%">
+          <div style="max-width: 300px; width: 100%">
             <q-select
               outlined
               dense
@@ -60,6 +60,7 @@
               label="ハッシュタグ"
               class="bg-white"
               clearable
+              @update:model-value="onHashtagClick($event)"
             />
           </div>
         </div>
@@ -97,7 +98,13 @@
           </div>
           <div class="content-detail" v-if="mv.detail">{{ mv.detail }}</div>
           <div>
-            <span v-for="tag in mv.hashtags" :key="tag">{{ tag }}</span>
+            <span
+              class="content-hashtag"
+              v-for="tag in mv.hashtags"
+              :key="tag.name"
+              @click="onHashtagClick(tag.name)"
+              >#{{ tag.name }}</span
+            >
           </div>
           <img
             class="q-mt-sm thumbnail image"
@@ -145,6 +152,19 @@ export default defineComponent({
       router.push('/movie/upload');
     };
 
+    const onHashtagClick = function (name: string) {
+      // 検索
+      searchCondition.value.hashtag = name;
+      page.value = 1;
+      searchMovie();
+
+      // スクロール
+      const element = document.getElementById('search-card');
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
+
     return {
       playId,
       isLoading,
@@ -156,6 +176,7 @@ export default defineComponent({
       getDownloadLink,
       getThumbnailLink,
       getHashtags,
+      onHashtagClick,
       // navi
       onNavigateUpload,
     };
@@ -193,6 +214,15 @@ export default defineComponent({
   font-family: 'Noto Sans JP';
   white-space: pre-wrap;
   font-weight: 500;
+}
+.content-hashtag {
+  cursor: pointer;
+  color: var(--q-primary);
+  margin-right: 16px;
+}
+.content-hashtag:hover {
+  color: orange;
+  transition: 0.4s;
 }
 .nav-text {
   color: var(--q-primary);
