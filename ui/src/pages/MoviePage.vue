@@ -13,26 +13,30 @@
       <div class="text-subtitle1">登録・編集は以下のリンクから！</div>
       <div class="q-ml-md row q-gutter-md">
         <div class="q-mr-md">
-          <a href="#" class="text-primary text-subtitle1 text-bold">
+          <a
+            href="/#/movie/upload"
+            @click.prevent.stop="onNavigateUpload"
+            class="nav-text text-subtitle1"
+          >
             <q-icon name="upload" />
             動画を投稿する
           </a>
         </div>
         <div class="q-mr-md">
-          <a href="#" class="text-primary text-subtitle1 text-bold">
+          <a href="#" class="nav-text text-subtitle1">
             <q-icon name="edit" />
             動画を編集する
           </a>
         </div>
         <div>
-          <a href="#" class="text-primary text-subtitle1 text-bold">
+          <a href="#" class="nav-text text-subtitle1">
             <q-icon name="tag" />
             ハッシュタグを編集する
           </a>
         </div>
       </div>
     </div>
-    <q-card style="max-width: 500px">
+    <q-card style="max-width: 600px">
       <q-card-section>
         <div class="text-subtitle1">検索条件</div>
         <div class="q-pt-xs row q-gutter-md" style="padding-left: 12px">
@@ -63,11 +67,7 @@
           <div class="text-subtitle1">表示方法</div>
           <!--表示条件に応じて表示を切り替えたい(API)-->
           <div>
-            <q-radio
-              v-model="searchCondition.mode"
-              :val="1"
-              label="サムネ(大)"
-            />
+            <q-radio v-model="searchCondition.mode" :val="1" label="サムネ" />
             <q-radio v-model="searchCondition.mode" :val="2" label="リスト" />
             <q-radio
               v-model="searchCondition.mode"
@@ -91,7 +91,7 @@
     <!--検索結果-->
     <div class="q-mt-md">
       <div v-for="mv in pageState.records" :key="mv.id" class="q-mb-lg">
-        <div style="max-width: 400px">
+        <div style="max-width: 400px; margin-bottom: 80px">
           <div class="content-title">
             {{ mv.title }}
           </div>
@@ -120,9 +120,12 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useMovieModel } from 'src/models/MovieModels';
+import { useRoute, useRouter } from 'vue-router';
 export default defineComponent({
   name: 'movie-page',
   setup() {
+    const route = useRoute();
+    const router = useRouter();
     const {
       playId,
       isLoading,
@@ -138,6 +141,10 @@ export default defineComponent({
     searchMovie();
     getHashtags();
 
+    const onNavigateUpload = function () {
+      router.push('/movie/upload');
+    };
+
     return {
       playId,
       isLoading,
@@ -149,6 +156,8 @@ export default defineComponent({
       getDownloadLink,
       getThumbnailLink,
       getHashtags,
+      // navi
+      onNavigateUpload,
     };
   },
 });
@@ -184,5 +193,13 @@ export default defineComponent({
   font-family: 'Noto Sans JP';
   white-space: pre-wrap;
   font-weight: 500;
+}
+.nav-text {
+  color: var(--q-primary);
+  font-weight: bolder;
+}
+.nav-text:hover {
+  color: orange;
+  transition: 0.4s;
 }
 </style>

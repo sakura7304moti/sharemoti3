@@ -3,9 +3,16 @@ OmuTube
 """
 
 import math
+import random
+import cv2
+import os
+
+
 from src.route.service.module.utils import const, interface
+from src.route.service.module import movie_thumbnail
 
 query_model = const.PsqlBase()
+path_model = const.Path()
 
 """
 ・作成
@@ -37,6 +44,27 @@ def create(condition: interface.Movie):
     args = condition.to_args()
     args["current_time"] = query_model.current_time()
     query_model.execute_commit(query, args)
+
+    # サムネイル作成
+    path = os.path.join(path_model.movie_uploads(), condition.file_name)
+    cap = cv2.VideoCapture(path)
+    if not cap.isOpened():
+        print(f"動画がひらけませんでした -> {path}")
+        return
+
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if total_frames == 0:
+        print(f"フレームが見つかりませんでした -> {path}")
+        return
+
+    frame_no = random.randint(0, total_frames - 1)
+    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
+    ret, frame = cap.read()
+    if ret:
+        save_path = movie_thumbnail.get_thumbnail_path(path)
+        cv2.imwrite(save_path, frame)
+    else:
+        print(f"フレームが読み取れませんでした -> {path}")
 
 
 def update(condition: interface.Movie):

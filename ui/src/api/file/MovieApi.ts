@@ -4,8 +4,7 @@ import { PutResponse } from '../BaseApi';
 
 export class MovieApi extends FileAPIClient {
   public async upload(file: File): Promise<MovieUploadResponse | null> {
-    const url = '/movie/upload';
-    const path = this.combineUrl(url);
+    const path = this.uploadUrl();
 
     return this.httpUpload<MovieUploadResponse>(path, file);
   }
@@ -14,6 +13,12 @@ export class MovieApi extends FileAPIClient {
     const url = '/movie';
     const path = this.combineUrl(url);
     return this.httpPut<CreateMovie, PutResponse>(path, request);
+  }
+
+  public uploadUrl() {
+    const url = '/movie/upload';
+    const path = this.combineUrl(url);
+    return path;
   }
 
   public async updateMovie(request: Movie): Promise<PutResponse | null> {
@@ -111,7 +116,7 @@ interface CreateMovie {
   detail: string;
   fileName: string;
   thumbnailFlg: number;
-  staffCd: string;
+  staffCd: number;
   hashtags: string[];
 }
 
