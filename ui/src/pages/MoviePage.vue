@@ -122,10 +122,25 @@
         </div>
       </div>
     </div>
+    <!--ロード-->
+    <div class="text-center" v-if="page > 1 && isLoading">
+      <q-spinner color="primary" size="md" class="q-mr-md" /><sapn
+        >読み込み中...</sapn
+      >
+    </div>
+    <!--スクロールボタン-->
+    <button v-if="isShowTopButton" class="scroll-to-top" @click="onTopClick">
+      <img
+        style="height: 70px"
+        class="holotwitter-top-scroll-img"
+        src="../assets/Rocket Base 512x512.png"
+      />
+      <div>トップに戻る</div>
+    </button>
   </q-page>
 </template>
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
 import { useMovieModel } from 'src/models/MovieModels';
 import { useRoute, useRouter } from 'vue-router';
 export default defineComponent({
@@ -145,8 +160,43 @@ export default defineComponent({
       getThumbnailLink,
       getHashtags,
     } = useMovieModel();
+
+    // スクロール系
+    const isShowTopButton = ref(false);
+    const onScrollSearch = async function () {
+      console.log('scroll called', !isLoading);
+      if (isLoading.value == false && page.value < pageState.value.totalCount) {
+        console.log('scroll search...');
+        page.value = page.value + 1;
+        await searchMovie();
+      }
+    };
+    const handleScroll = () => {
+      const bottomOfWindow =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.offsetHeight - 200;
+
+      if (bottomOfWindow && !isLoading.value) {
+        onScrollSearch();
+      }
+    };
+
+    const onTopClick = function () {
+      // スムーズにページのトップに戻る
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    };
+
+    const setTopBtn = function () {
+      isShowTopButton.value = window.scrollY > 100;
+    };
+
     searchMovie();
     getHashtags();
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', setTopBtn);
 
     const onNavigateUpload = function () {
       router.push('/movie/upload');
@@ -179,6 +229,9 @@ export default defineComponent({
       onHashtagClick,
       // navi
       onNavigateUpload,
+      // スクロール
+      isShowTopButton,
+      onTopClick,
     };
   },
 });

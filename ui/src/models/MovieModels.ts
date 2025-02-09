@@ -14,7 +14,7 @@ export function useMovieModel() {
 
   const pageState = ref({
     records: [],
-    totalCount: 0,
+    totalCount: 1,
   } as PageState);
 
   const searchMovie = async function () {
@@ -30,7 +30,9 @@ export function useMovieModel() {
         if (response) {
           console.log('search response', response);
           playId.value = null;
-          pageState.value.records.splice(0);
+          if (page.value < 2) {
+            pageState.value.records.splice(0);
+          }
           response.records.forEach((it) => {
             pageState.value.records.push({
               id: it.id,

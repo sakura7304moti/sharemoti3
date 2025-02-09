@@ -165,7 +165,7 @@ def movie_search():
     keyword = request.args.get("keyword", "")
     hashtag = request.args.get("hashtag", "")
     page_no = int(request.args.get("page", "1"))
-    PAGE_SIZE = 20
+    PAGE_SIZE = 4
 
     df, total_count, hashtag_df = movie_service.search_movie(
         keyword, hashtag, page_no, PAGE_SIZE
