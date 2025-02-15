@@ -93,7 +93,11 @@ def movie_upload():
         formatted_datetime = now.strftime("%Y%m%d%H%M%S")
         save_file_name = formatted_datetime + "." + ext
 
-        file.save(os.path.join(UPLOAD_FOLDER, save_file_name))
+        save_path = os.path.join(UPLOAD_FOLDER, save_file_name)
+        file.save(save_path)
+
+        # サムネイルの作成
+        movie_service.create_thumbnail(save_path)
 
         jsondata = {"fileName": save_file_name}
         response = jsonify(jsondata)

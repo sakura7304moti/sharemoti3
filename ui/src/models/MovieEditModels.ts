@@ -1,5 +1,6 @@
+import { useQuasar } from 'quasar';
 import { MovieApi } from 'src/api/file/MovieApi';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 const STAFF_KEY = 'movie-default-staff-cd';
 export function useMovieEditModel() {
   /**
@@ -21,6 +22,7 @@ export function useMovieEditModel() {
    * ・動画のアップロードしてファイル名の取得
    * ・保存処理
    */
+  const quasar = useQuasar();
   const staffSelect = ref([
     {
       staffCd: 1,
@@ -33,7 +35,6 @@ export function useMovieEditModel() {
   ] as MovieStaff[]);
   const loadState = ref({
     fetch: false,
-    upload: false,
     update: false,
   } as LoadState);
   const movieInfo = ref({
@@ -51,6 +52,41 @@ export function useMovieEditModel() {
   } as MovieInfo);
   const pickedFile = ref(null as File | null);
   const api = new MovieApi();
+  const updateMovie = async function () {
+    if (movieInfo.value.title == '' || movieInfo.value.fileName == '') {
+      quasar.notify({
+        color: 'red',
+        position: 'top',
+        message: 'タイトルとファイルは必須！',
+      });
+      return;
+    }
+    const hashtags = [] as string[];
+    movieInfo.value.newHashtags.forEach((it) => hashtags.push(it.name));
+    movieInfo.value.hashtags
+      .filter((it) => it.check)
+      .forEach((it) => hashtags.push(it.name));
+    await api
+      .updateMovie({
+        id: movieInfo.value.id,
+        title: movieInfo.value.title,
+        detail: movieInfo.value.detail,
+        thumbnailFlg: movieInfo.value.thumbnailFlg,
+        fileName: movieInfo.value.fileName,
+        staffCd: movieInfo.value.staff.staffCd,
+        hashtags: hashtags,
+      })
+      .then((response) => {
+        if (response) {
+          console.log('movie update response', response);
+          quasar.notify({
+            color: 'primary',
+            position: 'top',
+            message: '保存したで！',
+          });
+        }
+      });
+  };
   const uploadFile = async function () {
     if (pickedFile.value == null) {
       return;
@@ -140,6 +176,7 @@ export function useMovieEditModel() {
     getDefaultStaff,
     setDefaultStaffCd,
     uploadFile,
+    updateMovie,
   };
 }
 interface MovieInfo {
@@ -160,7 +197,6 @@ interface Hashtag {
 
 interface LoadState {
   fetch: boolean;
-  upload: boolean;
   update: boolean;
 }
 interface MovieStaff {

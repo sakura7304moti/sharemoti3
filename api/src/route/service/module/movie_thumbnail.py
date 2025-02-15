@@ -12,27 +12,31 @@ UPLOAD_FOLDER = p.movie_uploads()
 THUMNAIL_FOLDER = p.movie_thumbnails_uploads()
 
 
+def create_thumbnail(path: str):
+    cap = cv2.VideoCapture(path)
+    if not cap.isOpened():
+        print(f"動画がひらけませんでした -> {path}")
+        return
+
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    if total_frames == 0:
+        print(f"フレームが見つかりませんでした -> {path}")
+        return
+
+    frame_no = random.randint(0, total_frames - 1)
+    cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
+    ret, frame = cap.read()
+    if ret:
+        save_path = get_thumbnail_path(path)
+        cv2.imwrite(save_path, frame)
+    else:
+        print(f"フレームが読み取れませんでした -> {path}")
+
+
 def update_thumbnail_all():
     movies = glob.glob(os.path.join(UPLOAD_FOLDER, "*"))
     for path in movies:
-        cap = cv2.VideoCapture(path)
-        if not cap.isOpened():
-            print(f"動画がひらけませんでした -> {path}")
-            continue
-
-        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        if total_frames == 0:
-            print(f"フレームが見つかりませんでした -> {path}")
-            continue
-
-        frame_no = random.randint(0, total_frames - 1)
-        cap.set(cv2.CAP_PROP_POS_FRAMES, frame_no)
-        ret, frame = cap.read()
-        if ret:
-            save_path = get_thumbnail_path(path)
-            cv2.imwrite(save_path, frame)
-        else:
-            print(f"フレームが読み取れませんでした -> {path}")
+        create_thumbnail(path)
 
 
 def get_thumbnail_path(file_name: str):

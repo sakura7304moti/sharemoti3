@@ -13,6 +13,10 @@ def create_hashtag(movie_id: int, name: str):
     movie_hashtag.create(movie_id, name)
 
 
+def create_thumbnail(path: str):
+    movie_thumbnail.create_thumbnail(path)
+
+
 def update_thumbnail_all():
     movie_thumbnail.update_thumbnail_all()
 

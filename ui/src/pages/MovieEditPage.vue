@@ -8,9 +8,15 @@
         color="primary"
         icon="arrow_back"
         dense
-      />動画の編集ページ
+      />動画の編集ページ<q-spinner
+        class="q-ml-sm"
+        v-if="loadState.fetch"
+        color="primary"
+        size="sm"
+      />
     </div>
-    <q-card class="q-mt-md">
+
+    <q-card class="q-mt-md" v-if="!loadState.fetch">
       <q-card-section>
         <div>
           <div style="max-width: 700px; width: 100%">
@@ -35,7 +41,7 @@
               />
               <q-file
                 v-model="pickedFile"
-                label="クリック・ドロップして動画を選択してね*"
+                label="動画を変更する場合、クリック・ドロップして動画を選択してね"
                 outlined
                 dense
                 :clearable="pickedFile?.size != null"
@@ -173,7 +179,13 @@
                 style="max-width: 700px; width: 100%; margin-top: 32px"
                 class="text-right"
               >
-                <q-btn label="保存" color="primary" push />
+                <q-btn
+                  label="保存"
+                  color="primary"
+                  push
+                  :loading="loadState.update"
+                  @click="onUpdaateClick"
+                />
               </div>
             </div>
           </div>
@@ -199,6 +211,8 @@ export default defineComponent({
       getMoieInfo,
       getDefaultStaff,
       setDefaultStaffCd,
+      uploadFile,
+      updateMovie,
     } = useMovieEditModel();
     const onMount = async function () {
       // 初期データ取得
@@ -225,7 +239,7 @@ export default defineComponent({
         }
       } else {
         URL.revokeObjectURL(tempVideoUrl.value);
-        tempVideoUrl.value = '';
+        tempVideoUrl.value = api.thumbnailLink(movieInfo.value.fileName);
       }
     });
 
@@ -243,6 +257,17 @@ export default defineComponent({
       hashtagInput.value = '';
     };
 
+    // 更新処理全体
+    const onUpdaateClick = async function () {
+      loadState.value.update = true;
+      if (pickedFile.value) {
+        await uploadFile();
+      }
+
+      await updateMovie();
+      loadState.value.update = false;
+    };
+
     const onNavigateTop = function () {
       router.push('/movie');
     };
@@ -258,6 +283,7 @@ export default defineComponent({
       setDefaultStaffCd,
       onNavigateTop,
       onClickHashtag,
+      onUpdaateClick,
     };
   },
 });

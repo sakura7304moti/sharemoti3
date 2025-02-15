@@ -73,6 +73,7 @@ def update(condition: interface.Movie):
     SET
         title = %(title)s,
         detail = %(detail)s,
+        file_name = %(fileName)s,
         thumbnail_flg = %(thumbnailFlg)s,
         update_at = %(current_time)s 
     where
