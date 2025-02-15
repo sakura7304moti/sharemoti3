@@ -3,26 +3,8 @@ import { MovieApi } from 'src/api/file/MovieApi';
 import { ref } from 'vue';
 const STAFF_KEY = 'movie-default-staff-cd';
 export function useMovieEditModel() {
-  /**
-   * 流れ
-   * 1. ページのidのクエリパラメータを元に動画のデータを取得する
-   * 2. 色々編集してもらう
-   * 3. 入力チェック
-   * 4. OKなら保存して完了
-   */
-
-  /**
-   * 必要変数・処理
-   * ⭐️変数
-   * ・動画データ
-   *
-   * ⭐️処理
-   * ・動画データの取得
-   * ・入力チェック処理
-   * ・動画のアップロードしてファイル名の取得
-   * ・保存処理
-   */
   const quasar = useQuasar();
+  const lockIcon = ref(false);
   const staffSelect = ref([
     {
       staffCd: 1,
@@ -36,6 +18,7 @@ export function useMovieEditModel() {
   const loadState = ref({
     fetch: false,
     update: false,
+    delete: false,
   } as LoadState);
   const movieInfo = ref({
     id: 0,
@@ -52,6 +35,37 @@ export function useMovieEditModel() {
   } as MovieInfo);
   const pickedFile = ref(null as File | null);
   const api = new MovieApi();
+  const deleteMovie = async function () {
+    if (lockIcon.value == false) {
+      return false;
+    }
+    loadState.value.delete = true;
+    return await api
+      .deleteMovie(movieInfo.value.fileName)
+      .then((response) => {
+        if (response) {
+          console.log('delete response', response);
+          quasar.notify({
+            color: 'primary',
+            position: 'top',
+            message: movieInfo.value.title + 'の動画は削除したで！',
+          });
+          return true;
+        } else {
+          return false;
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+
+        quasar.notify({
+          color: 'red',
+          position: 'top',
+          message: '削除に失敗した...',
+        });
+        return false;
+      });
+  };
   const updateMovie = async function () {
     if (movieInfo.value.title == '' || movieInfo.value.fileName == '') {
       quasar.notify({
@@ -172,11 +186,13 @@ export function useMovieEditModel() {
     loadState,
     movieInfo,
     pickedFile,
+    lockIcon,
     getMoieInfo,
     getDefaultStaff,
     setDefaultStaffCd,
     uploadFile,
     updateMovie,
+    deleteMovie,
   };
 }
 interface MovieInfo {
@@ -198,6 +214,7 @@ interface Hashtag {
 interface LoadState {
   fetch: boolean;
   update: boolean;
+  delete: boolean;
 }
 interface MovieStaff {
   staffCd: number;

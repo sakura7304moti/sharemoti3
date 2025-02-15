@@ -248,11 +248,7 @@
               動画のハッシュタグ
             </div>
             <div class="q-mt-lg">
-              <q-markup-table
-                separator="cell"
-                style="max-width: 700px"
-                v-if="createForm.newHashtags.length > 0"
-              >
+              <q-markup-table separator="cell" style="max-width: 700px">
                 <thead>
                   <tr>
                     <th></th>

@@ -1,22 +1,45 @@
 <template>
   <q-page class="">
-    <div class="text-h6">
-      <q-btn
-        class="q-mr-md q-mb-xs"
-        @click="onNavigateTop"
-        label="一覧に戻る"
-        color="primary"
-        icon="arrow_back"
-        dense
-      />動画の編集ページ<q-spinner
-        class="q-ml-sm"
-        v-if="loadState.fetch"
-        color="primary"
-        size="sm"
-      />
+    <div class="row justify-between">
+      <div class="text-h6 q-mb-md">
+        <q-btn
+          class="q-mr-md q-mb-xs"
+          @click="onNavigateTop"
+          label="一覧に戻る"
+          color="primary"
+          icon="arrow_back"
+          dense
+        />動画の編集ページ<q-spinner
+          class="q-ml-sm"
+          v-if="loadState.fetch"
+          color="primary"
+          size="sm"
+        /><q-icon
+          v-if="lockIcon == false"
+          class="q-ml-sm cursor-pointer"
+          name="lock"
+          color="secondary"
+          @click="lockIcon = !lockIcon"
+        />
+        <q-icon
+          v-else
+          class="q-ml-sm cursor-pointer"
+          name="lock_open"
+          color="secondary"
+          @click="lockIcon = !lockIcon"
+        />
+      </div>
+      <div v-if="lockIcon" class="text-right delete-btn">
+        <q-btn
+          class="q-mb-md"
+          color="negative"
+          label="動画を削除する"
+          @click="deleteDialog = true"
+        />
+      </div>
     </div>
 
-    <q-card class="q-mt-md" v-if="!loadState.fetch">
+    <q-card v-if="!loadState.fetch">
       <q-card-section>
         <div>
           <div style="max-width: 700px; width: 100%">
@@ -192,6 +215,29 @@
         </div>
       </q-card-section>
     </q-card>
+    <q-dialog v-model="deleteDialog">
+      <q-card style="max-width: 400px; width: 100%">
+        <q-card-section>
+          <div class="text-h6">動画の削除確認</div>
+          <div class="q-ma-md">
+            <div class="text-subtitle1">このページの動画を削除しますか？</div>
+          </div>
+          <div class="row justify-between">
+            <q-btn
+              label="キャンセル"
+              color="grey-4"
+              @click="deleteDialog = false"
+            />
+            <q-btn
+              label="削除する"
+              color="negative"
+              @click="onDeleteClick"
+              :loading="loadState.delete"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 <script lang="ts">
@@ -204,6 +250,7 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     const {
+      lockIcon,
       staffSelect,
       loadState,
       movieInfo,
@@ -213,6 +260,7 @@ export default defineComponent({
       setDefaultStaffCd,
       uploadFile,
       updateMovie,
+      deleteMovie,
     } = useMovieEditModel();
     const onMount = async function () {
       // 初期データ取得
@@ -268,10 +316,19 @@ export default defineComponent({
       loadState.value.update = false;
     };
 
+    // 削除処理全体
+    const onDeleteClick = async function () {
+      const result = await deleteMovie();
+      if (result) {
+        onNavigateTop();
+      }
+    };
+
     const onNavigateTop = function () {
       router.push('/movie');
     };
     return {
+      lockIcon,
       staffSelect,
       loadState,
       movieInfo,
@@ -284,7 +341,16 @@ export default defineComponent({
       onNavigateTop,
       onClickHashtag,
       onUpdaateClick,
+      onDeleteClick,
+      deleteDialog: ref(false),
     };
   },
 });
 </script>
+<style>
+@media (max-width: 600px) {
+  .delete-btn {
+    width: 100%;
+  }
+}
+</style>
