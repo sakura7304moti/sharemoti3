@@ -43,6 +43,12 @@ export class MovieApi extends FileAPIClient {
     });
   }
 
+  public async getMovieInfo(id: number) {
+    const url = '/movie/info/' + id;
+    const path = this.combineUrl(url);
+    return this.httpGet<MovieInfo>(path);
+  }
+
   public async getThumbNailImage(fileName: string) {
     const url = '/movie/thumbnail/' + fileName;
     const path = this.combineUrl(url);
@@ -157,4 +163,18 @@ interface SearchMovieResponse {
   records: Movie[];
   totalCount: number;
   hashtags: MovieHashtagListBase[];
+}
+
+interface MovieInfo {
+  movie: MovieInfoBase;
+
+  hashtags: MovieHashtagListBase[];
+}
+interface MovieInfoBase {
+  id: number;
+  title: string;
+  detail: string;
+  fileName: string;
+  thumbnailFlg: number;
+  staffCd: number;
 }

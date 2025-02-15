@@ -200,3 +200,24 @@ def get_movie_hashtags(id_list: list[int]):
     """
     df = query_model.execute_df(query)
     return df
+
+
+def get_movie(id: int):
+    query = """
+    SELECT
+        mv.id,
+        mv.title,
+        mv.detail,
+        mv.file_name AS "fileName",
+        mv.thumbnail_flg AS "thumbnailFlg",
+        mv.staff_cd AS "staffCd",
+        TO_CHAR(mv.create_at, 'YYYY-MM-DD') as "createAt",
+        TO_CHAR(mv.update_at, 'YYYY-MM-DD') as "updateAt"
+    FROM
+        sharemoti.movie AS mv
+    where
+        mv.id = %(id)s
+    """
+    args = {"id": id}
+    df = query_model.execute_df(query, args)
+    return df

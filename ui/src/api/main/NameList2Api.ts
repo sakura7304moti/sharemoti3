@@ -48,17 +48,10 @@ interface UpdateRequest {
 interface DeleteRequest {
   id: number;
 }
-interface SearchResponse {
-  records: DataState[];
-}
 interface DataState {
   id: number;
   name: string;
   ssbuName: string;
   createAt: string;
   updateAt: string;
-}
-interface DbResult {
-  success: boolean;
-  errorText: string;
 }

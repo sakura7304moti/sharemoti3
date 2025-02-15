@@ -1,0 +1,169 @@
+import { MovieApi } from 'src/api/file/MovieApi';
+import { computed, ref } from 'vue';
+const STAFF_KEY = 'movie-default-staff-cd';
+export function useMovieEditModel() {
+  /**
+   * 流れ
+   * 1. ページのidのクエリパラメータを元に動画のデータを取得する
+   * 2. 色々編集してもらう
+   * 3. 入力チェック
+   * 4. OKなら保存して完了
+   */
+
+  /**
+   * 必要変数・処理
+   * ⭐️変数
+   * ・動画データ
+   *
+   * ⭐️処理
+   * ・動画データの取得
+   * ・入力チェック処理
+   * ・動画のアップロードしてファイル名の取得
+   * ・保存処理
+   */
+  const staffSelect = ref([
+    {
+      staffCd: 1,
+      name: 'レゴマン',
+    },
+    {
+      staffCd: 2,
+      name: '王将マン',
+    },
+  ] as MovieStaff[]);
+  const loadState = ref({
+    fetch: false,
+    upload: false,
+    update: false,
+  } as LoadState);
+  const movieInfo = ref({
+    id: 0,
+    title: '',
+    detail: '',
+    fileName: '',
+    thumbnailFlg: 1,
+    staff: {
+      staffCd: 1,
+      name: 'レゴマン',
+    },
+    hashtags: [],
+    newHashtags: [],
+  } as MovieInfo);
+  const pickedFile = ref(null as File | null);
+  const api = new MovieApi();
+  const uploadFile = async function () {
+    if (pickedFile.value == null) {
+      return;
+    }
+    await api
+      .upload(pickedFile.value)
+      .then((response) => {
+        if (response) {
+          console.log('upload response', response);
+          movieInfo.value.fileName = response.fileName;
+        }
+      })
+      .catch((err) => {
+        console.log('upload err', err);
+      });
+  };
+  const getHashtagList = async function () {
+    await api
+      .hashtagList()
+      .then((response) => {
+        if (response) {
+          console.log('hashtag list', response);
+          movieInfo.value.hashtags.splice(0);
+          response.forEach((it) =>
+            movieInfo.value.hashtags.push({
+              name: it.name,
+              isGroup: it.isGroup == 1,
+              check: false,
+            })
+          );
+        }
+      })
+      .catch((err) => {
+        console.log('hashtag list err', err);
+      });
+  };
+  const getMoieInfo = async function (id: number) {
+    loadState.value.fetch = true;
+    await getHashtagList();
+    await api
+      .getMovieInfo(id)
+      .then((response) => {
+        if (response) {
+          console.log('movie info response', response);
+          movieInfo.value.id = response.movie.id;
+          movieInfo.value.title = response.movie.title;
+          movieInfo.value.detail = response.movie.detail;
+          movieInfo.value.fileName = response.movie.fileName;
+          movieInfo.value.thumbnailFlg = response.movie.thumbnailFlg;
+          movieInfo.value.staff.staffCd = response.movie.staffCd;
+          response.hashtags.forEach((h) => {
+            const hs = movieInfo.value.hashtags.find((it) => it.name == h.name);
+            if (hs) {
+              hs.check = true;
+            }
+          });
+          console.log('movie info result', movieInfo.value);
+        }
+      })
+      .catch((err) => {
+        console.log('upload err', err);
+      });
+    loadState.value.fetch = false;
+  };
+
+  const getDefaultStaff = function () {
+    const code = localStorage.getItem(STAFF_KEY);
+    if (code == null) {
+      return;
+    }
+
+    const staff = staffSelect.value.find((it) => it.staffCd == Number(code));
+    if (staff) {
+      movieInfo.value.staff.staffCd = staff.staffCd;
+    }
+  };
+  const setDefaultStaffCd = function (staffCd: number) {
+    localStorage.setItem(STAFF_KEY, staffCd.toString());
+  };
+
+  return {
+    staffSelect,
+    loadState,
+    movieInfo,
+    pickedFile,
+    getMoieInfo,
+    getDefaultStaff,
+    setDefaultStaffCd,
+    uploadFile,
+  };
+}
+interface MovieInfo {
+  id: number;
+  title: string;
+  detail: string;
+  fileName: string;
+  thumbnailFlg: number;
+  staff: MovieStaff;
+  hashtags: Hashtag[];
+  newHashtags: Hashtag[];
+}
+interface Hashtag {
+  name: string;
+  isGroup: boolean;
+  check: boolean;
+}
+
+interface LoadState {
+  fetch: boolean;
+  upload: boolean;
+  update: boolean;
+}
+interface MovieStaff {
+  staffCd: number;
+  name: string;
+}

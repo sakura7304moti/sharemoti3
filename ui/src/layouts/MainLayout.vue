@@ -177,7 +177,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
-import { Router, useRoute, useRouter } from 'vue-router';
+import { Router, useRouter } from 'vue-router';
 import { createPinia, setActivePinia } from 'pinia';
 
 export default defineComponent({

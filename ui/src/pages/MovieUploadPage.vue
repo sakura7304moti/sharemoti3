@@ -10,7 +10,13 @@
         dense
       />動画アップロードページ
     </div>
-    <q-stepper v-model="formStep" header-nav color="primary" animated>
+    <q-stepper
+      class="q-mt-md"
+      v-model="formStep"
+      header-nav
+      color="primary"
+      animated
+    >
       <q-step
         :name="1"
         title="動画のアップロード・入力"

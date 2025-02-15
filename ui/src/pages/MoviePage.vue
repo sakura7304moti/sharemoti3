@@ -22,12 +22,6 @@
             動画を投稿する
           </a>
         </div>
-        <div class="q-mr-md">
-          <a href="#" class="nav-text text-subtitle1">
-            <q-icon name="edit" />
-            動画を編集する
-          </a>
-        </div>
         <div>
           <a href="#" class="nav-text text-subtitle1">
             <q-icon name="tag" />
@@ -82,7 +76,10 @@
             label="検索"
             color="primary"
             icon="search"
-            @click="searchMovie"
+            @click="
+              page = 1;
+              searchMovie();
+            "
             :loading="isLoading"
           />
         </div>
@@ -93,7 +90,8 @@
     <div class="q-mt-md">
       <div v-for="mv in pageState.records" :key="mv.id" class="q-mb-lg">
         <div style="max-width: 400px; margin-bottom: 80px">
-          <div class="content-title">
+          <div class="content-title" @click="onNavigateEdit(mv.id)">
+            <q-tooltip class="text-subtitle2"> 動画の内容を変更する </q-tooltip>
             {{ mv.title }}
           </div>
           <div class="content-detail" v-if="mv.detail">{{ mv.detail }}</div>
@@ -142,11 +140,10 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import { useMovieModel } from 'src/models/MovieModels';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 export default defineComponent({
   name: 'movie-page',
   setup() {
-    const route = useRoute();
     const router = useRouter();
     const {
       playId,
@@ -202,6 +199,10 @@ export default defineComponent({
       router.push('/movie/upload');
     };
 
+    const onNavigateEdit = function (id: number) {
+      router.push('/movie/edit?id=' + id);
+    };
+
     const onHashtagClick = function (name: string) {
       // 検索
       searchCondition.value.hashtag = name;
@@ -229,6 +230,7 @@ export default defineComponent({
       onHashtagClick,
       // navi
       onNavigateUpload,
+      onNavigateEdit,
       // スクロール
       isShowTopButton,
       onTopClick,
@@ -250,12 +252,17 @@ export default defineComponent({
   opacity: 0.5;
 }
 .content-title {
+  cursor: pointer;
   color: rgb(24, 191, 160);
   line-height: 30px;
   font-size: 20px;
   font-weight: 700;
   white-space: pre-wrap;
   font-family: 'Noto Sans JP';
+}
+.content-title:hover {
+  transition: 0.4s;
+  opacity: 0.5;
 }
 .content-detail {
   max-width: 100%;

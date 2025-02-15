@@ -160,6 +160,25 @@ def movie_hashtag_update(name: str):
     return success_status()
 
 
+@app.route("/movie/info/<id>", methods=["GET"])
+def get_movie_info(id: int):
+    df, hashtag_df = movie_service.get_movie(id)
+    movie = df.iloc[0].to_dict()
+
+    # 検索結果
+    # records = df.iloc[0].to_json(orient="records", force_ascii=False)
+    # records_json = json.loads(records)
+
+    # ハッシュタグの一覧
+    hashtag_records = hashtag_df.to_json(orient="records", force_ascii=False)
+    tag_json = json.loads(hashtag_records)
+    response = {
+        "movie": movie,
+        "hashtags": tag_json,
+    }
+    return jsonify(json.dumps(response))
+
+
 @app.route("/movie", methods=["GET"])
 def movie_search():
     keyword = request.args.get("keyword", "")

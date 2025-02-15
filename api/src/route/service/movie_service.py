@@ -59,3 +59,9 @@ def search_movie(keyword: str, hashtag: str, page_no: int, page_size: int):
 
 def get_thumbnail_path(file_name: str):
     return movie_thumbnail.get_thumbnail_path(file_name)
+
+
+def get_movie(id: int):
+    df = movie.get_movie(id)
+    hashtag_df = movie.get_movie_hashtags([id])
+    return df, hashtag_df
