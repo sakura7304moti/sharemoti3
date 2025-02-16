@@ -218,6 +218,9 @@ export default defineComponent({
       searchMovie();
 
       // スクロール
+      if (window.scrollY < 400) {
+        return;
+      }
       const element = document.getElementById('search-card');
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
