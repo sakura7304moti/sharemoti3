@@ -12,6 +12,7 @@ import datetime
 import mimetypes
 import json
 import os
+from PIL import Image
 from flask import Blueprint, flash, request, jsonify, send_file, abort
 from werkzeug.utils import secure_filename
 from src.route.route_base import success_status
@@ -102,6 +103,40 @@ def movie_upload():
         jsondata = {"fileName": save_file_name}
         response = jsonify(jsondata)
         return response
+
+
+@app.route("/movie/thumbnail/<name>", methods=["POST"])
+def upload_thumbnail(name: str):
+    if "file" not in request.files:
+        flash("No file part")
+        return jsonify({"fileName": ""})
+
+    file = request.files["file"]
+    if file.filename == "":
+        print("No selected file")
+        return jsonify({"fileName": ""})
+
+    # 拡張子なしのファイル名を取得
+    filename = secure_filename(name).rsplit(".", 1)[0]  # name から拡張子を削除
+
+    # 一時的に保存（Pillow は一度保存しないと処理できない）
+    temp_path = os.path.join(THUMBNAIUL_FOLDER, secure_filename(file.filename))
+    file.save(temp_path)
+
+    # 画像を JPG に変換
+    try:
+        img = Image.open(temp_path)
+        save_file_name = f"{filename}.jpg"
+        save_path = os.path.join(THUMBNAIUL_FOLDER, save_file_name)
+
+        img.convert("RGB").save(save_path, "JPEG", quality=95)
+        os.remove(temp_path)  # 一時ファイルを削除
+
+        return jsonify({"fileName": save_file_name})
+
+    except Exception as e:
+        print(f"Error processing image: {e}")
+        return jsonify({"fileName": ""})
 
 
 @app.route("/movie", methods=["PUT"])

@@ -9,6 +9,16 @@ export class MovieApi extends FileAPIClient {
     return this.httpUpload<MovieUploadResponse>(path, file);
   }
 
+  public async uploadThumbnail(
+    file: File,
+    fileName: string
+  ): Promise<PutResponse | null> {
+    const url = '/movie/thumbnail/' + fileName;
+    const path = this.combineUrl(url);
+
+    return this.httpUpload<PutResponse>(path, file);
+  }
+
   public async createMovie(request: CreateMovie): Promise<PutResponse | null> {
     const url = '/movie';
     const path = this.combineUrl(url);

@@ -75,9 +75,44 @@
               />
             </div>
           </div>
+          <div style="margin-top: 80px; max-width: 700px; width: 100%">
+            <div class="text-subtitle1">2. サムネイルはどうする？</div>
+            <div class="q-ma-md">
+              <div class="row q-gutter-md">
+                <q-radio
+                  v-model="createForm.thumbnailFlg"
+                  :val="1"
+                  label="自動で作成する"
+                />
+                <q-radio
+                  v-model="createForm.thumbnailFlg"
+                  :val="0"
+                  label="自分で設定する"
+                />
+              </div>
+              <div v-if="createForm.thumbnailFlg == 0" class="q-mt-md">
+                <q-file
+                  v-model="thumbnailFile"
+                  label="クリック・ドロップしてサムネイルの画像を選択してね"
+                  outlined
+                  dense
+                  :clearable="thumbnailFile?.size != null"
+                  stack-label
+                  class="q-mb-lg"
+                  accept="image/*"
+                />
+                <img
+                  v-if="tempThumbnailUrl"
+                  :src="tempThumbnailUrl"
+                  class="thumbnail"
+                  style="border: 1px rgba(220, 220, 220, 0.7) solid"
+                />
+              </div>
+            </div>
+          </div>
           <div style="margin-top: 80px">
             <div class="text-subtitle1">
-              2. 既にあるハッシュタグはここから選択してね<span
+              3. 既にあるハッシュタグはここから選択してね<span
                 class="text-grey q-ml-sm"
                 >(省略可能)</span
               >
@@ -109,7 +144,7 @@
           </div>
           <div style="margin-top: 80px">
             <div class="text-subtitle1">
-              3. 新しくハッシュタグを作る場合は入力してね<span
+              4. 新しくハッシュタグを作る場合は入力してね<span
                 class="text-grey q-ml-sm"
                 >(省略可能)</span
               >
@@ -193,12 +228,12 @@
           </div>
         </q-stepper-navigation>
       </q-step>
-      <q-step :name="2" title="内容確認">
+      <q-step :name="2" title="内容確認" :done="formStep > 2">
         <q-stepper-navigation>
           <div style="max-width: 700px; width: 100%">
             <div class="text-subtitle1">
-              確認してね！<span class="q-ml-md"
-                >でも後から全項目編集できるのよ</span
+              確認してね！<span class="q-ml-sm"
+                >でも投稿者以外は、後から全項目編集できるのよ</span
               >
             </div>
             <div class="q-ma-md">
@@ -234,6 +269,31 @@
                 readonly
                 style="max-width: 200px"
               />
+              <div class="q-mt-lg">
+                <div class="text-subtitle1">サムネイルは...</div>
+                <div class="row q-gutter-md">
+                  <q-radio
+                    disable
+                    v-model="createForm.thumbnailFlg"
+                    :val="1"
+                    label="自動で作成する"
+                  />
+                  <q-radio
+                    disable
+                    v-model="createForm.thumbnailFlg"
+                    :val="0"
+                    label="自分で設定する"
+                  />
+                </div>
+                <div v-if="createForm.thumbnailFlg == 0" class="q-mt-md">
+                  <img
+                    v-if="tempThumbnailUrl"
+                    :src="tempThumbnailUrl"
+                    class="thumbnail"
+                    style="border: 1px rgba(220, 220, 220, 0.7) solid"
+                  />
+                </div>
+              </div>
             </div>
             <div
               class="text-subtitle1"
@@ -301,7 +361,7 @@
           </div>
         </q-stepper-navigation>
       </q-step>
-      <q-step :name="3" title="アップロード完了">
+      <q-step :name="3" title="アップロード完了" :header-nav="false">
         <q-stepper-navigation>
           <div class="text-subtitle1">
             <div style="margin-bottom: 40px">アップロード完了！</div>
@@ -364,10 +424,12 @@ export default defineComponent({
       formStep,
       staffSelect,
       thumbnailUrl,
+      thumbnailFile,
       uploadFile,
       createMovie,
       getHashtagList,
       getDefaultStaff,
+      uploadThumbnail,
     } = useMovieUploadModels();
     // 初期化処理
     getDefaultStaff();
@@ -384,6 +446,17 @@ export default defineComponent({
       } else {
         URL.revokeObjectURL(tempVideoUrl.value);
         tempVideoUrl.value = '';
+      }
+    });
+
+    // サムネイルの画像用
+    const tempThumbnailUrl = ref('');
+    watch(thumbnailFile, () => {
+      if (thumbnailFile.value) {
+        tempThumbnailUrl.value = URL.createObjectURL(thumbnailFile.value);
+      } else {
+        URL.revokeObjectURL(tempThumbnailUrl.value);
+        tempThumbnailUrl.value = '';
       }
     });
 
@@ -411,6 +484,14 @@ export default defineComponent({
         });
         return;
       }
+      if (createForm.value.thumbnailFlg == 0 && thumbnailFile.value == null) {
+        quasar.notify({
+          color: 'red',
+          position: 'top',
+          message: 'サムネイルのファイルを選択してね！',
+        });
+        return;
+      }
       console.log('form state', createForm.value);
       formStep.value = 2;
     };
@@ -423,6 +504,8 @@ export default defineComponent({
       await uploadFile();
       if (createForm.value.fileName) {
         await createMovie();
+        await uploadThumbnail();
+        formStep.value = 3;
       } else {
         console.log('upload err...');
       }
@@ -455,12 +538,15 @@ export default defineComponent({
       formStep,
       staffSelect,
       thumbnailUrl,
+      thumbnailFile,
       uploadFile,
       createMovie,
       getHashtagList,
       getDefaultStaff,
       // 動画再生用URL
       tempVideoUrl,
+      // 画像表示用URL
+      tempThumbnailUrl,
       // ハッシュタグの入力用
       hashtagInput,
       onClickHashtag,

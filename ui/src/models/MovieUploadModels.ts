@@ -3,16 +3,6 @@ import { computed, ref } from 'vue';
 const STAFF_KEY = 'movie-default-staff-cd';
 export function useMovieUploadModels() {
   const api = new MovieApi();
-  /**
-   * 必要変数・処理
-   * ・入力内容
-   * ・表示ステップ
-   * ・単品のサムネイル作成処理(APIも)
-   * ・入力値のチェック
-   * ・アップロードしてファイル名取得処理
-   * ・データの追加処理
-   * ・データ追加後にサムネイル画像をつけて完了したよ！画面出したい
-   */
   const getDefaultStaff = function () {
     const code = localStorage.getItem(STAFF_KEY);
     if (code == null) {
@@ -31,6 +21,7 @@ export function useMovieUploadModels() {
   const isCreateLoading = ref(false);
   const isHashtagLoading = ref(false);
   const pickedFile = ref(null as File | null);
+  const thumbnailFile = ref(null as File | null);
   const createForm = ref({
     title: '',
     detail: '',
@@ -122,7 +113,6 @@ export function useMovieUploadModels() {
         if (response) {
           console.log('create response', response);
           await updateGroupHashtag();
-          formStep.value = 3;
         }
       });
   };
@@ -151,12 +141,32 @@ export function useMovieUploadModels() {
     });
   };
 
+  const uploadThumbnail = async function () {
+    // 動画のアップロードの後に実行すること
+    if (thumbnailFile.value == null || createForm.value.thumbnailFlg == 1) {
+      return;
+    }
+    isUploading.value = true;
+    await api
+      .uploadThumbnail(thumbnailFile.value, createForm.value.fileName)
+      .then((response) => {
+        if (response) {
+          console.log('upload thumbnail response', response);
+        }
+      })
+      .catch((err) => {
+        console.log('upload thumbnail err', err);
+      });
+    isUploading.value = false;
+  };
+
   return {
     uploadUrl,
     isUploading,
     isHashtagLoading,
     isCreateLoading,
     pickedFile,
+    thumbnailFile,
     createForm,
     formStep,
     staffSelect,
@@ -165,6 +175,7 @@ export function useMovieUploadModels() {
     createMovie,
     getHashtagList,
     getDefaultStaff,
+    uploadThumbnail,
   };
 }
 
