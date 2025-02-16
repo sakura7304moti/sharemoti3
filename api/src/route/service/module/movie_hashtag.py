@@ -75,3 +75,24 @@ def update_group(name: str, is_group: bool):
     """
     args = {"name": name, "isGroup": 1 if is_group else 0}
     query_model.execute_commit(query, args)
+
+
+def change_tagname(before_name: str, after_name: str):
+    query = """
+    UPDATE sharemoti.movie_hashtag
+    SET
+        name = %(after)s
+    WHERE
+        name = %(before)s
+    """
+    args = {"before": before_name, "after": after_name}
+    query_model.execute_commit(query, args)
+
+
+def delete_hashtag_by_name(name: str):
+    query = """
+    DELETE FROM sharemoti.movie_hashtag
+    where name = %(name)s
+    """
+    args = {"name": name}
+    query_model.execute_commit(query, args)

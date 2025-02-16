@@ -34,6 +34,10 @@ def update_group(name: str, is_group: bool):
     movie_hashtag.update_group(name, is_group)
 
 
+def change_hashtagname(before_name: str, after_name: str):
+    movie_hashtag.change_tagname(before_name, after_name)
+
+
 # 削除に使う関数
 def delete_movie(movie_id: int):
     movie.delete(movie_id)
@@ -46,6 +50,10 @@ def delete_hashtag(movie_id: int):
 
 def get_movie_id(file_name: str):
     return movie.get_id(file_name)
+
+
+def delete_hashtag_by_name(name: str):
+    movie_hashtag.delete_hashtag_by_name(name)
 
 
 # 検索に使う関数

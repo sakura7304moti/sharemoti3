@@ -91,11 +91,17 @@ export class MovieApi extends FileAPIClient {
     return this.httpGet<MovieHashtag[]>(path);
   }
 
-  public async createHashtag(
-    fileName: string,
-    hashtag: string,
-    isGroup: boolean
-  ) {
+  public async changeHashtagName(before: string, after: string) {
+    const url = '/movie/hashtag/name';
+    const path = this.combineUrl(url);
+    const request = {
+      before: before,
+      after: after,
+    } as HashtagChangeRequest;
+    return this.httpPut<HashtagChangeRequest, PutResponse>(path, request);
+  }
+
+  public async createHashtag(hashtag: string, isGroup: boolean) {
     const url =
       '/movie/hashtag/' + hashtag + '?isGroup=' + (isGroup ? 'true' : 'false');
     const path = this.combineUrl(url);
@@ -103,6 +109,12 @@ export class MovieApi extends FileAPIClient {
     return this.httpPut<PutResponse, PutResponse>(path, {
       status: '',
     });
+  }
+
+  public async deleteHashtag(name: string) {
+    const url = '/movie/hashtag/' + name;
+    const path = this.combineUrl(url);
+    return this.httpDelete<PutResponse>(path);
   }
 
   public async searchMovie(
@@ -177,4 +189,9 @@ interface MovieInfoBase {
   fileName: string;
   thumbnailFlg: number;
   staffCd: number;
+}
+
+interface HashtagChangeRequest {
+  before: string;
+  after: string;
 }

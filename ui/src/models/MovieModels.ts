@@ -29,7 +29,7 @@ export function useMovieModel() {
       .then((response) => {
         if (response) {
           console.log('search response', response);
-          playId.value = null;
+
           if (page.value < 2) {
             pageState.value.records.splice(0);
           }

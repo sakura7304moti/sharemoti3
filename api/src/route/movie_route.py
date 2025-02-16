@@ -155,12 +155,31 @@ def movie_hashtag():
     return jsonify(records)
 
 
+@app.route("/movie/hashtag/name", methods=["PUT"])
+def movie_hashtag_name_change():
+    json_data = request.json
+    before = json_data.get("before", "")
+    after = json_data.get("after", "")
+    if before == "" or after == "":
+        return abort(404)
+    movie_service.change_hashtagname(before, after)
+    return success_status()
+
+
 @app.route("/movie/hashtag/<name>", methods=["PUT"])
 def movie_hashtag_update(name: str):
     is_group = (
         False if request.args.get("isGroup", "false") == "false" else True
     )  # クエリパラメータがあれば星をつける
     movie_service.update_group(name, is_group)
+    return success_status()
+
+
+@app.route("/movie/hashtag/<name>", methods=["DELETE"])
+def movie_hashtag_delete(name: str):
+    if name == "":
+        return abort(404)
+    movie_service.delete_hashtag_by_name(name)
     return success_status()
 
 

@@ -23,7 +23,11 @@
           </a>
         </div>
         <div>
-          <a href="#" class="nav-text text-subtitle1">
+          <a
+            href="#/movie/hashtag"
+            @click.prevent.stop="onNavigateHashtag"
+            class="nav-text text-subtitle1"
+          >
             <q-icon name="tag" />
             ハッシュタグを編集する
           </a>
@@ -203,6 +207,10 @@ export default defineComponent({
       router.push('/movie/edit?id=' + id);
     };
 
+    const onNavigateHashtag = function () {
+      router.push('/movie/hashtag');
+    };
+
     const onHashtagClick = function (name: string) {
       // 検索
       searchCondition.value.hashtag = name;
@@ -228,6 +236,7 @@ export default defineComponent({
       getThumbnailLink,
       getHashtags,
       onHashtagClick,
+      onNavigateHashtag,
       // navi
       onNavigateUpload,
       onNavigateEdit,

@@ -136,7 +136,7 @@ export function useMovieUploadModels() {
     const hashtags = createForm.value.newHashtags.filter((it) => it.isGroup);
     hashtags.forEach(async (tag) => {
       await api
-        .createHashtag(createForm.value.fileName, tag.name, tag.isGroup)
+        .createHashtag(tag.name, tag.isGroup)
         .then((response) => {
           if (response) {
             console.log(

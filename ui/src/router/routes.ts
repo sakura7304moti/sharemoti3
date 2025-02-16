@@ -122,6 +122,13 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/movie/hashtag',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/MovieHashtagEditPage.vue') },
+    ],
+  },
+  {
     path: '/holo',
     component: () => import('layouts/HoloLayout.vue'),
     children: [
