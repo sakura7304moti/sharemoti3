@@ -10,6 +10,20 @@ p = const.Path()
 UPLOAD_FOLDER = p.movie_uploads()
 
 THUMNAIL_FOLDER = p.movie_thumbnails_uploads()
+query_model = const.PsqlBase()
+
+
+def get_update_movies():
+    query = """
+    SELECT
+        file_name as "fileName"
+    from sharemoti.movie
+    where
+        thumbnail_flg = 1
+    """
+    df = query_model.execute_df(query)
+    names = df["fileName"].tolist()
+    return names
 
 
 def create_thumbnail(path: str):
@@ -34,8 +48,9 @@ def create_thumbnail(path: str):
 
 
 def update_thumbnail_all():
-    movies = glob.glob(os.path.join(UPLOAD_FOLDER, "*"))
-    for path in movies:
+    names = get_update_movies()
+    for name in names:
+        path = os.path.join(UPLOAD_FOLDER, name)
         create_thumbnail(path)
 
 
