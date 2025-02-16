@@ -69,8 +69,6 @@
                 v-model="createForm.staff"
                 option-value="name"
                 option-label="name"
-                map-options
-                emit-value
                 dense
                 stack-label
                 style="max-width: 200px"
@@ -413,6 +411,7 @@ export default defineComponent({
         });
         return;
       }
+      console.log('form state', createForm.value);
       formStep.value = 2;
     };
 

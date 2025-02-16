@@ -87,10 +87,9 @@
                 v-model="movieInfo.staff"
                 option-value="staffCd"
                 option-label="name"
-                emit-value
-                map-options
                 dense
                 stack-label
+                readonly
                 style="max-width: 200px"
               />
             </div>

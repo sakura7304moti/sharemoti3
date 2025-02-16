@@ -151,6 +151,7 @@ export function useMovieEditModel() {
           movieInfo.value.fileName = response.movie.fileName;
           movieInfo.value.thumbnailFlg = response.movie.thumbnailFlg;
           movieInfo.value.staff.staffCd = response.movie.staffCd;
+          movieInfo.value.staff.name = response.movie.staffName;
           response.hashtags.forEach((h) => {
             const hs = movieInfo.value.hashtags.find((it) => it.name == h.name);
             if (hs) {

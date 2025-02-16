@@ -189,6 +189,7 @@ interface MovieInfoBase {
   fileName: string;
   thumbnailFlg: number;
   staffCd: number;
+  staffName: string;
 }
 
 interface HashtagChangeRequest {

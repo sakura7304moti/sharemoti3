@@ -212,10 +212,12 @@ def get_movie(id: int):
         mv.file_name AS "fileName",
         mv.thumbnail_flg AS "thumbnailFlg",
         mv.staff_cd AS "staffCd",
+        st.name as "staffName",
         TO_CHAR(mv.create_at, 'YYYY-MM-DD') as "createAt",
         TO_CHAR(mv.update_at, 'YYYY-MM-DD') as "updateAt"
     FROM
         sharemoti.movie AS mv
+        left join sharemoti.movie_staff as st on mv.staff_cd = st.staff_cd
     where
         mv.id = %(id)s
     """
