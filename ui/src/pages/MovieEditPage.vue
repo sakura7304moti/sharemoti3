@@ -94,9 +94,50 @@
               />
             </div>
           </div>
+          <div style="margin-top: 80px; max-width: 700px; width: 100%">
+            <div class="text-subtitle1">2. サムネイルはどうする？</div>
+            <div class="q-ma-md">
+              <div class="row q-gutter-md">
+                <q-radio
+                  v-model="movieInfo.thumbnailFlg"
+                  :val="1"
+                  label="自動で作成する"
+                />
+                <q-radio
+                  v-model="movieInfo.thumbnailFlg"
+                  :val="0"
+                  label="自分で設定する"
+                />
+              </div>
+              <div v-if="movieInfo.thumbnailFlg == 0" class="q-mt-md">
+                <q-file
+                  v-model="thumbnailFile"
+                  label="クリック・ドロップしてサムネイルの画像を選択してね"
+                  outlined
+                  dense
+                  :clearable="thumbnailFile?.size != null"
+                  stack-label
+                  class="q-mb-lg"
+                  accept="image/*"
+                />
+                <img
+                  v-if="tempThumbnailUrl && thumbnailFile"
+                  :src="tempThumbnailUrl"
+                  class="thumbnail"
+                  style="border: 1px rgba(220, 220, 220, 0.7) solid"
+                />
+                <img
+                  v-else
+                  :src="thumbnailUrl"
+                  class="thumbnail"
+                  style="border: 1px rgba(220, 220, 220, 0.7) solid"
+                />
+              </div>
+            </div>
+          </div>
           <div style="margin-top: 80px">
             <div class="text-subtitle1">
-              2. 既にあるハッシュタグはここから選択してね<span
+              3. 既にあるハッシュタグはここから選択してね<span
                 class="text-grey q-ml-sm"
                 >(省略可能)</span
               >
@@ -128,7 +169,7 @@
           </div>
           <div style="margin-top: 80px">
             <div class="text-subtitle1">
-              3. 新しくハッシュタグを作る場合は入力してね<span
+              4. 新しくハッシュタグを作る場合は入力してね<span
                 class="text-grey q-ml-sm"
                 >(省略可能)</span
               >
@@ -254,12 +295,15 @@ export default defineComponent({
       loadState,
       movieInfo,
       pickedFile,
+      thumbnailFile,
+      thumbnailUrl,
       getMoieInfo,
       getDefaultStaff,
       setDefaultStaffCd,
       uploadFile,
       updateMovie,
       deleteMovie,
+      uploadThumbnail,
     } = useMovieEditModel();
     const onMount = async function () {
       // 初期データ取得
@@ -290,6 +334,17 @@ export default defineComponent({
       }
     });
 
+    // 手動サムネ
+    const tempThumbnailUrl = ref('');
+    watch(thumbnailFile, () => {
+      if (thumbnailFile.value) {
+        tempThumbnailUrl.value = URL.createObjectURL(thumbnailFile.value);
+      } else {
+        URL.revokeObjectURL(tempThumbnailUrl.value);
+        tempThumbnailUrl.value = '';
+      }
+    });
+
     // ハッシュタグの入力用
     const hashtagInput = ref('');
     const onClickHashtag = function () {
@@ -312,6 +367,7 @@ export default defineComponent({
       }
 
       await updateMovie();
+      await uploadThumbnail();
       loadState.value.update = false;
     };
 
@@ -332,8 +388,11 @@ export default defineComponent({
       loadState,
       movieInfo,
       pickedFile,
+      thumbnailFile,
       tempVideoUrl,
+      tempThumbnailUrl,
       hashtagInput,
+      thumbnailUrl,
       getMoieInfo,
       getDefaultStaff,
       setDefaultStaffCd,
@@ -341,6 +400,7 @@ export default defineComponent({
       onClickHashtag,
       onUpdaateClick,
       onDeleteClick,
+      uploadThumbnail,
       deleteDialog: ref(false),
     };
   },
@@ -351,5 +411,13 @@ export default defineComponent({
   .delete-btn {
     width: 100%;
   }
+}
+.thumbnail {
+  max-width: 100%;
+  width: 100%;
+  max-height: 400px;
+  height: 100%;
+  object-fit: contain;
+  cursor: pointer;
 }
 </style>

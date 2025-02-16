@@ -1,6 +1,6 @@
 import { useQuasar } from 'quasar';
 import { MovieApi } from 'src/api/file/MovieApi';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 const STAFF_KEY = 'movie-default-staff-cd';
 export function useMovieEditModel() {
   const quasar = useQuasar();
@@ -34,7 +34,11 @@ export function useMovieEditModel() {
     newHashtags: [],
   } as MovieInfo);
   const pickedFile = ref(null as File | null);
+  const thumbnailFile = ref(null as File | null);
   const api = new MovieApi();
+  const thumbnailUrl = computed(() =>
+    api.thumbnailLink(movieInfo.value.fileName)
+  );
   const deleteMovie = async function () {
     if (lockIcon.value == false) {
       return false;
@@ -72,6 +76,14 @@ export function useMovieEditModel() {
         color: 'red',
         position: 'top',
         message: 'タイトルとファイルは必須！',
+      });
+      return;
+    }
+    if (movieInfo.value.thumbnailFlg == 0 && thumbnailFile.value == null) {
+      quasar.notify({
+        color: 'red',
+        position: 'top',
+        message: 'サムネイルの画像選択してね！',
       });
       return;
     }
@@ -182,18 +194,38 @@ export function useMovieEditModel() {
     localStorage.setItem(STAFF_KEY, staffCd.toString());
   };
 
+  const uploadThumbnail = async function () {
+    // 動画のアップロードの後に実行すること
+    if (thumbnailFile.value == null || movieInfo.value.thumbnailFlg == 1) {
+      return;
+    }
+    await api
+      .uploadThumbnail(thumbnailFile.value, movieInfo.value.fileName)
+      .then((response) => {
+        if (response) {
+          console.log('upload thumbnail response', response);
+        }
+      })
+      .catch((err) => {
+        console.log('upload thumbnail err', err);
+      });
+  };
+
   return {
     staffSelect,
     loadState,
     movieInfo,
     pickedFile,
+    thumbnailFile,
     lockIcon,
+    thumbnailUrl,
     getMoieInfo,
     getDefaultStaff,
     setDefaultStaffCd,
     uploadFile,
     updateMovie,
     deleteMovie,
+    uploadThumbnail,
   };
 }
 interface MovieInfo {
