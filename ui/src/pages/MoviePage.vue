@@ -1,110 +1,125 @@
 <template>
   <q-page class="">
-    <img
-      src="../assets/movie_icon.webp"
-      style="
-        max-width: calc(min(90vw, 400px));
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-      "
-    />
-    <div class="q-my-md" style="margin-bottom: 24px">
-      <div class="text-subtitle1">登録・編集は以下のリンクから！</div>
-      <div class="q-ml-md row q-gutter-md">
-        <div class="q-mr-md">
-          <a
-            href="/#/movie/upload"
-            @click.prevent.stop="onNavigateUpload"
-            class="nav-text text-subtitle1"
-          >
-            <q-icon name="upload" />
-            動画を投稿する
-          </a>
-        </div>
-        <div>
-          <a
-            href="#/movie/hashtag"
-            @click.prevent.stop="onNavigateHashtag"
-            class="nav-text text-subtitle1"
-          >
-            <q-icon name="tag" />
-            ハッシュタグを編集する
-          </a>
+    <div style="display: flex; flex-wrap: wrap">
+      <div style="height: 100%; padding-right: 32px">
+        <img
+          src="../assets/movie_icon.webp"
+          style="
+            max-width: calc(min(90vw, 400px));
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+          "
+        />
+        <div class="q-my-md" style="margin-bottom: 24px">
+          <div class="text-subtitle1">登録・編集は以下のリンクから！</div>
+          <div class="q-ml-md row q-gutter-md">
+            <div class="q-mr-md">
+              <a
+                href="/#/movie/upload"
+                @click.prevent.stop="onNavigateUpload"
+                class="nav-text text-subtitle1"
+              >
+                <q-icon name="upload" />
+                動画を投稿する
+              </a>
+            </div>
+            <div>
+              <a
+                href="#/movie/hashtag"
+                @click.prevent.stop="onNavigateHashtag"
+                class="nav-text text-subtitle1"
+              >
+                <q-icon name="tag" />
+                ハッシュタグを編集する
+              </a>
+            </div>
+          </div>
         </div>
       </div>
+      <div style="max-width: 400px; width: 100%">
+        <q-card id="search-card">
+          <q-card-section>
+            <div class="text-subtitle1">検索条件</div>
+            <div class="q-pt-xs row q-gutter-md" style="padding-left: 12px">
+              <div style="max-width: 300px; width: 100%">
+                <q-input
+                  outlined
+                  dense
+                  stack-label
+                  v-model="searchCondition.keyword"
+                  label="キーワード"
+                  class="bg-white"
+                />
+              </div>
+              <div style="max-width: 300px; width: 100%">
+                <q-select
+                  outlined
+                  dense
+                  stack-label
+                  :options="hashtags"
+                  v-model="searchCondition.hashtag"
+                  label="ハッシュタグ"
+                  class="bg-white"
+                  clearable
+                  @update:model-value="onHashtagClick($event)"
+                />
+              </div>
+            </div>
+            <div class="q-mt-lg" v-if="false">
+              <div class="text-subtitle1">表示方法</div>
+              <!--表示条件に応じて表示を切り替えたい(API)-->
+              <div>
+                <q-radio
+                  @update:model-value="onSearchClick"
+                  v-model="searchCondition.mode"
+                  :val="1"
+                  label="サムネ"
+                />
+                <q-radio
+                  @update:model-value="onSearchClick"
+                  v-model="searchCondition.mode"
+                  :val="2"
+                  label="リスト"
+                />
+                <q-radio
+                  @update:model-value="onSearchClick"
+                  v-model="searchCondition.mode"
+                  :val="3"
+                  label="シリーズ別"
+                />
+              </div>
+            </div>
+            <div class="text-right q-mt-md">
+              <q-btn
+                label="検索"
+                color="primary"
+                icon="search"
+                @click="
+                  page = 1;
+                  searchMovie();
+                "
+                :loading="isLoading"
+              />
+            </div>
+          </q-card-section>
+        </q-card>
+      </div>
     </div>
-    <q-card style="max-width: 400px" id="search-card">
-      <q-card-section>
-        <div class="text-subtitle1">検索条件</div>
-        <div class="q-pt-xs row q-gutter-md" style="padding-left: 12px">
-          <div style="max-width: 300px; width: 100%">
-            <q-input
-              outlined
-              dense
-              stack-label
-              v-model="searchCondition.keyword"
-              label="キーワード"
-              class="bg-white"
-            />
-          </div>
-          <div style="max-width: 300px; width: 100%">
-            <q-select
-              outlined
-              dense
-              stack-label
-              :options="hashtags"
-              v-model="searchCondition.hashtag"
-              label="ハッシュタグ"
-              class="bg-white"
-              clearable
-              @update:model-value="onHashtagClick($event)"
-            />
-          </div>
-        </div>
-        <div class="q-mt-lg">
-          <div class="text-subtitle1">表示方法</div>
-          <!--表示条件に応じて表示を切り替えたい(API)-->
-          <div>
-            <q-radio
-              @update:model-value="onSearchClick"
-              v-model="searchCondition.mode"
-              :val="1"
-              label="サムネ"
-            />
-            <q-radio
-              @update:model-value="onSearchClick"
-              v-model="searchCondition.mode"
-              :val="2"
-              label="リスト"
-            />
-            <q-radio
-              @update:model-value="onSearchClick"
-              v-model="searchCondition.mode"
-              :val="3"
-              label="シリーズ別"
-            />
-          </div>
-        </div>
-        <div class="text-right q-mt-md">
-          <q-btn
-            label="検索"
-            color="primary"
-            icon="search"
-            @click="
-              page = 1;
-              searchMovie();
-            "
-            :loading="isLoading"
-          />
-        </div>
-      </q-card-section>
-    </q-card>
 
     <!--検索結果-->
-    <div class="q-mt-md" v-if="searchCondition.mode == 1">
-      <div v-for="mv in pageState.records" :key="mv.id" class="q-mb-lg">
-        <div style="max-width: 400px; margin-bottom: 80px">
+    <div
+      class="q-mt-md"
+      v-if="searchCondition.mode == 1"
+      style="display: flex; flex-wrap: wrap; /* 画面幅に応じて折り返し */"
+    >
+      <div
+        v-for="mv in pageState.records"
+        :key="mv.id"
+        class="q-mb-lg"
+        style="max-width: 400px; width: 100%"
+      >
+        <div style="max-width: 400px; margin-bottom: 80px; padding-right: 32px">
           <div class="content-title" @click="onNavigateEdit(mv.id)">
             <q-tooltip class="text-subtitle2"> 動画の内容を変更する </q-tooltip>
             {{ mv.title }}
@@ -119,7 +134,7 @@
               >#{{ tag.name }}</span
             >
           </div>
-          <div>
+          <div class="q-mt-sm">
             <q-avatar>
               <img
                 :src="
