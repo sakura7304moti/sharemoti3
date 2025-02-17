@@ -131,6 +131,7 @@ export class MovieApi extends FileAPIClient {
     keyword: string | null,
     hashtag: string | null,
     displayMode: number | null,
+    listMode: boolean,
     pageNo: number
   ): Promise<SearchMovieResponse | null> {
     let url = '/movie?a=1';
@@ -142,6 +143,9 @@ export class MovieApi extends FileAPIClient {
     }
     if (displayMode != null) {
       url += `&mode=${displayMode}`;
+    }
+    if (listMode) {
+      url += '&list=a';
     }
     url += `&page=${pageNo}`;
     const path = this.combineUrl(url);

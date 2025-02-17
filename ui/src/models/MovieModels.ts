@@ -5,6 +5,7 @@ export function useMovieModel() {
   const isLoading = ref(false);
   const page = ref(1);
   const playId = ref(null as number | null);
+  const searchedMode = ref(1);
   const searchCondition = ref({
     keyword: '',
     hashtag: '',
@@ -19,11 +20,16 @@ export function useMovieModel() {
 
   const searchMovie = async function () {
     isLoading.value = true;
+    if (searchCondition.value.mode != searchedMode.value) {
+      pageState.value.records.splice(0);
+    }
+    searchedMode.value = searchCondition.value.mode;
     await api
       .searchMovie(
         searchCondition.value.keyword,
         searchCondition.value.hashtag,
         searchCondition.value.mode,
+        searchCondition.value.mode == 2,
         page.value
       )
       .then((response) => {

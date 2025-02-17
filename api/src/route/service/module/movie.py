@@ -122,7 +122,7 @@ def search_params(keyword: str, hashtag: str):
     """
     if keyword == "":
         query += """
-        1 = 1  
+        1 = 0  
         """
     else:
         query += """
@@ -158,7 +158,7 @@ def search_params(keyword: str, hashtag: str):
 
     if keyword == "" and hashtag == "":
         query += """
-        OR 1 = 0
+        OR 1 = 1
         """
     query += """
     ORDER BY

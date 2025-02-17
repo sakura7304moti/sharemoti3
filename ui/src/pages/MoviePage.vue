@@ -9,7 +9,7 @@
         object-fit: contain;
       "
     />
-    <div class="q-my-md" style="margin-bottom: 48px">
+    <div class="q-my-md" style="margin-bottom: 24px">
       <div class="text-subtitle1">登録・編集は以下のリンクから！</div>
       <div class="q-ml-md row q-gutter-md">
         <div class="q-mr-md">
@@ -66,9 +66,20 @@
           <div class="text-subtitle1">表示方法</div>
           <!--表示条件に応じて表示を切り替えたい(API)-->
           <div>
-            <q-radio v-model="searchCondition.mode" :val="1" label="サムネ" />
-            <q-radio v-model="searchCondition.mode" :val="2" label="リスト" />
             <q-radio
+              @update:model-value="onSearchClick"
+              v-model="searchCondition.mode"
+              :val="1"
+              label="サムネ"
+            />
+            <q-radio
+              @update:model-value="onSearchClick"
+              v-model="searchCondition.mode"
+              :val="2"
+              label="リスト"
+            />
+            <q-radio
+              @update:model-value="onSearchClick"
               v-model="searchCondition.mode"
               :val="3"
               label="シリーズ別"
@@ -91,7 +102,7 @@
     </q-card>
 
     <!--検索結果-->
-    <div class="q-mt-md">
+    <div class="q-mt-md" v-if="searchCondition.mode == 1">
       <div v-for="mv in pageState.records" :key="mv.id" class="q-mb-lg">
         <div style="max-width: 400px; margin-bottom: 80px">
           <div class="content-title" @click="onNavigateEdit(mv.id)">
@@ -135,6 +146,53 @@
           />
         </div>
       </div>
+    </div>
+    <div class="q-mt-md" v-if="searchCondition.mode == 2">
+      <q-markup-table>
+        <thead>
+          <tr>
+            <th style="min-width: 200px"></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="mv in pageState.records" :key="mv.id">
+            <td>
+              <q-btn class="q-ma-md" @click="playId = mv.id"
+                ><img
+                  class="thumbnail image"
+                  :src="getThumbnailLink(mv.fileName)"
+              /></q-btn>
+            </td>
+            <td style="height: 100%">
+              <q-video
+                v-if="playId == mv.id"
+                class="q-ma-md thumbnail"
+                :src="getDownloadLink(mv.fileName)"
+                style="min-width: 100%; max-width: 600px; width: 100%"
+                :ratio="16 / 9"
+              />
+              <div class="text-subtitle1">
+                {{ mv.title }}
+              </div>
+              <div class="q-ml-md">
+                <div class="text-body2">
+                  {{ mv.detail }}
+                </div>
+                <div>
+                  <span
+                    class="content-hashtag"
+                    v-for="tag in mv.hashtags"
+                    :key="tag.name"
+                    @click="onHashtagClick(tag.name)"
+                    >#{{ tag.name }}</span
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </q-markup-table>
     </div>
     <!--ロード-->
     <div class="text-center" v-if="page > 1 && isLoading">
@@ -189,7 +247,11 @@ export default defineComponent({
         window.innerHeight + window.scrollY >=
         document.documentElement.offsetHeight - 200;
 
-      if (bottomOfWindow && !isLoading.value) {
+      if (
+        bottomOfWindow &&
+        !isLoading.value &&
+        searchCondition.value.mode != 2
+      ) {
         onScrollSearch();
       }
     };
@@ -239,6 +301,11 @@ export default defineComponent({
       }
     };
 
+    const onSearchClick = function () {
+      page.value = 1;
+      searchMovie();
+    };
+
     return {
       playId,
       isLoading,
@@ -252,6 +319,7 @@ export default defineComponent({
       getHashtags,
       onHashtagClick,
       onNavigateHashtag,
+      onSearchClick,
       // navi
       onNavigateUpload,
       onNavigateEdit,
