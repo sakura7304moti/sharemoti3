@@ -41,6 +41,7 @@ export function useMovieModel() {
               fileName: it.fileName,
               thumbnailFlg: it.thumbnailFlg,
               staffCd: it.staffCd,
+              staffName: it.staffName,
               hashtags: response.hashtags
                 .filter((x) => x.movieId == it.id)
                 .map((h) => {
@@ -101,6 +102,7 @@ interface DataState {
   fileName: string;
   thumbnailFlg: number;
   staffCd: number;
+  staffName: string;
   hashtags: HashtagState[];
 }
 

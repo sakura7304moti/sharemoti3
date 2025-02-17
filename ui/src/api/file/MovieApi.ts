@@ -170,6 +170,7 @@ interface MovieHashtagListBase {
 
 interface Movie extends CreateMovie {
   id: number;
+  staffName: string;
 }
 
 interface MovieUploadResponse {

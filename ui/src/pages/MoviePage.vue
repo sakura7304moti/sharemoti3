@@ -108,6 +108,18 @@
               >#{{ tag.name }}</span
             >
           </div>
+          <div>
+            <q-avatar>
+              <img
+                :src="
+                  mv.staffCd == 1
+                    ? 'src/assets/legoman_profile.jpg'
+                    : 'src/assets/yosao.png'
+                "
+              />
+            </q-avatar>
+            <span class="q-ml-sm">{{ mv.staffName }}</span>
+          </div>
           <img
             class="q-mt-sm thumbnail image"
             :src="getThumbnailLink(mv.fileName)"
