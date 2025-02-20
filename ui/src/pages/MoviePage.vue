@@ -139,8 +139,8 @@
               <img
                 :src="
                   mv.staffCd == 1
-                    ? 'src/assets/legoman_profile.jpg'
-                    : 'src/assets/yosao.png'
+                    ? '../assets/legoman_profile.jpg'
+                    : '../assets/yosao.png'
                 "
               />
             </q-avatar>
