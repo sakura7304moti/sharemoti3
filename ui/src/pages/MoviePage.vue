@@ -136,13 +136,8 @@
           </div>
           <div class="q-mt-sm">
             <q-avatar>
-              <img
-                :src="
-                  mv.staffCd == 1
-                    ? '../assets/legoman_profile.jpg'
-                    : '../assets/yosao.png'
-                "
-              />
+              <img src="../assets/legoman_profile.jpg" v-if="mv.staffCd == 1" />
+              <img src="../assets/yosao.png" v-else />
             </q-avatar>
             <span class="q-ml-sm">{{ mv.staffName }}</span>
           </div>
