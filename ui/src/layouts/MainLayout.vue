@@ -329,6 +329,10 @@ function usePage(router: Router) {
     },
     {
       title: '動画',
+      url: '/movieList',
+    },
+    {
+      title: 'オサム・ザ・ムービー',
       url: '/movie',
     },
   ] as PageState[]);
