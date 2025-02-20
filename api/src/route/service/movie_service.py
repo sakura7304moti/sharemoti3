@@ -65,7 +65,10 @@ def search_movie(keyword: str, hashtag: str, page_no: int, page_size: int):
     df = movie.search(keyword, hashtag, page_no, page_size)
     total_count = movie.search_total_count(keyword, hashtag, page_size)
     id_list = df["id"].to_list()
-    hashtag_df = movie.get_movie_hashtags(id_list)
+    if len(id_list) == 0:
+        hashtag_df = pd.DataFrame(columns=["movieId", "name", "isGroup"])
+    else:
+        hashtag_df = movie.get_movie_hashtags(id_list)
     return df, total_count, hashtag_df
 
 

@@ -10,6 +10,7 @@ export function useMovieModel() {
     keyword: '',
     hashtag: '',
     mode: 1,
+    isGroup: false,
   } as SearchCondition);
   const hashtags = ref([] as string[]);
 
@@ -100,6 +101,7 @@ interface SearchCondition {
   keyword: string | null;
   hashtag: string | null;
   mode: number;
+  isGroup: boolean;
 }
 interface DataState {
   id: number;

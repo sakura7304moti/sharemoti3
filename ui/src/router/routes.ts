@@ -103,6 +103,13 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/movieList',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/MovieListPage.vue') },
+    ],
+  },
+  {
     path: '/movie',
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: () => import('pages/MoviePage.vue') }],
