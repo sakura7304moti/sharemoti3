@@ -10,6 +10,7 @@ Blueprint import
 """
 # main
 from src.route import wordList_route
+from src.route import word_collection_route
 from src.route import nameList_route
 from src.route import nameList2_route
 from src.route import yakiList_route
@@ -53,6 +54,7 @@ register blueprint
 """
 # main
 app.register_blueprint(wordList_route.app)
+app.register_blueprint(word_collection_route.app)
 app.register_blueprint(nameList_route.app)
 app.register_blueprint(nameList2_route.app)
 app.register_blueprint(yakiList_route.app)

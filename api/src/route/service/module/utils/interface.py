@@ -918,3 +918,18 @@ class Movie:
             "thumbnailFlg": self.thumbnail_flg,
             "staffCd": self.staff_cd,
         }
+
+
+class SearchWordCellectionCondition:
+    def __init__(self, keyword: str, date_order: bool, text_order: bool, kinen: int):
+        self.keyword = keyword
+        self.date_order = date_order
+        self.text_order = text_order
+        self.kinen = kinen
+
+    def to_args(self):
+        return {
+            "keyword": self.keyword,
+            "kinenBefore": max(self.kinen - 500, 0),
+            "kinenAfter": self.kinen,
+        }
