@@ -1,18 +1,9 @@
 <template>
   <q-page class="">
-    <div class="text-h6">名言コレクション</div>
-    <div class="q-mb-md">
-      <div class="text-subtitle1">
-        <span class="text-bold">なにかおもろい感じにしたい...</span>
-      </div>
-      <img
-        src="../assets/gottu_eyan.png"
-        style="height: 150px; width: 150px; object-fit: contain"
-      />
-    </div>
+    <div class="text-h6 q-mb-sm">名言コレクション</div>
     <!--検索枠-->
     <q-form @submit.prevent="searchWord">
-      <div class="search-form">
+      <div class="search-form q-mb-sm">
         <div class="row q-gutter-md wrap q-mb-md">
           <!--検索条件 キーワード-->
           <div>
@@ -34,14 +25,32 @@
             </div>
             <q-radio
               v-model="searchCondition.dateOrder"
+              val=""
+              label="未指定"
+              class="q-mr-sm"
+              @update:model-value="
+                resetTextOrder();
+                searchWord();
+              "
+            />
+            <q-radio
+              v-model="searchCondition.dateOrder"
               val="desc"
               label="新しい順"
               class="q-mr-sm"
+              @update:model-value="
+                resetTextOrder();
+                searchWord();
+              "
             />
             <q-radio
               v-model="searchCondition.dateOrder"
               val="asc"
               label="古い順"
+              @update:model-value="
+                resetTextOrder();
+                searchWord();
+              "
             />
           </div>
 
@@ -52,14 +61,32 @@
             </div>
             <q-radio
               v-model="searchCondition.textOrder"
-              val="desc"
-              label="0123..."
+              val=""
+              label="未指定"
               class="q-mr-sm"
+              @update:model-value="
+                resetDateOrder();
+                searchWord();
+              "
             />
             <q-radio
               v-model="searchCondition.textOrder"
               val="asc"
+              label="0123..."
+              class="q-mr-sm"
+              @update:model-value="
+                resetDateOrder();
+                searchWord();
+              "
+            />
+            <q-radio
+              v-model="searchCondition.textOrder"
+              val="desc"
               label="漢字から..."
+              @update:model-value="
+                resetDateOrder();
+                searchWord();
+              "
             />
           </div>
 
@@ -76,18 +103,37 @@
               class="bg-white"
               clearable
               style="min-width: 100px"
+              @update:model-value="searchWord()"
             />
           </div>
         </div>
-        <div style="max-width: 710px" class="text-right">
-          <q-btn label="検索" icon="search" color="primary" type="submit" />
+        <div style="max-width: 890px" class="text-right">
+          <q-btn
+            label="検索"
+            icon="search"
+            color="primary"
+            type="submit"
+            :loading="load.search"
+          />
+          <span class="q-ml-md text-subtitle2">{{ records.length }}件</span>
         </div>
       </div>
     </q-form>
 
     <!--検索結果-->
     <div>
-      <div v-for="rec in records" :key="rec.id" style="margin-bottom: 32px">
+      <div
+        v-for="rec in records"
+        :key="rec.id"
+        style="margin-bottom: 32px; max-width: 800px"
+      >
+        <div
+          class="q-mt-sm"
+          v-if="searchCondition.kinen != null && !load.search"
+          style="font-size: 16px"
+        >
+          {{ rec.id }}
+        </div>
         <div
           style="
             text-align: left;
@@ -100,14 +146,19 @@
         </div>
         <div
           style="
+            margin-left: 16px;
             text-align: left;
             white-space: pre-wrap;
             word-wrap: break-word;
-            font-size: 16px;
+            font-size: 14px;
           "
         >
           {{ rec.detail }}
         </div>
+        <div class="text-right text-grey">
+          {{ rec.updateAt > rec.createAt ? rec.updateAt : rec.createAt }}
+        </div>
+        <hr color="#D3D3D3" />
       </div>
     </div>
 
@@ -144,6 +195,13 @@ export default defineComponent({
     getKinenList();
     searchWord();
 
+    const resetDateOrder = function () {
+      searchCondition.value.dateOrder = '';
+    };
+    const resetTextOrder = function () {
+      searchCondition.value.textOrder = '';
+    };
+
     const isShowTopButton = ref(false);
     const onTopScrollClick = function () {
       // スムーズにページのトップに戻る
@@ -168,16 +226,19 @@ export default defineComponent({
       // scroll
       isShowTopButton,
       onTopScrollClick,
+      // search
+      resetDateOrder,
+      resetTextOrder,
     };
   },
 });
 </script>
 <style>
-@media (max-width: 600px) {
-  .search-form {
-    background-color: white;
-    border-radius: 10px;
-    padding: 16px;
-  }
+.search-form {
+  background-color: white;
+  border-radius: 10px;
+  padding: 16px;
+  max-width: 930px;
+  width: 100%;
 }
 </style>

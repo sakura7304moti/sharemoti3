@@ -20,8 +20,8 @@ export function useWordCollectionModel() {
 
   const searchCondition = ref({
     keyword: '',
-    dateOrder: 'desc',
-    textOrder: 'desc',
+    dateOrder: '',
+    textOrder: '',
     kinen: null,
   } as ConditionState);
 
@@ -33,8 +33,8 @@ export function useWordCollectionModel() {
     await wordCollectionApi
       .searchWord({
         keyword: searchCondition.value.keyword ?? '',
-        dateOrder: searchCondition.value.dateOrder ?? 'desc',
-        textOrder: searchCondition.value.textOrder ?? 'desc',
+        dateOrder: searchCondition.value.dateOrder ?? '',
+        textOrder: searchCondition.value.textOrder ?? '',
         kinen: searchCondition.value.kinen ?? 0,
       })
       .then((response) => {

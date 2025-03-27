@@ -921,7 +921,7 @@ class Movie:
 
 
 class SearchWordCellectionCondition:
-    def __init__(self, keyword: str, date_order: bool, text_order: bool, kinen: int):
+    def __init__(self, keyword: str, date_order: str, text_order: str, kinen: int):
         self.keyword = keyword
         self.date_order = date_order
         self.text_order = text_order

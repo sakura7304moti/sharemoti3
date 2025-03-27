@@ -14,8 +14,8 @@ app = Blueprint("word_collection", __name__)
 def to_search_condition():
     json = request.json
     keyword = json.get("keyword", "")
-    date_order = json.get("dateOrder", "desc") == "desc"
-    text_order = json.get("textOrder", "desc") == "desc"
+    date_order = json.get("dateOrder", "")
+    text_order = json.get("textOrder", "")
     kinen = int(json.get("kinen", "0"))
     return interface.SearchWordCellectionCondition(
         keyword=keyword, date_order=date_order, text_order=text_order, kinen=kinen
