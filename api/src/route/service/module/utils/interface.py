@@ -929,7 +929,7 @@ class SearchWordCellectionCondition:
 
     def to_args(self):
         return {
-            "keyword": self.keyword,
+            "keyword": f"%{self.keyword}%",
             "kinenBefore": max(self.kinen - 500, 0),
             "kinenAfter": self.kinen,
         }

@@ -281,6 +281,10 @@ function usePage(router: Router) {
       url: '/wordlist',
     },
     {
+      title: '名言コレクション',
+      url: '/wordCollection',
+    },
+    {
       title: 'あだ名一覧',
       url: '/namelist',
     },

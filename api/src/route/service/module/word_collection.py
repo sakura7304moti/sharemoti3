@@ -38,28 +38,30 @@ def search_word(condition: interface.SearchWordCellectionCondition):
         """
 
     if condition.kinen > 0:
-        query = """
+        query += """
+        -- 登録番号の範囲指定
         and wd.id IN (
             SELECT
-                s.id
+                s2.id
             FROM
-                sharemoti.word AS s
+                sharemoti.word AS s2
             WHERE
-                s.id BETWEEN %(kinenBefore)s and %(kinenAfter)s
+                s2.id BETWEEN %(kinenBefore)s AND %(kinenAfter)s
         )
         """
 
     query += " order by "
     if condition.date_order:
-        query += " wd.create_at desc "
+        query += " wd.create_at desc ,"
     else:
-        query += " wd.create_at asc "
+        query += " wd.create_at asc ,"
 
     if condition.text_order:
         query += " wd.word desc "
     else:
         query += " wd.word asc "
 
+    print(query)
     return query_model.execute_df(query, condition.to_args())
 
 
