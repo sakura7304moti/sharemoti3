@@ -88,6 +88,7 @@ interface DataState {
   id: number;
   word: string;
   detail: string;
+  wordRank: number;
   createAt: string;
   updateAt: string;
 }

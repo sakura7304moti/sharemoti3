@@ -928,8 +928,11 @@ class SearchWordCellectionCondition:
         self.kinen = kinen
 
     def to_args(self):
-        return {
+        args = {
             "keyword": f"%{self.keyword}%",
-            "kinenBefore": max(self.kinen - 500, 0),
+            "kinenBefore": max(self.kinen - 500, 0) + 1,
             "kinenAfter": self.kinen,
         }
+        if self.kinen == 0:
+            args["kinenAfter"] = 100000
+        return args

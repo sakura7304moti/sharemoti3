@@ -93,7 +93,10 @@
           <!--検索条件 記念-->
           <div>
             <div class="text-subtitle1">
-              <span class="text-bold">xxx回記念</span>
+              <span class="text-bold">
+                <span v-if="searchCondition.kinen == null"> xxx回記念 </span>
+                <span v-else> {{ searchCondition.kinen }}回記念！ </span>
+              </span>
             </div>
             <q-select
               v-model="searchCondition.kinen"
@@ -122,43 +125,29 @@
 
     <!--検索結果-->
     <div>
-      <div
-        v-for="rec in records"
-        :key="rec.id"
-        style="margin-bottom: 32px; max-width: 800px"
-      >
+      <div v-for="rec in records" :key="rec.id" class="search-card">
         <div
           class="q-mt-sm"
           v-if="searchCondition.kinen != null && !load.search"
           style="font-size: 16px"
         >
-          {{ rec.id }}
+          {{ rec.wordRank + searchCondition.kinen - 500 }}
         </div>
-        <div
-          style="
-            text-align: left;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-size: 24px;
-          "
-        >
-          {{ rec.word }}
+
+        <div class="word-space">
+          <div class="word">
+            {{ rec.word }}
+          </div>
         </div>
-        <div
-          style="
-            margin-left: 16px;
-            text-align: left;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            font-size: 14px;
-          "
-        >
-          {{ rec.detail }}
+        <div class="word-space q-ml-sm">
+          <div class="detail">
+            {{ rec.detail }}
+          </div>
         </div>
-        <div class="text-right text-grey">
+        <div class="text-right text-grey date">
           {{ rec.updateAt > rec.createAt ? rec.updateAt : rec.createAt }}
         </div>
-        <hr color="#D3D3D3" />
+        <q-separator />
       </div>
     </div>
 
@@ -240,5 +229,50 @@ export default defineComponent({
   padding: 16px;
   max-width: 930px;
   width: 100%;
+}
+/*
+@media (max-width: 800px) {
+  .scroll-to-top {
+    display: block;
+  }
+}*/
+.date {
+  font-size: 14px;
+  font-family: serif;
+}
+.word-space {
+  text-align: left;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: serif;
+  .word {
+    font-size: 24px;
+    font-weight: 550;
+  }
+  .detail {
+    font-size: 16px;
+  }
+}
+.search-card {
+  margin-bottom: 24px;
+  /*max-width: calc(min(800px, 100vw - 130px));*/
+  max-width: 800px;
+}
+@media (max-width: 800px) {
+  .word-space {
+    .word {
+      font-size: 20px;
+    }
+    .detail {
+      font-size: 14px;
+    }
+  }
+  .date {
+    font-size: 12px;
+  }
+
+  .search-card {
+    margin-bottom: 16px;
+  }
 }
 </style>

@@ -16,6 +16,7 @@ def search_word(condition: interface.SearchWordCellectionCondition):
         wd.id,
         wd.word,
         wd.detail,
+        rank() OVER (ORDER BY wd.id asc) as "wordRank",
         TO_CHAR(create_at, 'YYYY-MM-DD') as "createAt",
         TO_CHAR(update_at, 'YYYY-MM-DD') as "updateAt"
     FROM
@@ -41,12 +42,18 @@ def search_word(condition: interface.SearchWordCellectionCondition):
         query += """
         -- 登録番号の範囲指定
         and wd.id IN (
-            SELECT
-                s2.id
-            FROM
-                sharemoti.word AS s2
-            order by s2.id
-            offset %(kinenBefore)s limit 500
+            select
+                s3.id
+            from (
+                SELECT
+                    s2.id,
+                    rank() OVER (ORDER BY id asc) as "rn"
+                FROM
+                    sharemoti.word AS s2
+            ) as s3
+            where
+                s3."rn" >= %(kinenBefore)s and %(kinenAfter)s >= s3."rn"
+            
         )
         """
 
@@ -57,9 +64,9 @@ def search_word(condition: interface.SearchWordCellectionCondition):
         query += " wd.update_at desc "
 
     if condition.date_order == "desc" and condition.text_order == "":
-        query += " wd.create_at desc, wd.word asc "
+        query += " wd.id desc, wd.word asc "
     if condition.date_order == "asc" and condition.text_order == "":
-        query += " wd.create_at asc, wd.word asc "
+        query += " wd.id asc, wd.word asc "
 
     if condition.date_order == "" and condition.text_order == "desc":
         query += " wd.word desc "

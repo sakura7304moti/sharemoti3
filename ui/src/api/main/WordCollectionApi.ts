@@ -22,12 +22,14 @@ interface SearchRequest {
   keyword: string | null;
   dateOrder: string | null;
   textOrder: string | null;
+
   kinen: number | null;
 }
 interface WordState {
   id: number;
   word: string;
   detail: string;
+  wordRank: number;
   createAt: string;
   updateAt: string;
 }
