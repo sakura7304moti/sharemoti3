@@ -335,7 +335,8 @@ export default defineComponent({
   font-family: serif;
   .word {
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 700 !important;
+    color: black;
   }
   .detail {
     font-size: 16px;
