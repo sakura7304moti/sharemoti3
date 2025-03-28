@@ -70,9 +70,9 @@ def search_word(condition: interface.SearchWordCellectionCondition):
         query += " wd.update_at desc "
 
     if condition.date_order == "desc" and condition.text_order == "":
-        query += " wd.id desc, wd.word asc "
+        query += " wd.update_at desc, wd.word asc "
     if condition.date_order == "asc" and condition.text_order == "":
-        query += " wd.id asc, wd.word asc "
+        query += " wd.update_at asc, wd.word asc "
 
     if condition.date_order == "" and condition.text_order == "desc":
         query += " wd.word desc "
