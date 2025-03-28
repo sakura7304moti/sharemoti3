@@ -94,8 +94,8 @@
           <div>
             <div class="text-subtitle1">
               <span class="text-bold">
-                <span v-if="searchCondition.kinen == null"> xxx回記念 </span>
-                <span v-else> {{ searchCondition.kinen }}回記念！ </span>
+                <span v-if="searchCondition.kinen == null"> xxxこ記念 </span>
+                <span v-else> {{ searchCondition.kinen }}こ記念！ </span>
               </span>
             </div>
             <q-select
@@ -125,29 +125,44 @@
 
     <!--検索結果-->
     <div>
-      <div v-for="rec in records" :key="rec.id" class="search-card">
+      <div v-for="(rec, index) in records" :key="rec.id" class="search-card">
+        <!--日付表示用-->
+        <div v-if="isDateDisplay()">
+          <!--日付異なるよ条件 ・前回の行と比較して作成日が異なれば日付を表示する-->
+          <div
+            v-if="
+              records[index].updateAt !=
+                records[Math.max(index - 1, 0)].updateAt || index == 0
+            "
+          >
+            <div class="last-date">{{ formatDateWithDay(rec.updateAt) }}</div>
+          </div>
+        </div>
+        <!--記念用の連番-->
         <div
-          class="q-mt-sm"
+          class="q-mt-sm no"
+          :class="{ 'q-ml-sm': isDateDisplay() }"
           v-if="searchCondition.kinen != null && !load.search"
-          style="font-size: 16px"
         >
           {{ rec.wordRank + searchCondition.kinen - 500 }}
         </div>
 
-        <div class="word-space">
-          <div class="word">
-            {{ rec.word }}
+        <div :class="{ 'q-ml-sm': isDateDisplay() }">
+          <div class="word-space">
+            <div class="word">
+              {{ rec.word }}
+            </div>
           </div>
-        </div>
-        <div class="word-space q-ml-sm">
-          <div class="detail">
-            {{ rec.detail }}
+          <div class="word-space q-ml-sm">
+            <div class="detail">
+              {{ rec.detail }}
+            </div>
           </div>
+          <div class="text-right text-grey date" v-if="!isDateDisplay()">
+            {{ rec.updateAt > rec.createAt ? rec.updateAt : rec.createAt }}
+          </div>
+          <q-separator />
         </div>
-        <div class="text-right text-grey date">
-          {{ rec.updateAt > rec.createAt ? rec.updateAt : rec.createAt }}
-        </div>
-        <q-separator />
       </div>
     </div>
 
@@ -205,6 +220,35 @@ export default defineComponent({
     };
 
     window.addEventListener('scroll', checkTopButton);
+
+    function formatDateWithDay(dateStr: string): string {
+      // 曜日つきの日付に変換
+      const date = new Date(`${dateStr}T00:00:00+09:00`);
+      const daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
+      const dayOfWeek = daysOfWeek[date.getDay()];
+      return `${dateStr} (${dayOfWeek})`;
+    }
+
+    function isDateDisplay() {
+      if (
+        searchCondition.value.kinen != null &&
+        searchCondition.value.textOrder == '' &&
+        searchCondition.value.dateOrder == ''
+      ) {
+        return false;
+      }
+      return searchCondition.value.textOrder == '';
+
+      return (
+        searchCondition.value.textOrder == '' || // &&
+        //searchCondition.value.kinen == null
+        (searchCondition.value.kinen != null &&
+          searchCondition.value.textOrder == '' &&
+          (searchCondition.value.dateOrder == 'desc' ||
+            searchCondition.value.dateOrder == 'asc'))
+      );
+    }
+
     return {
       load,
       searchCondition,
@@ -218,6 +262,9 @@ export default defineComponent({
       // search
       resetDateOrder,
       resetTextOrder,
+      // date display
+      formatDateWithDay,
+      isDateDisplay,
     };
   },
 });
@@ -237,6 +284,16 @@ export default defineComponent({
   }
 }*/
 .date {
+  font-size: 14px;
+  font-family: serif;
+}
+.last-date {
+  font-size: 24px;
+  color: rgb(0, 167, 137);
+  font-family: serif;
+  margin-bottom: 8px;
+}
+.no {
   font-size: 14px;
   font-family: serif;
 }
