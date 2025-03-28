@@ -57,6 +57,12 @@ def search_word(condition: interface.SearchWordCellectionCondition):
         )
         """
 
+    if condition.year > 0:
+        query += """
+        -- 更新日の年指定
+        and EXTRACT(year from wd.create_at) = %(year)s 
+        """
+
     query += "  order by "
     if condition.date_order != "" and condition.text_order != "":
         query += " wd.update_at desc "
@@ -90,3 +96,14 @@ def get_kinen_count():
     # 600 -> 1 -> 500
     # 1200 -> 2 -> 500, 1000
     return [(c + 1) * 500 for c in range(count)]
+
+
+def get_word_years():
+    query = """
+    SELECT
+        distinct(EXTRACT(year from create_at)) as "year"
+    from sharemoti.word
+    order by "year" desc
+    """
+    df = query_model.execute_df(query)
+    return df["year"].tolist()

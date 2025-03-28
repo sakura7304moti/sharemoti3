@@ -921,17 +921,21 @@ class Movie:
 
 
 class SearchWordCellectionCondition:
-    def __init__(self, keyword: str, date_order: str, text_order: str, kinen: int):
+    def __init__(
+        self, keyword: str, date_order: str, text_order: str, kinen: int, year: int
+    ):
         self.keyword = keyword
         self.date_order = date_order
         self.text_order = text_order
         self.kinen = kinen
+        self.year = year
 
     def to_args(self):
         args = {
             "keyword": f"%{self.keyword}%",
             "kinenBefore": max(self.kinen - 500, 0) + 1,
             "kinenAfter": self.kinen,
+            "year": self.year,
         }
         if self.kinen == 0:
             args["kinenAfter"] = 100000

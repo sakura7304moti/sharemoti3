@@ -23,10 +23,12 @@ export function useWordCollectionModel() {
     dateOrder: '',
     textOrder: '',
     kinen: null,
+    year: null,
   } as ConditionState);
 
   const records = ref([] as DataState[]);
   const kinenList = ref([] as number[]);
+  const yearList = ref([] as number[]);
 
   const searchWord = async function () {
     load.value.search = true;
@@ -36,6 +38,7 @@ export function useWordCollectionModel() {
         dateOrder: searchCondition.value.dateOrder ?? '',
         textOrder: searchCondition.value.textOrder ?? '',
         kinen: searchCondition.value.kinen ?? 0,
+        year: searchCondition.value.year ?? 0,
       })
       .then((response) => {
         if (response) {
@@ -64,13 +67,24 @@ export function useWordCollectionModel() {
     });
   };
 
+  const getYearList = async function () {
+    await wordCollectionApi.getYears().then((response) => {
+      if (response) {
+        console.log('year response', response);
+        yearList.value = response;
+      }
+    });
+  };
+
   return {
     load,
     searchCondition,
     records,
     kinenList,
+    yearList,
     searchWord,
     getKinenList,
+    getYearList,
   };
 }
 interface LoadState {
@@ -83,6 +97,7 @@ interface ConditionState {
   dateOrder: string | null;
   textOrder: string | null;
   kinen: number | null;
+  year: number | null;
 }
 interface DataState {
   id: number;

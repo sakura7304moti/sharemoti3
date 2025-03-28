@@ -17,8 +17,13 @@ def to_search_condition():
     date_order = json.get("dateOrder", "")
     text_order = json.get("textOrder", "")
     kinen = int(json.get("kinen", "0"))
+    year = int(json.get("year", "0"))
     return interface.SearchWordCellectionCondition(
-        keyword=keyword, date_order=date_order, text_order=text_order, kinen=kinen
+        keyword=keyword,
+        date_order=date_order,
+        text_order=text_order,
+        kinen=kinen,
+        year=year,
     )
 
 
@@ -33,4 +38,10 @@ def word_collection_search():
 @app.route("/wordCollection/kinen", methods=["GET"])
 def word_collection_kinen():
     ls = service.get_kinen_count()
+    return jsonify(ls)
+
+
+@app.route("/wordCollection/year", methods=["GET"])
+def word_collection_years():
+    ls = service.get_word_year()
     return jsonify(ls)

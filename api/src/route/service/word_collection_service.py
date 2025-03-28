@@ -14,3 +14,10 @@ def get_kinen_count():
     500n記念の数を取得
     """
     return word_collection.get_kinen_count()
+
+
+def get_word_year():
+    """
+    名言集の年のリストを取得
+    """
+    return word_collection.get_word_years()

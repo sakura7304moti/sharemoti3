@@ -106,11 +106,37 @@
               class="bg-white"
               clearable
               style="min-width: 100px"
-              @update:model-value="searchWord()"
+              @update:model-value="
+                resetYear();
+                searchWord();
+              "
+            />
+          </div>
+
+          <!--検索条件 年-->
+          <div>
+            <div class="text-subtitle1">
+              <span class="text-bold">
+                <span v-if="searchCondition.year == null"> 20xx年 </span>
+                <span v-else> {{ searchCondition.year }}年まとめ！ </span>
+              </span>
+            </div>
+            <q-select
+              v-model="searchCondition.year"
+              :options="yearList"
+              dense
+              outlined
+              class="bg-white"
+              clearable
+              style="min-width: 100px"
+              @update:model-value="
+                resetKinen();
+                searchWord();
+              "
             />
           </div>
         </div>
-        <div style="max-width: 890px" class="text-right">
+        <div style="max-width: 1065px" class="text-right">
           <q-btn
             label="検索"
             icon="search"
@@ -193,10 +219,13 @@ export default defineComponent({
       searchCondition,
       records,
       kinenList,
+      yearList,
       searchWord,
       getKinenList,
+      getYearList,
     } = useWordCollectionModel();
     getKinenList();
+    getYearList();
     searchWord();
 
     const resetDateOrder = function () {
@@ -204,6 +233,12 @@ export default defineComponent({
     };
     const resetTextOrder = function () {
       searchCondition.value.textOrder = '';
+    };
+    const resetKinen = function () {
+      searchCondition.value.kinen = null;
+    };
+    const resetYear = function () {
+      searchCondition.value.year = null;
     };
 
     const isShowTopButton = ref(false);
@@ -230,6 +265,7 @@ export default defineComponent({
     }
 
     function isDateDisplay() {
+      // 緑色の日付の表示フラグ
       if (
         searchCondition.value.kinen != null &&
         searchCondition.value.textOrder == '' &&
@@ -238,15 +274,6 @@ export default defineComponent({
         return false;
       }
       return searchCondition.value.textOrder == '';
-
-      return (
-        searchCondition.value.textOrder == '' || // &&
-        //searchCondition.value.kinen == null
-        (searchCondition.value.kinen != null &&
-          searchCondition.value.textOrder == '' &&
-          (searchCondition.value.dateOrder == 'desc' ||
-            searchCondition.value.dateOrder == 'asc'))
-      );
     }
 
     return {
@@ -254,14 +281,18 @@ export default defineComponent({
       searchCondition,
       records,
       kinenList,
+      yearList,
       searchWord,
       getKinenList,
+      getYearList,
       // scroll
       isShowTopButton,
       onTopScrollClick,
       // search
       resetDateOrder,
       resetTextOrder,
+      resetKinen,
+      resetYear,
       // date display
       formatDateWithDay,
       isDateDisplay,
@@ -274,7 +305,7 @@ export default defineComponent({
   background-color: white;
   border-radius: 10px;
   padding: 16px;
-  max-width: 930px;
+  max-width: 1130px;
   width: 100%;
 }
 /*
